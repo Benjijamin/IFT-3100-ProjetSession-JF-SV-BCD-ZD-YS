@@ -7,6 +7,12 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ofApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="menu.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -15,8 +21,29 @@
     <Filter Include="src">
       <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="addons">
+      <UniqueIdentifier>{C3F006F4--6B4-C-46-23-A-C77-AAFFB33B0DA2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxImGui">
+      <UniqueIdentifier>{C6C59859--703-1-42-79-B-554-CCD417677BA1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxImGui\src">
+      <UniqueIdentifier>{94D0B540--7FA-1-48-5B-9-A05-BDC044BEE459}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxImGui\libs">
+      <UniqueIdentifier>{4E457C67--05D-C-42-31-8-3E1-4DE16E56D7A2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxImGui\libs\imgui">
+      <UniqueIdentifier>{370533EB--C32-1-44-7B-9-D57-0D77578048C3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="addons\ofxImGui\libs\imgui\src">
+      <UniqueIdentifier>{3659B43A--EE2-E-43-DB-B-A22-48756C0A9546}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ofApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>

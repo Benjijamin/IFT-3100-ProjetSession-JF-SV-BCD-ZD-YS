@@ -1,8 +1,11 @@
 #include "ofApp.h"
+#include "ofxImGui.h"
+
+ofxImGui::Gui gui;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-
+	gui.setup();
 }
 
 //--------------------------------------------------------------
@@ -12,7 +15,11 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	gui.begin();
+	
+	menuBar();
 
+	gui.end();
 }
 
 //--------------------------------------------------------------
@@ -68,4 +75,29 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+void ofApp::menuBar() 
+{
+	//MenuBar
+
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("Test"))
+		{
+			if (ImGui::MenuItem("1"))
+			{
+				ofLog() << "test1";
+			}
+
+			if (ImGui::MenuItem("2"))
+			{
+				ofLog() << "test2";
+			}
+
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+	}
 }

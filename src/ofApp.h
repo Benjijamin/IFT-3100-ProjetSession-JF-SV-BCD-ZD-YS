@@ -9,6 +9,9 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
 
+		//Couleur qui est pris du colorPicker
+		float pickedColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y );
@@ -21,5 +24,9 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 	private:
+		bool showColorPicker = false;
+		int colorPickerDisplay = 1;
+
 		void menuBar();
+		void colorPicker();
 };

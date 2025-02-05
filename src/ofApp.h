@@ -1,32 +1,34 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ImageEditor.h"
+#include "ofxImGui.h"
 
-class ofApp : public ofBaseApp{
+class ofApp : public ofBaseApp {
+public:
+    void setup();
+    void update();
+    void draw();
+    void exit();
 
-	public:
-		void setup();
-		void update();
-		void draw();
+    void keyPressed(int key);
+    void keyReleased(int key);
+    void mouseMoved(int x, int y);
+    void mouseDragged(int x, int y, int button);
+    void mouseScrolled(int x, int y, float scrollX, float scrollY);
+    void mousePressed(int x, int y, int button);
+    void mouseReleased(int x, int y, int button);
+    void mouseEntered(int x, int y);
+    void mouseExited(int x, int y);
+    void windowResized(int w, int h);
+    void dragEvent(ofDragInfo dragInfo);
+    void gotMessage(ofMessage msg);
 
-		//Couleur qui est pris du colorPicker
-		float pickedColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+private:
+    void createFileWindow();
+    void openImage();
+    void saveImage();
 
-		void keyPressed(int key);
-		void keyReleased(int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void mouseEntered(int x, int y);
-		void mouseExited(int x, int y);
-		void windowResized(int w, int h);
-		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
-	private:
-		bool showColorPicker = false;
-		int colorPickerDisplay = 1;
-
-		void menuBar();
-		void colorPicker();
+    ImageEditor imageEditor;
+    ofxImGui::Gui gui;
 };

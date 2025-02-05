@@ -104,9 +104,6 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\ofApp.cpp" />
-    <ClCompile Include="src\menu.cpp" />
     <ClCompile Include="..\..\..\addons\ofxImGui\src\BaseEngine.cpp" />
     <ClCompile Include="..\..\..\addons\ofxImGui\src\DefaultTheme.cpp" />
     <ClCompile Include="..\..\..\addons\ofxImGui\src\EngineGLFW.cpp" />
@@ -119,10 +116,11 @@
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_demo.cpp" />
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_widgets.cpp" />
+    <ClCompile Include="src\ImageEditor.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\ofApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ofApp.h" />
-    <ClInclude Include="src\menu.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\src\BaseEngine.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\src\BaseTheme.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\src\DefaultTheme.h" />
@@ -139,6 +137,8 @@
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_textedit.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_truetype.h" />
+    <ClInclude Include="src\ImageEditor.h" />
+    <ClInclude Include="src\ofApp.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

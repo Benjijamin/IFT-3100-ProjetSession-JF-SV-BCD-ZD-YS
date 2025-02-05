@@ -5,7 +5,11 @@
 
 class AssetBrowser {
 public:
+    void setup();
+    void update();
+    void draw();
     void drawGui();
+    void exit();
 
     void addAsset(const std::string& assetPath);
     void removeAsset(const std::string& asset);

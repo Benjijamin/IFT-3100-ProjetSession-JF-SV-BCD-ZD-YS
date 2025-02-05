@@ -5,6 +5,7 @@
 #include "ImageEditor.h"
 #include "ModelEditor.h"
 #include "AssetBrowser.h"
+#include "ScreenCapture.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -35,6 +36,8 @@ private:
     ImageEditor imageEditor;
     ModelEditor modelEditor;
     AssetBrowser assetBrowser;
+    ScreenCapture screenCapture;
+
     enum class EditorType { Image, Model };
     EditorType currentEditor;
 };

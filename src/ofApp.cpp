@@ -6,6 +6,7 @@ void ofApp::setup() {
 
     imageEditor.setup();
     modelEditor.setup();
+    screenCapture.setup();
 
     currentEditor = EditorType::Image;
 
@@ -23,6 +24,8 @@ void ofApp::update() {
 }
 
 void ofApp::draw() {
+    screenCapture.draw();
+
     gui.begin();
 
     if (currentEditor == EditorType::Image) {
@@ -33,6 +36,7 @@ void ofApp::draw() {
     }
 
     assetBrowser.drawGui();
+    screenCapture.drawGui();
 
     if (currentEditor == EditorType::Image) {
         imageEditor.drawGui();
@@ -47,6 +51,7 @@ void ofApp::draw() {
 void ofApp::exit() {
     imageEditor.exit();
     modelEditor.exit();
+    screenCapture.exit();
 }
 
 void ofApp::keyPressed(int key) {

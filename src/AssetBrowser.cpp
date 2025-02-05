@@ -3,6 +3,18 @@
 
 namespace fs = std::filesystem;
 
+void AssetBrowser::setup() {
+
+}
+
+void AssetBrowser::update() {
+
+}
+
+void AssetBrowser::draw() {
+
+}
+
 void AssetBrowser::drawGui() {
     ImGui::Begin("Asset Browser");
 
@@ -30,6 +42,10 @@ void AssetBrowser::drawGui() {
     }
 
     ImGui::End();
+}
+
+void AssetBrowser::exit() {
+
 }
 
 void AssetBrowser::addAsset(const std::string& assetPath) {

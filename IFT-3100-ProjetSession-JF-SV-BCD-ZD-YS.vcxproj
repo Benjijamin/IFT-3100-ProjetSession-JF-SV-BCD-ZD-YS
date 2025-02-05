@@ -104,11 +104,12 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\AssetBrowser.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\ModelEditor.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
+    <ClCompile Include="src\AssetBrowser.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
+    <ClCompile Include="src\ModelEditor.cpp" />
+    <ClCompile Include="src\ScreenCapture.cpp" />
     <ClCompile Include="..\..\..\addons\ofxAssimpModelLoader\src\ofxAssimpAnimation.cpp" />
     <ClCompile Include="..\..\..\addons\ofxAssimpModelLoader\src\ofxAssimpMeshHelper.cpp" />
     <ClCompile Include="..\..\..\addons\ofxAssimpModelLoader\src\ofxAssimpModelLoader.cpp" />
@@ -127,10 +128,11 @@
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\AssetBrowser.h" />
-    <ClInclude Include="src\ModelEditor.h" />
     <ClInclude Include="src\ofApp.h" />
+    <ClInclude Include="src\AssetBrowser.h" />
     <ClInclude Include="src\ImageEditor.h" />
+    <ClInclude Include="src\ModelEditor.h" />
+    <ClInclude Include="src\ScreenCapture.h" />
     <ClInclude Include="..\..\..\addons\ofxAssimpModelLoader\src\ofxAssimpAnimation.h" />
     <ClInclude Include="..\..\..\addons\ofxAssimpModelLoader\src\ofxAssimpMeshHelper.h" />
     <ClInclude Include="..\..\..\addons\ofxAssimpModelLoader\src\ofxAssimpModelLoader.h" />

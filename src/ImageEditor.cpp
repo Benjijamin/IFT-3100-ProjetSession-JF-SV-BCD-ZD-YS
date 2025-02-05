@@ -14,6 +14,7 @@ void ImageEditor::setup() {
 }
 
 void ImageEditor::update() {
+
 }
 
 void ImageEditor::draw() {

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ImageEditor.h"
 #include "ofxImGui.h"
+#include "ImageEditor.h"
+#include "ModelEditor.h"
+#include "AssetBrowser.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -25,10 +27,14 @@ public:
     void gotMessage(ofMessage msg);
 
 private:
-    void createFileWindow();
-    void openImage();
-    void saveImage();
+    void switchEditor();
+    void handleAssetSelection();
+    void handleAssetDeletion();
 
-    ImageEditor imageEditor;
     ofxImGui::Gui gui;
+    ImageEditor imageEditor;
+    ModelEditor modelEditor;
+    AssetBrowser assetBrowser;
+    enum class EditorType { Image, Model };
+    EditorType currentEditor;
 };

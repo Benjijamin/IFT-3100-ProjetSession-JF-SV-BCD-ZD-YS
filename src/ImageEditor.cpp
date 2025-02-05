@@ -1,18 +1,19 @@
 #include "ImageEditor.h"
 
 void ImageEditor::setup() {
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+
     currentImage = new ofImage();
     panOffset.set(0, 0);
     zoomFactor = 1.0f;
     isDrawing = false;
     drawRadius = 10;
-    drawColor = ofColor(255, 0, 0); // Default draw color
-
-    currentTool = Tool::PanZoom; // Default tool
+    drawColor = ofColor(255, 0, 0);
+    currentTool = Tool::PanZoom;
 }
 
 void ImageEditor::update() {
-    
 }
 
 void ImageEditor::draw() {
@@ -20,36 +21,32 @@ void ImageEditor::draw() {
         currentImage->draw(panOffset.x, panOffset.y, currentImage->getWidth() * zoomFactor, currentImage->getHeight() * zoomFactor);
     }
 
-    if (currentTool == Tool::CopyRegion) {
-        if (isDragging) {
-            ofVec2f corner1 = dragStartPos;
-            ofVec2f corner2 = ofVec2f(ofGetMouseX(), ofGetMouseY());
+    if (currentTool == Tool::CopyRegion && isDragging) {
+        ofVec2f corner1 = dragStartPos;
+        ofVec2f corner2 = ofVec2f(ofGetMouseX(), ofGetMouseY());
 
-            int x = std::min(corner1.x, corner2.x);
-            int y = std::min(corner1.y, corner2.y);
-            int width = std::abs(corner2.x - corner1.x);
-            int height = std::abs(corner2.y - corner1.y);
+        int x = std::min(corner1.x, corner2.x);
+        int y = std::min(corner1.y, corner2.y);
+        int width = std::abs(corner2.x - corner1.x);
+        int height = std::abs(corner2.y - corner1.y);
 
-            ofPushStyle();
-            ofSetColor(0, 122, 204, 128);
-            ofNoFill();
-            ofDrawRectangle(x, y, width, height);
-            ofPopStyle();
-        }
+        ofPushStyle();
+        ofSetColor(0, 122, 204, 128);
+        ofNoFill();
+        ofDrawRectangle(x, y, width, height);
+        ofPopStyle();
     }
-    else if (currentTool == Tool::PasteRegion) {
-        if (copiedRegion.isAllocated()) {
-            int x = ofGetMouseX();
-            int y = ofGetMouseY();
-            int width = copiedRegion.getWidth() * zoomFactor;
-            int height = copiedRegion.getHeight() * zoomFactor;
+    else if (currentTool == Tool::PasteRegion && copiedRegion.isAllocated()) {
+        int x = ofGetMouseX();
+        int y = ofGetMouseY();
+        int width = copiedRegion.getWidth() * zoomFactor;
+        int height = copiedRegion.getHeight() * zoomFactor;
 
-            ofPushStyle();
-            ofSetColor(128, 128, 128, 128);
-            ofFill();
-            ofDrawRectangle(x, y, width, height);
-            ofPopStyle();
-        }
+        ofPushStyle();
+        ofSetColor(128, 128, 128, 128);
+        ofFill();
+        ofDrawRectangle(x, y, width, height);
+        ofPopStyle();
     }
 }
 
@@ -61,25 +58,21 @@ void ImageEditor::drawGui() {
     }
 
     ImGui::SameLine();
-
     if (ImGui::Button("Circle")) {
         currentTool = Tool::Circle;
     }
 
     ImGui::SameLine();
-
     if (ImGui::Button("Square")) {
         currentTool = Tool::Square;
     }
 
     ImGui::SameLine();
-
     if (ImGui::Button("Copy Region")) {
         currentTool = Tool::CopyRegion;
     }
 
     ImGui::SameLine();
-
     if (ImGui::Button("Paste Region")) {
         currentTool = Tool::PasteRegion;
     }
@@ -102,6 +95,69 @@ void ImageEditor::exit() {
     currentImage = nullptr;
 }
 
+void ImageEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
+    if (currentTool == Tool::PanZoom) {
+        zoomImage(1.0f + scrollY * 0.1f, x, y);
+    }
+}
+
+void ImageEditor::mouseDragged(int x, int y, int button) {
+    ofVec2f p = screenToPixelCoords(ofVec2f(x, y));
+
+    switch (currentTool) {
+    case Tool::PanZoom:
+        panImage(x - dragStartPos.x, y - dragStartPos.y);
+        dragStartPos = ofVec2f(x, y);
+        break;
+    case Tool::Circle:
+        drawCircle(p.x, p.y);
+        break;
+    case Tool::Square:
+        drawSquare(p.x, p.y);
+        break;
+    default:
+        break;
+    }
+}
+
+void ImageEditor::mousePressed(int x, int y, int button) {
+    dragStartPos.set(x, y);
+    isDragging = true;
+
+    if (currentTool == Tool::PasteRegion) {
+        ofVec2f p = screenToPixelCoords(ofVec2f(x, y));
+        pasteRegion(p.x, p.y);
+    }
+}
+
+void ImageEditor::mouseReleased(int x, int y, int button) {
+    dragEndPos.set(x, y);
+    isDragging = false;
+
+    if (currentTool == Tool::CopyRegion) {
+        ofVec2f start = screenToPixelCoords(dragStartPos);
+        ofVec2f end = screenToPixelCoords(dragEndPos);
+        copyRegion(start.x, start.y, end.x, end.y);
+    }
+}
+
+void ImageEditor::loadImage(const std::string& path) {
+    if (currentImage) {
+        currentImage->load(path);
+    }
+    else {
+        currentImage = new ofImage();
+        currentImage->load(path);
+    }
+    adjustZoomAndPan();
+}
+
+void ImageEditor::saveImage(const std::string& path) const {
+    if (isImageAllocated()) {
+        currentImage->save(path);
+    }
+}
+
 void ImageEditor::panImage(float dx, float dy) {
     panOffset.x += dx;
     panOffset.y += dy;
@@ -121,6 +177,20 @@ void ImageEditor::zoomImage(float scale, float mouseX, float mouseY) {
     ofVec2f newMousePos = (ofVec2f(mouseX, mouseY) - panOffset) / zoomFactor;
     ofVec2f panAdjust = (newMousePos - prevMousePos) * zoomFactor;
     panOffset += panAdjust;
+}
+
+void ImageEditor::adjustZoomAndPan() {
+    if (currentImage->isAllocated()) {
+        int screenWidth = ofGetWidth();
+        int screenHeight = ofGetHeight();
+        int imageWidth = currentImage->getWidth();
+        int imageHeight = currentImage->getHeight();
+
+        float targetWidth = screenWidth * 0.8f;
+        zoomFactor = targetWidth / imageWidth;
+
+        panOffset.set((screenWidth - imageWidth * zoomFactor) / 2, (screenHeight - imageHeight * zoomFactor) / 2);
+    }
 }
 
 void ImageEditor::drawCircle(int x, int y) {
@@ -182,84 +252,6 @@ void ImageEditor::pasteRegion(int x, int y) {
     currentImage->update();
 }
 
-void ImageEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
-    if (currentTool == Tool::PanZoom) {
-        zoomImage(1.0f + scrollY * 0.1f, x, y);
-    }
-}
-
-void ImageEditor::mouseDragged(int x, int y, int button) {
-    ofVec2f p = screenToPixelCoords(ofVec2f(x, y));
-
-    switch (currentTool) {
-    case Tool::PanZoom:
-        panImage(x - dragStartPos.x, y - dragStartPos.y);
-        dragStartPos = ofVec2f(x, y);
-        break;
-    case Tool::Circle:
-        drawCircle(p.x, p.y);
-        break;
-    case Tool::Square:
-        drawSquare(p.x, p.y);
-        break;
-    default:
-        break;
-    }
-}
-
-void ImageEditor::mousePressed(int x, int y, int button) {
-    dragStartPos.set(x, y);
-    isDragging = true;
-
-    if (currentTool == Tool::PasteRegion) {
-        ofVec2f p = screenToPixelCoords(ofVec2f(x, y));
-
-        pasteRegion(p.x, p.y);
-    }
-}
-
-void ImageEditor::mouseReleased(int x, int y, int button) {
-    dragEndPos.set(x, y);
-    isDragging = false;
-
-    if (currentTool == Tool::CopyRegion) {
-        ofVec2f start = screenToPixelCoords(dragStartPos);
-        ofVec2f end = screenToPixelCoords(dragEndPos);
-
-        copyRegion(start.x, start.y, end.x, end.y);
-    }
-}
-
-void ImageEditor::loadImage(const std::string& path) {
-    if (currentImage) {
-        currentImage->load(path);
-    }
-    else {
-        currentImage = new ofImage();
-        currentImage->load(path);
-    }
-
-    if (currentImage->isAllocated()) {
-        int screenWidth = ofGetWidth();
-        int screenHeight = ofGetHeight();
-        int imageWidth = currentImage->getWidth();
-        int imageHeight = currentImage->getHeight();
-
-        // Compute zoom factor to make the image take 80% of the screen width
-        float targetWidth = screenWidth * 0.8f;
-        zoomFactor = targetWidth / imageWidth;
-
-        // Center the image on the screen
-        panOffset.set((screenWidth - imageWidth * zoomFactor) / 2, (screenHeight - imageHeight * zoomFactor) / 2);
-    }
-}
-
-void ImageEditor::saveImage(const std::string& path) const {
-    if (isImageAllocated()) {
-        currentImage->save(path);
-    }
-}
-
 bool ImageEditor::isImageAllocated() const {
     return currentImage && currentImage->isAllocated();
 }
@@ -272,6 +264,6 @@ ofVec2f ImageEditor::screenToPixelCoords(const ofVec2f& screenCoords) const {
     return (screenCoords - panOffset) / zoomFactor;
 }
 
-ofVec2f ImageEditor::pixelToScreenCoords(const ofVec2f& p) const {
-    return p * zoomFactor + panOffset;
+ofVec2f ImageEditor::pixelToScreenCoords(const ofVec2f& pixelCoords) const {
+    return pixelCoords * zoomFactor + panOffset;
 }

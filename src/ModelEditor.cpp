@@ -1,9 +1,7 @@
 #include "ModelEditor.h"
+#include <filesystem>
 
 void ModelEditor::setup() {
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-
     light.setup();
     light.setPosition(200, 300, 400);
     light.enable();
@@ -14,51 +12,37 @@ void ModelEditor::setup() {
 
     ofDisableDepthTest();
     ofDisableLighting();
+
+    sceneGraph.setup();
 }
 
 void ModelEditor::update() {
     light.setPosition(camera.getPosition());
+    sceneGraph.update();
 }
 
 void ModelEditor::draw() {
-    camera.begin();
-
     ofEnableDepthTest();
     ofEnableLighting();
 
+    camera.begin();
+
     light.enable();
-
-    ofPushMatrix();
-    ofTranslate(translation);
-    ofRotateDeg(rotation.x, 1, 0, 0);
-    ofRotateDeg(rotation.y, 0, 1, 0);
-    ofRotateDeg(rotation.z, 0, 0, 1);
-    ofScale(scale, scale, scale);
-
     material.begin();
-    if (model.getNumMeshes() > 0) {
-        model.drawFaces();
-    }
+
+    sceneGraph.draw(camera); // Draw the scene graph
+
     material.end();
-
-    ofPopMatrix();
-
     light.disable();
+
+    camera.end();
 
     ofDisableDepthTest();
     ofDisableLighting();
-
-    camera.end();
 }
 
 void ModelEditor::drawGui() {
-    ImGui::Begin("Model Editor");
-
-    ImGui::SliderFloat3("Translate", translation.getPtr(), -200.0f, 200.0f);
-    ImGui::SliderFloat3("Rotate", rotation.getPtr(), 0.0f, 360.0f);
-    ImGui::SliderFloat("Scale", &scale, 0.1f, 10.0f);
-
-    ImGui::End();
+    sceneGraph.drawGui();
 }
 
 void ModelEditor::exit() {
@@ -66,8 +50,14 @@ void ModelEditor::exit() {
 }
 
 void ModelEditor::loadModel(const std::string& path) {
-    model.load(path);
-    model.setPosition(0, 0, 0);
+    // Load the model from the specified path
+    auto model = std::make_shared<ofxAssimpModelLoader>();
+    model->load(path);
+    model->setPosition(0, 0, 0);
+
+    // Extract the stem to use as the node name
+    std::string stem = std::filesystem::path(path).stem().string();
+    sceneGraph.addModelNode(stem, model);
 
     camera.enableMouseInput();
 }

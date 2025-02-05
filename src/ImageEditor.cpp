@@ -1,9 +1,6 @@
 #include "ImageEditor.h"
 
 void ImageEditor::setup() {
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-
     currentImage = new ofImage();
     panOffset.set(0, 0);
     zoomFactor = 1.0f;
@@ -14,7 +11,7 @@ void ImageEditor::setup() {
 }
 
 void ImageEditor::update() {
-
+    // No update logic required for now
 }
 
 void ImageEditor::draw() {
@@ -23,6 +20,7 @@ void ImageEditor::draw() {
     }
 
     if (currentTool == Tool::CopyRegion && isDragging) {
+        // Draw rectangle for copying region
         ofVec2f corner1 = dragStartPos;
         ofVec2f corner2 = ofVec2f(ofGetMouseX(), ofGetMouseY());
 
@@ -38,6 +36,7 @@ void ImageEditor::draw() {
         ofPopStyle();
     }
     else if (currentTool == Tool::PasteRegion && copiedRegion.isAllocated()) {
+        // Draw rectangle for pasting region
         int x = ofGetMouseX();
         int y = ofGetMouseY();
         int width = copiedRegion.getWidth() * zoomFactor;
@@ -54,6 +53,7 @@ void ImageEditor::draw() {
 void ImageEditor::drawGui() {
     ImGui::Begin("Toolbar");
 
+    // Toolbar buttons for selecting tools
     if (ImGui::Button("Pan/Zoom")) {
         currentTool = Tool::PanZoom;
     }
@@ -96,12 +96,6 @@ void ImageEditor::exit() {
     currentImage = nullptr;
 }
 
-void ImageEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
-    if (currentTool == Tool::PanZoom) {
-        zoomImage(1.0f + scrollY * 0.1f, x, y);
-    }
-}
-
 void ImageEditor::mouseDragged(int x, int y, int button) {
     ofVec2f p = screenToPixelCoords(ofVec2f(x, y));
 
@@ -142,6 +136,12 @@ void ImageEditor::mouseReleased(int x, int y, int button) {
     }
 }
 
+void ImageEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
+    if (currentTool == Tool::PanZoom) {
+        zoomImage(1.0f + scrollY * 0.1f, x, y);
+    }
+}
+
 void ImageEditor::loadImage(const std::string& path) {
     if (currentImage) {
         currentImage->load(path);
@@ -150,6 +150,7 @@ void ImageEditor::loadImage(const std::string& path) {
         currentImage = new ofImage();
         currentImage->load(path);
     }
+
     adjustZoomAndPan();
 }
 

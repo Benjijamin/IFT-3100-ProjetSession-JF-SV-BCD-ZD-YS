@@ -2,12 +2,16 @@
 
 void ofApp::setup() {
     ofSetFrameRate(60);
+
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+
     gui.setup();
 
     imageEditor.setup();
     modelEditor.setup();
     screenCapture.setup();
-
+ 
     currentEditor = EditorType::Image;
 
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
@@ -72,12 +76,6 @@ void ofApp::mouseDragged(int x, int y, int button) {
     }
 }
 
-void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
-    if (currentEditor == EditorType::Image) {
-        imageEditor.mouseScrolled(x, y, scrollX, scrollY);
-    }
-}
-
 void ofApp::mousePressed(int x, int y, int button) {
     if (currentEditor == EditorType::Image) {
         imageEditor.mousePressed(x, y, button);
@@ -87,6 +85,12 @@ void ofApp::mousePressed(int x, int y, int button) {
 void ofApp::mouseReleased(int x, int y, int button) {
     if (currentEditor == EditorType::Image) {
         imageEditor.mouseReleased(x, y, button);
+    }
+}
+
+void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
+    if (currentEditor == EditorType::Image) {
+        imageEditor.mouseScrolled(x, y, scrollX, scrollY);
     }
 }
 

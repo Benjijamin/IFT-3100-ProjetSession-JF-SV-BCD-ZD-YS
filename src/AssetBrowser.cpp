@@ -4,20 +4,21 @@
 namespace fs = std::filesystem;
 
 void AssetBrowser::setup() {
-
+    // No setup logic required for now
 }
 
 void AssetBrowser::update() {
-
+    // No update logic required for now
 }
 
 void AssetBrowser::draw() {
-
+    // No drawing logic required for now
 }
 
 void AssetBrowser::drawGui() {
     ImGui::Begin("Asset Browser");
 
+    // Display list of assets
     for (size_t i = 0; i < assets.size(); ++i) {
         const auto& asset = assets[i];
         if (ImGui::Selectable(asset.c_str(), selectedAsset == asset)) {
@@ -26,6 +27,7 @@ void AssetBrowser::drawGui() {
         }
     }
 
+    // Delete button for the selected asset
     if (!selectedAsset.empty()) {
         if (ImGui::Button("Delete")) {
             removeAsset(selectedAsset);
@@ -34,6 +36,7 @@ void AssetBrowser::drawGui() {
         }
     }
 
+    // Button to load a new asset
     if (ImGui::Button("Load New Asset")) {
         ofFileDialogResult result = ofSystemLoadDialog("Select an asset");
         if (result.bSuccess) {
@@ -45,7 +48,7 @@ void AssetBrowser::drawGui() {
 }
 
 void AssetBrowser::exit() {
-
+    // No exit logic required for now
 }
 
 void AssetBrowser::addAsset(const std::string& assetPath) {

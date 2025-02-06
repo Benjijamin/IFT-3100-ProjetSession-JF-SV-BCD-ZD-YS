@@ -33,7 +33,6 @@ private:
     FreeFlightCamera freeFlightCam;
     SceneGraph sceneGraph;
 
-    ofxImGui::Gui gui;
-
-    bool isFreeFlightMode = false;
+    bool isFreeFlightMode;
+    bool shouldEnableMouseInput;
 };

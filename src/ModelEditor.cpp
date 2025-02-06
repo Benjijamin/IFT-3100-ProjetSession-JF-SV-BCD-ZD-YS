@@ -8,13 +8,13 @@ void ModelEditor::setup() {
 
     material.setDiffuseColor(ofFloatColor::gray);
     material.setSpecularColor(ofFloatColor::white);
-    material.setShininess(64);
-
-    ofDisableDepthTest();
-    ofDisableLighting();
+    material.setShininess(32);
 
     sceneGraph.setup();
+
     switchToOrbitCamera();
+
+    shouldEnableMouseInput = false;
 }
 
 void ModelEditor::update() {
@@ -32,7 +32,23 @@ void ModelEditor::draw() {
     ofEnableDepthTest();
     ofEnableLighting();
 
-    ofCamera* activeCam = isFreeFlightMode ? static_cast<ofCamera*>(&freeFlightCam) : static_cast<ofCamera*>(&orbitCam);
+    if (shouldEnableMouseInput) {
+        if (isFreeFlightMode) {
+            orbitCam.enableMouseInput();
+        }
+        else {
+            freeFlightCam.enableMouseInput();
+        }
+    }
+
+    ofCamera* activeCam = nullptr;
+
+    if (isFreeFlightMode) {
+        activeCam = static_cast<ofCamera*>(&freeFlightCam);
+    }
+    else {
+        activeCam = static_cast<ofCamera*>(&orbitCam);
+    }
 
     activeCam->begin();
 
@@ -81,8 +97,12 @@ void ModelEditor::drawGui() {
 }
 
 void ModelEditor::exit() {
+    sceneGraph.exit();
+
     orbitCam.disableMouseInput();
     freeFlightCam.disableMouseInput();
+
+    shouldEnableMouseInput = true;
 }
 
 void ModelEditor::mouseDragged(int x, int y, int button) {
@@ -108,10 +128,6 @@ void ModelEditor::load(const std::string& path) {
 
     std::string stem = std::filesystem::path(path).stem().string();
     sceneGraph.addModelNode(stem, model);
-
-    if (!isFreeFlightMode) {
-        orbitCam.enableMouseInput();
-    }
 }
 
 void ModelEditor::save(const std::string& path) {
@@ -119,12 +135,14 @@ void ModelEditor::save(const std::string& path) {
 }
 
 void ModelEditor::switchToOrbitCamera() {
-    orbitCam.setTarget(glm::vec3(0.0f));
+    freeFlightCam.disableMouseInput();
     orbitCam.enableMouseInput();
+    orbitCam.setTarget(glm::vec3(0.0f));
     isFreeFlightMode = false;
 }
 
 void ModelEditor::switchToFreeFlightCamera() {
+    orbitCam.disableMouseInput();
     freeFlightCam.enableMouseInput();
     isFreeFlightMode = true;
 }

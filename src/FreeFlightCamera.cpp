@@ -1,33 +1,54 @@
 #include "FreeFlightCamera.h"
 
 FreeFlightCamera::FreeFlightCamera()
-    : moveSpeed(10.0f), sensitivity(0.1f) {}
+    : moveSpeed(10.0f), sensitivity(0.1f), mouseInputEnabled(false), eventsSet(false), events(nullptr) {}
 
-void FreeFlightCamera::setup() {
-    lastMouse = glm::vec2(ofGetMouseX(), ofGetMouseY());
-}
-
-void FreeFlightCamera::update() {
-    handleKeyboardInput();
-    if (mouseControlEnabled) {
-        handleMouseInput();
+void FreeFlightCamera::begin(const ofRectangle& viewport) {
+    if (!eventsSet) {
+        setEvents(ofEvents());
     }
+    ofCamera::begin(viewport);
 }
 
-void FreeFlightCamera::enableMouseControl() {
-    mouseControlEnabled = true;
-    lastMouse = glm::vec2(ofGetMouseX(), ofGetMouseY());
+void FreeFlightCamera::begin() {
+    begin(getViewport());
 }
 
-void FreeFlightCamera::disableMouseControl() {
-    mouseControlEnabled = false;
+void FreeFlightCamera::enableMouseInput() {
+    if (!mouseInputEnabled && events) {
+        listeners.push(events->update.newListener(this, &FreeFlightCamera::update));
+        listeners.push(events->mouseDragged.newListener(this, &FreeFlightCamera::mouseDragged));
+        listeners.push(events->mousePressed.newListener(this, &FreeFlightCamera::mousePressed));
+    }
+    mouseInputEnabled = true;
 }
 
-float FreeFlightCamera::getMouseSpeed() const {
+void FreeFlightCamera::disableMouseInput() {
+    if (mouseInputEnabled && events) {
+        listeners.unsubscribeAll();
+    }
+    mouseInputEnabled = false;
+}
+
+bool FreeFlightCamera::getMouseInputEnabled() const {
+    return mouseInputEnabled;
+}
+
+void FreeFlightCamera::setEvents(ofCoreEvents& events) {
+    bool wasMouseInputEnabled = mouseInputEnabled;
+    disableMouseInput();
+    this->events = &events;
+    if (wasMouseInputEnabled) {
+        enableMouseInput();
+    }
+    eventsSet = true;
+}
+
+float FreeFlightCamera::getMoveSpeed() const {
     return moveSpeed;
 }
 
-void FreeFlightCamera::setMouseSpeed(float speed) {
+void FreeFlightCamera::setMoveSpeed(float speed) {
     moveSpeed = speed;
 }
 
@@ -39,7 +60,7 @@ void FreeFlightCamera::setSensitivity(float sensitivity) {
     this->sensitivity = sensitivity;
 }
 
-void FreeFlightCamera::handleKeyboardInput() {
+void FreeFlightCamera::update(ofEventArgs& args) {
     if (ofGetKeyPressed('w')) {
         dolly(-moveSpeed);
     }
@@ -57,15 +78,15 @@ void FreeFlightCamera::handleKeyboardInput() {
     }
     if (ofGetKeyPressed('e')) {
         boom(moveSpeed);
-    }
+    };
 }
 
-void FreeFlightCamera::handleMouseInput() {
-    glm::vec2 currentMouse = glm::vec2(ofGetMouseX(), ofGetMouseY());
-    glm::vec2 delta = currentMouse - lastMouse;
-    lastMouse = currentMouse;
-
+void FreeFlightCamera::mouseDragged(ofMouseEventArgs& args) {
     if (ofGetMousePressed(OF_MOUSE_BUTTON_LEFT)) {
+        glm::vec2 currentMouse(args.x, args.y);
+        glm::vec2 delta = currentMouse - lastMouse;
+        lastMouse = currentMouse;
+
         float yaw = delta.x * sensitivity;
         float pitch = delta.y * sensitivity;
 
@@ -75,4 +96,8 @@ void FreeFlightCamera::handleMouseInput() {
         glm::quat orientation = qYaw * getOrientationQuat() * qPitch;
         setOrientation(orientation);
     }
+}
+
+void FreeFlightCamera::mousePressed(ofMouseEventArgs& args) {
+    lastMouse = glm::vec2(args.x, args.y);
 }

@@ -1,29 +1,36 @@
 #pragma once
-
 #include "ofMain.h"
 
 class FreeFlightCamera : public ofCamera {
 public:
     FreeFlightCamera();
 
-    void setup();
-    void update();
-    void enableMouseControl();
-    void disableMouseControl();
+    virtual void begin(const ofRectangle& viewport);
+    virtual void begin();
 
-    float getMouseSpeed() const;
-    void setMouseSpeed(float speed);
+    void enableMouseInput();
+    void disableMouseInput();
+    bool getMouseInputEnabled() const;
+    void setEvents(ofCoreEvents& events);
+
+    float getMoveSpeed() const;
+    void setMoveSpeed(float speed);
 
     float getSensitivity() const;
     void setSensitivity(float sensitivity);
 
 private:
-    void handleKeyboardInput();
-    void handleMouseInput();
-
-    glm::vec2 lastMouse;
-    bool mouseControlEnabled = false;
+    void update(ofEventArgs& args);
+    void mouseDragged(ofMouseEventArgs& args);
+    void mousePressed(ofMouseEventArgs& args);
 
     float moveSpeed;
     float sensitivity;
+
+    glm::vec2 lastMouse;
+
+    bool mouseInputEnabled;
+    bool eventsSet;
+    ofCoreEvents* events;
+    ofEventListeners listeners;
 };

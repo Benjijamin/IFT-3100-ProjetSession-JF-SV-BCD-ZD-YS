@@ -19,7 +19,6 @@ void ModelEditor::setup() {
 
 void ModelEditor::update() {
     if (isFreeFlightMode) {
-        freeFlightCam.update();
         light.setPosition(freeFlightCam.getPosition());
     }
     else {
@@ -33,32 +32,19 @@ void ModelEditor::draw() {
     ofEnableDepthTest();
     ofEnableLighting();
 
-    if (isFreeFlightMode) {
-        freeFlightCam.begin();
-    }
-    else {
-        orbitCam.begin();
-    }
+    ofCamera* activeCam = isFreeFlightMode ? static_cast<ofCamera*>(&freeFlightCam) : static_cast<ofCamera*>(&orbitCam);
+
+    activeCam->begin();
 
     light.enable();
     material.begin();
 
-    if (isFreeFlightMode) {
-        sceneGraph.draw(freeFlightCam);
-    }
-    else {
-        sceneGraph.draw(orbitCam);
-    }
+    sceneGraph.draw(*activeCam);
 
     material.end();
     light.disable();
 
-    if (isFreeFlightMode) {
-        freeFlightCam.end();
-    }
-    else {
-        orbitCam.end();
-    }
+    activeCam->end();
 
     ofDisableDepthTest();
     ofDisableLighting();
@@ -80,9 +66,9 @@ void ModelEditor::drawGui() {
     }
 
     if (isFreeFlightMode) {
-        float moveSpeed = freeFlightCam.getMouseSpeed();
+        float moveSpeed = freeFlightCam.getMoveSpeed();
         if (ImGui::SliderFloat("Move Speed", &moveSpeed, 1.0f, 50.0f)) {
-            freeFlightCam.setMouseSpeed(moveSpeed);
+            freeFlightCam.setMoveSpeed(moveSpeed);
         }
 
         float sensitivity = freeFlightCam.getSensitivity();
@@ -96,6 +82,7 @@ void ModelEditor::drawGui() {
 
 void ModelEditor::exit() {
     orbitCam.disableMouseInput();
+    freeFlightCam.disableMouseInput();
 }
 
 void ModelEditor::mouseDragged(int x, int y, int button) {
@@ -138,7 +125,6 @@ void ModelEditor::switchToOrbitCamera() {
 }
 
 void ModelEditor::switchToFreeFlightCamera() {
-    freeFlightCam.setup();
-    freeFlightCam.enableMouseControl();
+    freeFlightCam.enableMouseInput();
     isFreeFlightMode = true;
 }

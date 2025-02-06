@@ -6,6 +6,7 @@
 #include "ModelEditor.h"
 #include "AssetBrowser.h"
 #include "ScreenCapture.h"
+#include "DessinVectoriel.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -37,7 +38,8 @@ private:
     ModelEditor modelEditor;
     AssetBrowser assetBrowser;
     ScreenCapture screenCapture;
+    DessinVectoriel dessinVectoriel;
 
-    enum class EditorType { Image, Model };
+    enum class EditorType { Image, Model, Dessin };
     EditorType currentEditor;
 };

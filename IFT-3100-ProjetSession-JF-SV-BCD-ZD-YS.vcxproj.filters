@@ -103,6 +103,9 @@
     <ClCompile Include="src\SceneNode.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
+    <ClCompile Include="src\DessinVectoriel.cpp">
+      <Filter>src\editors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -547,6 +550,12 @@
     </ClInclude>
     <ClInclude Include="src\SceneGraph.h">
       <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DessinVectoriel.h">
+      <Filter>src\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Editor.h">
+      <Filter>src\editors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

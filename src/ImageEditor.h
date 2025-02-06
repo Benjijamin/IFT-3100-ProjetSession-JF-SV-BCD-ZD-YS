@@ -2,22 +2,23 @@
 
 #include "ofMain.h"
 #include "ofxImGui.h"
+#include "Editor.h"
 
-class ImageEditor {
+class ImageEditor : public Editor {
 public:
-    void setup();
-    void update();
-    void draw();
-    void drawGui();
-    void exit();
+    void setup() override;
+    void update() override;
+    void draw() override;
+    void drawGui() override;
+    void exit() override;
 
-    void mouseDragged(int x, int y, int button);
-    void mousePressed(int x, int y, int button);
-    void mouseReleased(int x, int y, int button);
-    void mouseScrolled(int x, int y, float scrollX, float scrollY);
+    void mouseDragged(int x, int y, int button) override;
+    void mousePressed(int x, int y, int button) override;
+    void mouseReleased(int x, int y, int button) override;
+    void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
-    void loadImage(const std::string& path);
-    void saveImage(const std::string& path) const;
+    void load(const std::string& path) override;
+    void save(const std::string& path) override;
 
 private:
     void panImage(float dx, float dy);

@@ -98,7 +98,23 @@ void ModelEditor::exit() {
     orbitCam.disableMouseInput();
 }
 
-void ModelEditor::loadModel(const std::string& path) {
+void ModelEditor::mouseDragged(int x, int y, int button) {
+
+}
+
+void ModelEditor::mousePressed(int x, int y, int button) {
+
+}
+
+void ModelEditor::mouseReleased(int x, int y, int button) {
+
+}
+
+void ModelEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
+
+}
+
+void ModelEditor::load(const std::string& path) {
     auto model = std::make_shared<ofxAssimpModelLoader>();
     model->load(path);
     model->setPosition(0, 0, 0);
@@ -109,6 +125,10 @@ void ModelEditor::loadModel(const std::string& path) {
     if (!isFreeFlightMode) {
         orbitCam.enableMouseInput();
     }
+}
+
+void ModelEditor::save(const std::string& path) {
+
 }
 
 void ModelEditor::switchToOrbitCamera() {

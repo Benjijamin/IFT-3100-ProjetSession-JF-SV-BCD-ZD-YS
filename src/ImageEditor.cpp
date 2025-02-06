@@ -122,7 +122,7 @@ void ImageEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
     }
 }
 
-void ImageEditor::loadImage(const std::string& path) {
+void ImageEditor::load(const std::string& path) {
     if (currentImage) {
         currentImage->load(path);
     }
@@ -134,7 +134,7 @@ void ImageEditor::loadImage(const std::string& path) {
     adjustZoomAndPan();
 }
 
-void ImageEditor::saveImage(const std::string& path) const {
+void ImageEditor::save(const std::string& path) {
     if (isImageAllocated()) {
         currentImage->save(path);
     }

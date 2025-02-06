@@ -2,11 +2,12 @@
 
 #include "ofMain.h"
 #include "ofxImGui.h"
+#include "Editor.h"
 #include "ImageEditor.h"
 #include "ModelEditor.h"
+#include "DessinVectoriel.h"
 #include "AssetBrowser.h"
 #include "ScreenCapture.h"
-#include "DessinVectoriel.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -34,12 +35,9 @@ private:
     void handleAssetDeletion();
 
     ofxImGui::Gui gui;
-    ImageEditor imageEditor;
-    ModelEditor modelEditor;
+
     AssetBrowser assetBrowser;
     ScreenCapture screenCapture;
-    DessinVectoriel dessinVectoriel;
 
-    enum class EditorType { Image, Model, Dessin };
-    EditorType currentEditor;
+    std::unique_ptr<Editor> currentEditor;
 };

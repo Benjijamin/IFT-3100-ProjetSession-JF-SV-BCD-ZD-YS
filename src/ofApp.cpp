@@ -8,50 +8,46 @@ void ofApp::setup() {
 
     gui.setup();
 
-    imageEditor.setup();
-    modelEditor.setup();
+    assetBrowser.setup();
     screenCapture.setup();
 
-    currentEditor = EditorType::Image;
+    currentEditor = nullptr;
 
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
     assetBrowser.onAssetDeletion = std::bind(&ofApp::handleAssetDeletion, this);
 }
 
 void ofApp::update() {
-    if (currentEditor == EditorType::Image) {
-        imageEditor.update();
-    } else if (currentEditor == EditorType::Model) {
-        modelEditor.update();
+    if (currentEditor) {
+        currentEditor->update();
     }
 }
 
 void ofApp::draw() {
+    if (currentEditor) {
+        currentEditor->draw();
+    }
+
     screenCapture.draw();
 
     gui.begin();
 
-    if (currentEditor == EditorType::Image) {
-        imageEditor.draw();
-    } else if (currentEditor == EditorType::Model) {
-        modelEditor.draw();
+    if (currentEditor) {
+        currentEditor->drawGui();
     }
 
     assetBrowser.drawGui();
     screenCapture.drawGui();
 
-    if (currentEditor == EditorType::Image) {
-        imageEditor.drawGui();
-    } else if (currentEditor == EditorType::Model) {
-        modelEditor.drawGui();
-    }
-
     gui.end();
 }
 
 void ofApp::exit() {
-    imageEditor.exit();
-    modelEditor.exit();
+    if (currentEditor) {
+        currentEditor->exit();
+    }
+
+    assetBrowser.exit();
     screenCapture.exit();
 }
 
@@ -60,12 +56,8 @@ void ofApp::keyPressed(int key) {
 }
 
 void ofApp::keyReleased(int key) {
-    switch (key) {
-        case 90:  // touche Z
-            currentEditor = EditorType::Dessin;
-            break;
-        default:
-            break;
+    if (key == 90) {
+        currentEditor.reset();
     }
 }
 
@@ -74,50 +66,26 @@ void ofApp::mouseMoved(int x, int y) {
 }
 
 void ofApp::mouseDragged(int x, int y, int button) {
-    switch (currentEditor)
-    {
-        case EditorType::Image:
-            imageEditor.mouseDragged(x, y, button);
-            break;
-        case EditorType::Dessin:
-            dessinVectoriel.mouseDragged(x, y, button);
-            break;
-        default:
-            break;
+    if (currentEditor) {
+        currentEditor->mouseDragged(x, y, button);
     }
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
-    switch (currentEditor)
-    {
-        case EditorType::Image:
-            imageEditor.mousePressed(x, y, button);
-            break;
-        case EditorType::Dessin:
-            dessinVectoriel.mousePressed(x, y, button);
-            break;
-        default:
-            break;
+    if (currentEditor) {
+        currentEditor->mousePressed(x, y, button);
     }
 }
 
 void ofApp::mouseReleased(int x, int y, int button) {
-    switch (currentEditor)
-    {
-        case EditorType::Image:
-            imageEditor.mouseReleased(x, y, button);
-            break;
-        case EditorType::Dessin:
-            dessinVectoriel.mouseReleased(x, y, button);
-            break;
-        default:
-            break;
+    if (currentEditor) {
+        currentEditor->mouseReleased(x, y, button);
     }
 }
 
 void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
-    if (currentEditor == EditorType::Image) {
-        imageEditor.mouseScrolled(x, y, scrollX, scrollY);
+    if (currentEditor) {
+        currentEditor->mouseScrolled(x, y, scrollX, scrollY);
     }
 }
 
@@ -144,12 +112,20 @@ void ofApp::gotMessage(ofMessage msg) {
 void ofApp::switchEditor() {
     std::string selectedAsset = assetBrowser.getSelectedAssetPath();
     if (!selectedAsset.empty()) {
+        if (currentEditor) {
+            currentEditor->exit();
+        }
+
         if (assetBrowser.isImageAsset(selectedAsset)) {
-            currentEditor = EditorType::Image;
-            imageEditor.loadImage(selectedAsset);
-        } else if (assetBrowser.isModelAsset(selectedAsset)) {
-            currentEditor = EditorType::Model;
-            modelEditor.loadModel(selectedAsset);
+            currentEditor = std::make_unique<ImageEditor>();
+        }
+        else if (assetBrowser.isModelAsset(selectedAsset)) {
+            currentEditor = std::make_unique<ModelEditor>();
+        }
+
+        if (currentEditor) {
+            currentEditor->setup();
+            currentEditor->load(selectedAsset);
         }
     }
 }
@@ -159,9 +135,8 @@ void ofApp::handleAssetSelection() {
 }
 
 void ofApp::handleAssetDeletion() {
-    if (currentEditor == EditorType::Image) {
-        imageEditor.exit();
-    } else if (currentEditor == EditorType::Model) {
-        modelEditor.exit();
+    if (currentEditor) {
+        currentEditor->exit();
     }
+    currentEditor.reset();
 }

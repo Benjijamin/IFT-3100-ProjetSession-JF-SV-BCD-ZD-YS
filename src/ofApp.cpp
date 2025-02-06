@@ -11,7 +11,7 @@ void ofApp::setup() {
     imageEditor.setup();
     modelEditor.setup();
     screenCapture.setup();
- 
+
     currentEditor = EditorType::Image;
 
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
@@ -21,8 +21,7 @@ void ofApp::setup() {
 void ofApp::update() {
     if (currentEditor == EditorType::Image) {
         imageEditor.update();
-    }
-    else if (currentEditor == EditorType::Model) {
+    } else if (currentEditor == EditorType::Model) {
         modelEditor.update();
     }
 }
@@ -34,8 +33,7 @@ void ofApp::draw() {
 
     if (currentEditor == EditorType::Image) {
         imageEditor.draw();
-    }
-    else if (currentEditor == EditorType::Model) {
+    } else if (currentEditor == EditorType::Model) {
         modelEditor.draw();
     }
 
@@ -44,8 +42,7 @@ void ofApp::draw() {
 
     if (currentEditor == EditorType::Image) {
         imageEditor.drawGui();
-    }
-    else if (currentEditor == EditorType::Model) {
+    } else if (currentEditor == EditorType::Model) {
         modelEditor.drawGui();
     }
 
@@ -63,7 +60,13 @@ void ofApp::keyPressed(int key) {
 }
 
 void ofApp::keyReleased(int key) {
-
+    switch (key) {
+        case 90:  // touche Z
+            currentEditor = EditorType::Dessin;
+            break;
+        default:
+            break;
+    }
 }
 
 void ofApp::mouseMoved(int x, int y) {
@@ -71,20 +74,44 @@ void ofApp::mouseMoved(int x, int y) {
 }
 
 void ofApp::mouseDragged(int x, int y, int button) {
-    if (currentEditor == EditorType::Image) {
-        imageEditor.mouseDragged(x, y, button);
+    switch (currentEditor)
+    {
+        case EditorType::Image:
+            imageEditor.mouseDragged(x, y, button);
+            break;
+        case EditorType::Dessin:
+            dessinVectoriel.mouseDragged(x, y, button);
+            break;
+        default:
+            break;
     }
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
-    if (currentEditor == EditorType::Image) {
-        imageEditor.mousePressed(x, y, button);
+    switch (currentEditor)
+    {
+        case EditorType::Image:
+            imageEditor.mousePressed(x, y, button);
+            break;
+        case EditorType::Dessin:
+            dessinVectoriel.mousePressed(x, y, button);
+            break;
+        default:
+            break;
     }
 }
 
 void ofApp::mouseReleased(int x, int y, int button) {
-    if (currentEditor == EditorType::Image) {
-        imageEditor.mouseReleased(x, y, button);
+    switch (currentEditor)
+    {
+        case EditorType::Image:
+            imageEditor.mouseReleased(x, y, button);
+            break;
+        case EditorType::Dessin:
+            dessinVectoriel.mouseReleased(x, y, button);
+            break;
+        default:
+            break;
     }
 }
 
@@ -120,8 +147,7 @@ void ofApp::switchEditor() {
         if (assetBrowser.isImageAsset(selectedAsset)) {
             currentEditor = EditorType::Image;
             imageEditor.loadImage(selectedAsset);
-        }
-        else if (assetBrowser.isModelAsset(selectedAsset)) {
+        } else if (assetBrowser.isModelAsset(selectedAsset)) {
             currentEditor = EditorType::Model;
             modelEditor.loadModel(selectedAsset);
         }
@@ -135,8 +161,7 @@ void ofApp::handleAssetSelection() {
 void ofApp::handleAssetDeletion() {
     if (currentEditor == EditorType::Image) {
         imageEditor.exit();
-    }
-    else if (currentEditor == EditorType::Model) {
+    } else if (currentEditor == EditorType::Model) {
         modelEditor.exit();
     }
 }

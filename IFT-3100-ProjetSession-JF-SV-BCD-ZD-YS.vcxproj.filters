@@ -7,18 +7,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\AssetBrowser.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ImageEditor.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ModelEditor.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ScreenCapture.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -94,11 +82,26 @@
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_widgets.cpp">
       <Filter>addons\ofxImGui\libs\imgui\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ImageEditor.cpp">
+      <Filter>src\editors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModelEditor.cpp">
+      <Filter>src\editors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ScreenCapture.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AssetBrowser.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FreeFlightCamera.cpp">
+      <Filter>src\camera</Filter>
+    </ClCompile>
     <ClCompile Include="src\SceneGraph.cpp">
-      <Filter>src</Filter>
+      <Filter>src\components</Filter>
     </ClCompile>
     <ClCompile Include="src\SceneNode.cpp">
-      <Filter>src</Filter>
+      <Filter>src\components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -162,21 +165,18 @@
     <Filter Include="addons\ofxImGui\libs\imgui\src">
       <UniqueIdentifier>{D8D257FF--A13-5-41-87-8-836-AEFAA4E9E0AD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\editors">
+      <UniqueIdentifier>{ee1e0234-f916-436a-9c1f-367f054b6de0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\components">
+      <UniqueIdentifier>{3adaf60f-d4cc-4dbd-8432-05f6181cbd96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\camera">
+      <UniqueIdentifier>{a2ded317-f4b7-446d-8787-374079313d3b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ofApp.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\AssetBrowser.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ImageEditor.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ModelEditor.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ScreenCapture.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\ofApp.h">
@@ -527,11 +527,26 @@
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_truetype.h">
       <Filter>addons\ofxImGui\libs\imgui\src</Filter>
     </ClInclude>
-    <ClInclude Include="src\SceneGraph.h">
-      <Filter>src</Filter>
+    <ClInclude Include="src\ImageEditor.h">
+      <Filter>src\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ModelEditor.h">
+      <Filter>src\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ScreenCapture.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AssetBrowser.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FreeFlightCamera.h">
+      <Filter>src\camera</Filter>
     </ClInclude>
     <ClInclude Include="src\SceneNode.h">
-      <Filter>src</Filter>
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneGraph.h">
+      <Filter>src\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -29,6 +29,8 @@ private:
 
     void copyRegion(int startX, int startY, int endX, int endY);
     void pasteRegion(int x, int y);
+    void drawCopyRegion();
+    void drawPasteRegion();
 
     bool isImageAllocated() const;
     bool isWithinBounds(int x, int y) const;

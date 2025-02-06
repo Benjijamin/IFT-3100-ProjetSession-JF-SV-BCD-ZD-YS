@@ -11,7 +11,7 @@ void ImageEditor::setup() {
 }
 
 void ImageEditor::update() {
-    // No update logic required for now
+
 }
 
 void ImageEditor::draw() {
@@ -20,60 +20,40 @@ void ImageEditor::draw() {
     }
 
     if (currentTool == Tool::CopyRegion && isDragging) {
-        // Draw rectangle for copying region
-        ofVec2f corner1 = dragStartPos;
-        ofVec2f corner2 = ofVec2f(ofGetMouseX(), ofGetMouseY());
-
-        int x = std::min(corner1.x, corner2.x);
-        int y = std::min(corner1.y, corner2.y);
-        int width = std::abs(corner2.x - corner1.x);
-        int height = std::abs(corner2.y - corner1.y);
-
-        ofPushStyle();
-        ofSetColor(0, 122, 204, 128);
-        ofNoFill();
-        ofDrawRectangle(x, y, width, height);
-        ofPopStyle();
+        drawCopyRegion();
     }
     else if (currentTool == Tool::PasteRegion && copiedRegion.isAllocated()) {
-        // Draw rectangle for pasting region
-        int x = ofGetMouseX();
-        int y = ofGetMouseY();
-        int width = copiedRegion.getWidth() * zoomFactor;
-        int height = copiedRegion.getHeight() * zoomFactor;
-
-        ofPushStyle();
-        ofSetColor(128, 128, 128, 128);
-        ofFill();
-        ofDrawRectangle(x, y, width, height);
-        ofPopStyle();
+        drawPasteRegion();
     }
 }
 
 void ImageEditor::drawGui() {
     ImGui::Begin("Toolbar");
 
-    // Toolbar buttons for selecting tools
     if (ImGui::Button("Pan/Zoom")) {
         currentTool = Tool::PanZoom;
     }
 
     ImGui::SameLine();
+
     if (ImGui::Button("Circle")) {
         currentTool = Tool::Circle;
     }
 
     ImGui::SameLine();
+
     if (ImGui::Button("Square")) {
         currentTool = Tool::Square;
     }
 
     ImGui::SameLine();
+
     if (ImGui::Button("Copy Region")) {
         currentTool = Tool::CopyRegion;
     }
 
     ImGui::SameLine();
+
     if (ImGui::Button("Paste Region")) {
         currentTool = Tool::PasteRegion;
     }
@@ -252,6 +232,35 @@ void ImageEditor::pasteRegion(int x, int y) {
         }
     }
     currentImage->update();
+}
+
+void ImageEditor::drawCopyRegion() {
+    ofVec2f corner1 = dragStartPos;
+    ofVec2f corner2 = ofVec2f(ofGetMouseX(), ofGetMouseY());
+
+    int x = std::min(corner1.x, corner2.x);
+    int y = std::min(corner1.y, corner2.y);
+    int width = std::abs(corner2.x - corner1.x);
+    int height = std::abs(corner2.y - corner1.y);
+
+    ofPushStyle();
+    ofSetColor(0, 122, 204, 128);
+    ofNoFill();
+    ofDrawRectangle(x, y, width, height);
+    ofPopStyle();
+}
+
+void ImageEditor::drawPasteRegion() {
+    int x = ofGetMouseX();
+    int y = ofGetMouseY();
+    int width = copiedRegion.getWidth() * zoomFactor;
+    int height = copiedRegion.getHeight() * zoomFactor;
+
+    ofPushStyle();
+    ofSetColor(128, 128, 128, 128);
+    ofFill();
+    ofDrawRectangle(x, y, width, height);
+    ofPopStyle();
 }
 
 bool ImageEditor::isImageAllocated() const {

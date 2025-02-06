@@ -2,7 +2,9 @@
 
 #include "ofMain.h"
 #include "ofxAssimpModelLoader.h"
+#include "ofxImGui.h"
 #include "SceneGraph.h"
+#include "FreeFlightCamera.h"
 
 class ModelEditor {
 public:
@@ -15,8 +17,16 @@ public:
     void loadModel(const std::string& path);
 
 private:
+    void switchToOrbitCamera();
+    void switchToFreeFlightCamera();
+
     ofLight light;
     ofMaterial material;
-    ofEasyCam camera;
+    ofEasyCam orbitCam;
+    FreeFlightCamera freeFlightCam;
     SceneGraph sceneGraph;
+
+    ofxImGui::Gui gui;
+
+    bool isFreeFlightMode = false;
 };

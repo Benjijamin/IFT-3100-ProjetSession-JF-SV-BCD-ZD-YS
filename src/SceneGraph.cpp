@@ -17,19 +17,17 @@ void SceneGraph::update() {
 }
 
 void SceneGraph::draw(ofCamera& camera) {
-    // Draw all nodes
     for (auto& node : nodes) {
         node.draw();
     }
 
-    // Draw gizmo
     gizmo.draw(camera);
 }
 
 void SceneGraph::drawGui() {
     ImGui::Begin("Scene Graph");
 
-    drawNodeGui(0); // Start drawing the node GUI from the root
+    drawNodeGui(0);
 
     ImGui::End();
 
@@ -41,22 +39,24 @@ void SceneGraph::drawGui() {
         bool rotateSelected = (gizmoType == ofxGizmo::OFX_GIZMO_ROTATE);
         bool scaleSelected = (gizmoType == ofxGizmo::OFX_GIZMO_SCALE);
 
-        // Gizmo mode selection
         if (ImGui::RadioButton("Translate", translateSelected)) {
             gizmoType = ofxGizmo::OFX_GIZMO_MOVE;
         }
+
         if (ImGui::RadioButton("Rotate", rotateSelected)) {
             gizmoType = ofxGizmo::OFX_GIZMO_ROTATE;
         }
+
         if (ImGui::RadioButton("Scale", scaleSelected)) {
             gizmoType = ofxGizmo::OFX_GIZMO_SCALE;
         }
 
         gizmo.setType(gizmoType);
 
-        // Button to delete the selected node
-        if (ImGui::Button("Delete Selected Node")) {
-            deleteNode(selectedIndex);
+        if (selectedIndex != 0) {
+            if (ImGui::Button("Delete Selected Node")) {
+                deleteNode(selectedIndex);
+            }
         }
 
         ImGui::End();
@@ -64,14 +64,13 @@ void SceneGraph::drawGui() {
 }
 
 void SceneGraph::exit() {
-    // No exit logic required for now
+
 }
 
 void SceneGraph::drawNodeGui(int index) {
     ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
     bool nodeOpen = ImGui::TreeNodeEx(nodes[index].getName().c_str(), nodeFlags);
 
-    // Select node on click
     if (ImGui::IsItemClicked()) {
         selectedIndex = index;
 
@@ -84,7 +83,6 @@ void SceneGraph::drawNodeGui(int index) {
         }
     }
 
-    // Recursively draw children if node is open
     if (nodeOpen) {
         if (childrenIndices.find(index) != childrenIndices.end()) {
             for (int childIndex : childrenIndices[index]) {
@@ -97,19 +95,16 @@ void SceneGraph::drawNodeGui(int index) {
 }
 
 void SceneGraph::addModelNode(const std::string& name, std::shared_ptr<ofxAssimpModelLoader> model) {
-    int parentIndex = 0; // Default parent is the root node
-
-    // Generate a unique name
     std::string uniqueName = generateUniqueName(name);
     nodes.emplace_back(uniqueName);
 
+    int parentIndex = 0;
     int newIndex = nodes.size() - 1;
 
     SceneNode& node = nodes.back();
     node.setModel(model);
     node.setParent(nodes[parentIndex]);
 
-    // Store the index of the new node as a child of the parent node
     childrenIndices[parentIndex].push_back(newIndex);
 }
 

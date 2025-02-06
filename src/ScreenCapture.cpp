@@ -10,23 +10,21 @@ void ScreenCapture::setup() {
 }
 
 void ScreenCapture::update() {
-    // No update logic required for now
+
 }
 
 void ScreenCapture::draw() {
-    // No drawing logic required for now
+
 }
 
 void ScreenCapture::drawGui() {
     ImGui::Begin("Screen Capture");
 
-    // Button to capture a screenshot
     if (ImGui::Button("Capture Screenshot")) {
         captureScreenshot();
         showScreenshotModal = true;
     }
 
-    // Show screenshot preview modal if screenshot is taken
     if (showScreenshotModal && screenshotTaken) {
         ImGui::OpenPopup("Screenshot");
 
@@ -39,7 +37,6 @@ void ScreenCapture::drawGui() {
 
             ImGui::Image((void*)(intptr_t)screenshotTexture, ImVec2(newWidth, newHeight));
 
-            // Button to save the screenshot
             if (ImGui::Button("Save Screenshot")) {
                 saveScreenshot();
                 ImGui::CloseCurrentPopup();
@@ -48,7 +45,6 @@ void ScreenCapture::drawGui() {
 
             ImGui::SameLine();
 
-            // Button to cancel the screenshot preview
             if (ImGui::Button("Cancel")) {
                 ImGui::CloseCurrentPopup();
                 showScreenshotModal = false;
@@ -66,7 +62,7 @@ void ScreenCapture::exit() {
 }
 
 void ScreenCapture::captureScreenshot() {
-    screenshotImg.grabScreen(0, 0, ofGetWidth(), ofGetHeight()); // Capture the screen
+    screenshotImg.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
     screenshotImg.update();
     createScreenshotTexture();
     screenshotTaken = true;
@@ -81,10 +77,9 @@ void ScreenCapture::saveScreenshot() {
 
 void ScreenCapture::createScreenshotTexture() {
     if (screenshotTexture != 0) {
-        deleteScreenshotTexture(); // Delete previous texture if exists
+        deleteScreenshotTexture();
     }
 
-    // Generate a new texture from the screenshot
     glGenTextures(1, &screenshotTexture);
     glBindTexture(GL_TEXTURE_2D, screenshotTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, screenshotImg.getWidth(), screenshotImg.getHeight(), 0, GL_BGRA, GL_UNSIGNED_BYTE, screenshotImg.getPixels().getData());

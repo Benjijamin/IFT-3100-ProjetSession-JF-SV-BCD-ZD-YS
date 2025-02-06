@@ -14,6 +14,7 @@ public:
     void addAsset(const std::string& assetPath);
     void removeAsset(const std::string& asset);
     void selectAsset(const std::string& assetPath);
+    void loadAssetsFromFolder(const std::string& folderPath);
 
     bool isImageAsset(const std::string& asset) const;
     bool isModelAsset(const std::string& asset) const;
@@ -24,6 +25,11 @@ public:
     std::function<void()> onAssetDeletion;
 
 private:
+    std::vector<std::string> getFilteredAssets() const;
+
     std::vector<std::string> assets;
-    std::string selectedAsset; 
+    std::string selectedAsset;
+
+    bool showFullPaths = false;
+    int filterIndex = 0;
 };

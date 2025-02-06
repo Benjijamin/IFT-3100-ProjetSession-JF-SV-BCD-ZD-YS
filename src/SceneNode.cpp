@@ -9,10 +9,10 @@ void SceneNode::setModel(std::shared_ptr<ofxAssimpModelLoader> model) {
 
 void SceneNode::customDraw() {
     if (model) {
-        model->drawFaces(); // Draw the model if it exists
+        model->drawFaces();
     }
     else {
-        ofDrawSphere(glm::vec3(0), 10); // Draw a default sphere otherwise
+        ofDrawSphere(glm::vec3(0), 10);
     }
 }
 

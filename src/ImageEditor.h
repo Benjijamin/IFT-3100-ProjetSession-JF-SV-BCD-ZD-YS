@@ -58,9 +58,5 @@ private:
 
     ofImage copiedRegion;
 
-    //ColorPicker
     ColorPicker colorPicker;
-
-    ofImage colorPickerIcon;
-    ofTexture colorPickerIconTex;
 };

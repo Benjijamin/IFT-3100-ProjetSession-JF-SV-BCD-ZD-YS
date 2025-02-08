@@ -39,6 +39,8 @@ void ofApp::draw() {
     assetBrowser.drawGui();
     screenCapture.drawGui();
 
+    menuBar.drawGui();
+
     gui.end();
 }
 

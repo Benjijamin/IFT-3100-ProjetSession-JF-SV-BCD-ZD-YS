@@ -104,9 +104,11 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ColorPicker.cpp" />
     <ClCompile Include="src\DessinVectoriel.cpp" />
     <ClCompile Include="src\FreeFlightCamera.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MenuBar.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\AssetBrowser.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
@@ -139,9 +141,11 @@
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ColorPicker.h" />
     <ClInclude Include="src\DessinVectoriel.h" />
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\FreeFlightCamera.h" />
+    <ClInclude Include="src\MenuBar.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\AssetBrowser.h" />
     <ClInclude Include="src\ImageEditor.h" />
@@ -269,12 +273,6 @@
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
       <Project>{5837595d-aca9-485c-8e76-729040ce4b0b}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="icon.rc">
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/D_DEBUG %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(OF_ROOT)\libs\openFrameworksCompiled\project\vs</AdditionalIncludeDirectories>
-    </ResourceCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

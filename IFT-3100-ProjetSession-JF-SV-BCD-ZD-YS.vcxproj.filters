@@ -106,6 +106,12 @@
     <ClCompile Include="src\DessinVectoriel.cpp">
       <Filter>src\editors</Filter>
     </ClCompile>
+    <ClCompile Include="src\MenuBar.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColorPicker.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -557,8 +563,11 @@
     <ClInclude Include="src\Editor.h">
       <Filter>src\editors</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="icon.rc" />
+    <ClInclude Include="src\MenuBar.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ColorPicker.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

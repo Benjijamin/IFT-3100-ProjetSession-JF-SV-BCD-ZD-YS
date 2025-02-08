@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxImGui.h"
 #include "Editor.h"
+#include "ColorPicker.h"
 
 class ImageEditor : public Editor {
 public:
@@ -56,4 +57,10 @@ private:
     bool isDragging;
 
     ofImage copiedRegion;
+
+    //ColorPicker
+    ColorPicker colorPicker;
+
+    ofImage colorPickerIcon;
+    ofTexture colorPickerIconTex;
 };

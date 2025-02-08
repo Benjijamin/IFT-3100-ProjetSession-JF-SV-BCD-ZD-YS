@@ -8,6 +8,7 @@
 #include "DessinVectoriel.h"
 #include "AssetBrowser.h"
 #include "ScreenCapture.h"
+#include "MenuBar.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -38,6 +39,8 @@ private:
 
     AssetBrowser assetBrowser;
     ScreenCapture screenCapture;
+
+    MenuBar menuBar;
 
     std::unique_ptr<Editor> currentEditor;
 };

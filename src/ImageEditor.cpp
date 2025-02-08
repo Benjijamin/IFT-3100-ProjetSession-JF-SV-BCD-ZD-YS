@@ -6,8 +6,11 @@ void ImageEditor::setup() {
     zoomFactor = 1.0f;
     isDrawing = false;
     drawRadius = 10;
-    drawColor = ofColor(255, 0, 0);
     currentTool = Tool::PanZoom;
+
+    colorPicker.setup();
+    drawColor = ofColor(colorPicker.selectedColor[0] * 255, colorPicker.selectedColor[1] * 255,
+        colorPicker.selectedColor[2] * 255);
 }
 
 void ImageEditor::update() {
@@ -28,7 +31,7 @@ void ImageEditor::draw() {
 }
 
 void ImageEditor::drawGui() {
-    ImGui::Begin("Toolbar");
+    ImGui::Begin("Toolbar", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
     if (ImGui::Button("Pan/Zoom")) {
         currentTool = Tool::PanZoom;
@@ -59,13 +62,29 @@ void ImageEditor::drawGui() {
     }
 
     if (currentTool == Tool::Circle || currentTool == Tool::Square) {
-        float color[3] = { drawColor.r / 255.0f, drawColor.g / 255.0f, drawColor.b / 255.0f };
 
-        if (ImGui::ColorEdit3("Draw Color", color)) {
-            drawColor = ofColor(color[0] * 255, color[1] * 255, color[2] * 255);
+        ImVec4 color(colorPicker.selectedColor[0], colorPicker.selectedColor[1], 
+            colorPicker.selectedColor[2], colorPicker.selectedColor[3]);
+
+        ImGui::PushStyleColor(ImGuiCol_Button, color);
+        if (ImGui::Button("", ImVec2(16, 16)))
+        {
+            ofLog() << "!";
+            colorPicker.showColorPicker = true;
         }
+        ImGui::PopStyleColor(1);
+
+        ImGui::SameLine();
 
         ImGui::SliderInt("Draw Radius", &drawRadius, 1, 50);
+        
+    }
+
+    if (colorPicker.showColorPicker) 
+    {
+        colorPicker.draw();
+        drawColor = ofColor(colorPicker.selectedColor[0] * 255, colorPicker.selectedColor[1] * 255,
+            colorPicker.selectedColor[2] * 255);
     }
 
     ImGui::End();

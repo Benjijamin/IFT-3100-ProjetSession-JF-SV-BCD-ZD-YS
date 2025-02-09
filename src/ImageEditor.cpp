@@ -69,7 +69,6 @@ void ImageEditor::drawGui() {
         ImGui::PushStyleColor(ImGuiCol_Button, color);
         if (ImGui::Button("", ImVec2(16, 16)))
         {
-            ofLog() << "!";
             colorPicker.showColorPicker = true;
         }
         ImGui::PopStyleColor(1);

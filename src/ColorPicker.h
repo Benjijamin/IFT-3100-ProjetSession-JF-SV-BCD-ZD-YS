@@ -24,10 +24,11 @@ class ColorPicker
 
 		bool showColorPicker;
 		float selectedColor[4];
-		HSB hsb;
-		RGB rgb;
 private:
 		enum class ColorPickerMode { RGB, HSB };
+
+		HSB hsb;
+		RGB rgb;
 
 		ColorPickerMode colorPickerMode;
 

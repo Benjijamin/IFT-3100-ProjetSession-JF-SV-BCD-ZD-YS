@@ -37,6 +37,14 @@ void ColorPicker::draw()
 		case ColorPickerMode::HSB:
 			float prevHue = hueSlider, prevSaturation = saturationSlider, prevBrightness = brightnessSlider;
 
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+			ImVec2 p = ImGui::GetCursorScreenPos();
+			drawList->AddRectFilled(p, ImVec2(p.x + 200, p.y + 200), 
+				ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], selectedColor[3])));
+			ImGui::Dummy(ImVec2(0.0f, 200.0f));
+
+
 			HSB saturationHSBNone, saturationHSBFull = hsb;
 			saturationHSBNone.s = 0.0f;
 			saturationHSBFull.s = 1.0f;
@@ -48,6 +56,7 @@ void ColorPicker::draw()
 
 			ImU32 brightnessColorStart = ImGui::GetColorU32(ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
 			ImU32 brightnessColorEnd = ImGui::GetColorU32(ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+
 			ImU32 alphaColorStart = ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], 0.0f));
 			ImU32 alphaColorEnd = ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], 1.0f));
 

@@ -46,10 +46,10 @@ void CustomSlider::HueSlider(const char* label, float* value, float valueMin, fl
 	drawList->AddRectFilled(ImVec2(grabX + margin * 1.5f, p.y + grabWidth - margin * 0.5f), ImVec2(grabX + grabWidth - margin * 0.5f, p.y + margin * 1.5f), ImGui::GetColorU32(isActive ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab));
 
 	//Draw value
-	ImVec2 textSize = ImGui::CalcTextSize(label);
-	ImVec2 textPos = ImVec2(p.x + (width - textSize.x) * 0.5f, p.y + (height - textSize.y) * 0.5f);
 	char cStringValue[50];
 	sprintf(cStringValue, "%.3f", *value);
+	ImVec2 textSize = ImGui::CalcTextSize(cStringValue);
+	ImVec2 textPos = ImVec2(p.x + (width - textSize.x) * 0.5f, p.y + (height - textSize.y) * 0.5f);
 	drawList->AddText(textPos, ImGui::GetColorU32(ImVec4(1.0f, 1.0f, 1.0f, 1.0f)), cStringValue);
 
 	ImGui::SameLine();
@@ -90,10 +90,10 @@ void CustomSlider::GradientSlider(const char* label, float* value, float valueMi
 	drawList->AddRectFilled(ImVec2(grabX + margin * 1.5f, p.y + grabWidth - margin * 0.5f), ImVec2(grabX + grabWidth - margin * 0.5f, p.y + margin * 1.5f), ImGui::GetColorU32(isActive ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab));
 
 	//Draw value
-	ImVec2 textSize = ImGui::CalcTextSize(label);
-	ImVec2 textPos = ImVec2(p.x + (width - textSize.x) * 0.5f, p.y + (height - textSize.y) * 0.5f);
 	char cStringValue[50];
 	sprintf(cStringValue, "%.3f", *value);
+	ImVec2 textSize = ImGui::CalcTextSize(cStringValue);
+	ImVec2 textPos = ImVec2(p.x + (width - textSize.x) * 0.5f, p.y + (height - textSize.y) * 0.5f);
 	drawList->AddText(textPos, ImGui::GetColorU32(ImVec4(1.0f, 1.0f, 1.0f, 1.0f)), cStringValue);
 
 	ImGui::SameLine();

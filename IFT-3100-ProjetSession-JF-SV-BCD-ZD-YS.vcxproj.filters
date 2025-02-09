@@ -112,6 +112,9 @@
     <ClCompile Include="src\ColorPicker.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
+    <ClCompile Include="src\CustomSlider.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -567,6 +570,9 @@
       <Filter>src\components</Filter>
     </ClInclude>
     <ClInclude Include="src\ColorPicker.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CustomSlider.h">
       <Filter>src\components</Filter>
     </ClInclude>
   </ItemGroup>

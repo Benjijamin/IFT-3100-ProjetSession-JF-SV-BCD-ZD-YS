@@ -35,15 +35,6 @@ private:
 		float saturationSlider;
 		float brightnessSlider;
 
-		void GradientSlider(const char* label, float* value, float valueMin, float valueMax, ImU32 colorStart, ImU32 colorEnd);
-		void HueSlider(const char* label, float* value, float valueMin, float valueMax);
-		ImU32 red = ImGui::GetColorU32(ImVec4(255, 0, 0, 1));
-		ImU32 yellow = ImGui::GetColorU32(ImVec4(255, 255, 0, 1));
-		ImU32 green = ImGui::GetColorU32(ImVec4(0, 255, 0, 1));
-		ImU32 cyan = ImGui::GetColorU32(ImVec4(0, 255, 255, 1));
-		ImU32 blue = ImGui::GetColorU32(ImVec4(0, 0, 255, 1));
-		ImU32 magenta = ImGui::GetColorU32(ImVec4(255, 0, 255, 1));
-
 		/**
 		* \brief Transforme un rgb en hsb (Hue, Saturation, Brightness)
 		* Possiblement extraire en methode Utils si besoin ailleurs

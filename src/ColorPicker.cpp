@@ -1,5 +1,5 @@
 #include "ColorPicker.h"
-#include <imgui_internal.h>
+#include "CustomSlider.h"
 
 void ColorPicker::setup() 
 {
@@ -51,10 +51,10 @@ void ColorPicker::draw()
 			ImU32 alphaColorStart = ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], 0.0f));
 			ImU32 alphaColorEnd = ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], 1.0f));
 
-			HueSlider("Hue", &hueSlider, 0.0f, 360.0f);
-			GradientSlider("Saturation", &saturationSlider, 0.0f, 1.0f, saturationColorStart, saturationColorEnd);
-			GradientSlider("Brightness", &brightnessSlider, 0.0f, 1.0f, brightnessColorStart, brightnessColorEnd);
-			GradientSlider("Alpha", &selectedColor[3], 0.0f, 1.0f, alphaColorStart, alphaColorEnd);
+			CustomSlider::HueSlider("Hue", &hueSlider, 0.0f, 360.0f);
+			CustomSlider::GradientSlider("Saturation", &saturationSlider, 0.0f, 1.0f, saturationColorStart, saturationColorEnd);
+			CustomSlider::GradientSlider("Brightness", &brightnessSlider, 0.0f, 1.0f, brightnessColorStart, brightnessColorEnd);
+			CustomSlider::GradientSlider("Alpha", &selectedColor[3], 0.0f, 1.0f, alphaColorStart, alphaColorEnd);
 
 			if (prevHue != hueSlider || prevSaturation != saturationSlider || prevBrightness != brightnessSlider) 
 			{
@@ -68,101 +68,6 @@ void ColorPicker::draw()
 
 		ImGui::End();
 	}
-}
-
-void ColorPicker::HueSlider(const char* label, float* value, float valueMin, float valueMax) 
-{
-	ImGui::PushID(label);
-	ImVec2 p = ImGui::GetCursorScreenPos();
-	float width = ImGui::CalcItemWidth();
-	float height = ImGui::GetFrameHeight();
-	float margin = 1.5f;
-	float grabWidth = height - margin;
-	ImRect grabBoundingBox = ImRect(ImVec2(p.x + height * 0.5f, p.y), ImVec2(p.x + width - height * 0.5f, p.y + height));
-
-	ImGui::InvisibleButton(label, ImVec2(width, height));
-	bool isActive = ImGui::IsItemActive();
-	bool clicked = ImGui::IsItemClicked();
-
-	if (isActive)
-	{
-		float mousePos = ImGui::GetMousePos().x - grabBoundingBox.Min.x;
-		*value = valueMin + (valueMax - valueMin) * (mousePos / grabBoundingBox.GetWidth());
-		*value = ImClamp(*value, valueMin, valueMax);
-	}
-
-	//Draw background
-	ImDrawList* drawList = ImGui::GetWindowDrawList();
-	float sixth = width / 6.0f;
-
-	drawList->AddRectFilledMultiColor(ImVec2(p.x, p.y), ImVec2(p.x + sixth, p.y + height), red, yellow, yellow, red);
-	drawList->AddRectFilledMultiColor(ImVec2(p.x + sixth, p.y), ImVec2(p.x + sixth * 2, p.y + height), yellow, green, green, yellow);
-	drawList->AddRectFilledMultiColor(ImVec2(p.x + sixth * 2, p.y), ImVec2(p.x + sixth * 3, p.y + height), green, cyan, cyan, green);
-	drawList->AddRectFilledMultiColor(ImVec2(p.x + sixth * 3, p.y), ImVec2(p.x + sixth * 4, p.y + height), cyan, blue, blue, cyan);
-	drawList->AddRectFilledMultiColor(ImVec2(p.x + sixth * 4, p.y), ImVec2(p.x + sixth * 5, p.y + height), blue, magenta, magenta, blue);
-	drawList->AddRectFilledMultiColor(ImVec2(p.x + sixth * 5, p.y), ImVec2(p.x + sixth * 6, p.y + height), magenta, red, red, magenta);
-
-	//Draw grab
-	float grabPos = (*value - valueMin) / (valueMax - valueMin) * grabBoundingBox.GetWidth();
-	float grabX = p.x + grabPos;
-	drawList->AddRectFilled(ImVec2(grabX + margin, p.y + grabWidth), ImVec2(grabX + grabWidth, p.y + margin), ImGui::GetColorU32(ImVec4(0.0f, 0.0f, 0.0f, 1.0f)));
-	drawList->AddRectFilled(ImVec2(grabX + margin * 1.5f, p.y + grabWidth - margin * 0.5f), ImVec2(grabX + grabWidth - margin * 0.5f, p.y + margin * 1.5f), ImGui::GetColorU32(isActive ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab));
-
-	//Draw value
-	ImVec2 textSize = ImGui::CalcTextSize(label);
-	ImVec2 textPos = ImVec2(p.x + (width - textSize.x) * 0.5f, p.y + (height - textSize.y) * 0.5f);
-	char cStringValue[50];
-	sprintf(cStringValue, "%.3f", *value);
-	drawList->AddText(textPos, ImGui::GetColorU32(ImVec4(1.0f, 1.0f, 1.0f, 1.0f)), cStringValue);
-
-	ImGui::SameLine();
-	ImGui::Text(label);
-
-	ImGui::PopID();
-}
-
-void ColorPicker::GradientSlider(const char* label, float* value, float valueMin, float valueMax, ImU32 colorStart, ImU32 colorEnd) 
-{
-	ImGui::PushID(label);
-	ImVec2 p = ImGui::GetCursorScreenPos();
-	float width = ImGui::CalcItemWidth();
-	float height = ImGui::GetFrameHeight();
-	float margin = 1.5f;
-	float grabWidth = height - margin;
-	ImRect grabBoundingBox = ImRect(ImVec2(p.x + height * 0.5f, p.y), ImVec2(p.x + width - height * 0.5f, p.y + height));
-
-	ImGui::InvisibleButton(label, ImVec2(width, height));
-	bool isActive = ImGui::IsItemActive();
-	bool clicked = ImGui::IsItemClicked();
-
-	if (isActive) 
-	{
-		float mousePos = ImGui::GetMousePos().x - grabBoundingBox.Min.x;
-		*value = valueMin + (valueMax - valueMin) * (mousePos / grabBoundingBox.GetWidth());
-		*value = ImClamp(*value, valueMin, valueMax);
-	}
-
-	//Draw background
-	ImDrawList* drawList = ImGui::GetWindowDrawList();
-	drawList->AddRectFilledMultiColor(p, ImVec2(p.x + width, p.y + height), colorStart, colorEnd, colorEnd, colorStart);
-
-	//Draw grab
-	float grabPos = (*value - valueMin) / (valueMax - valueMin) * grabBoundingBox.GetWidth();
-	float grabX = p.x + grabPos;
-	drawList->AddRectFilled(ImVec2(grabX + margin, p.y + grabWidth), ImVec2(grabX + grabWidth, p.y + margin), ImGui::GetColorU32(ImVec4(0.0f,0.0f,0.0f,1.0f)));
-	drawList->AddRectFilled(ImVec2(grabX + margin * 1.5f, p.y + grabWidth - margin * 0.5f), ImVec2(grabX + grabWidth - margin * 0.5f, p.y + margin * 1.5f), ImGui::GetColorU32(isActive ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab));
-
-	//Draw value
-	ImVec2 textSize = ImGui::CalcTextSize(label);
-	ImVec2 textPos = ImVec2(p.x + (width - textSize.x) * 0.5f, p.y + (height - textSize.y) * 0.5f);
-	char cStringValue[50];
-	sprintf(cStringValue, "%.3f", *value);
-	drawList->AddText(textPos, ImGui::GetColorU32(ImVec4(1.0f, 1.0f, 1.0f, 1.0f)), cStringValue);
-
-	ImGui::SameLine();
-	ImGui::Text(label);
-
-	ImGui::PopID();
 }
 
 ColorPicker::HSB ColorPicker::RGBToHSB(float r, float g, float b) 

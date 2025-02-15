@@ -10,11 +10,14 @@ void ofApp::setup() {
 
     assetBrowser.setup();
     screenCapture.setup();
+    dynamicCursor.setup();
 
     currentEditor = nullptr;
 
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
     assetBrowser.onAssetDeletion = std::bind(&ofApp::handleAssetDeletion, this);
+
+    carre.set(300, 200, 100, 100);
 }
 
 void ofApp::update() {
@@ -29,6 +32,10 @@ void ofApp::draw() {
     }
 
     screenCapture.draw();
+
+    // Dessiner le carré
+    ofSetColor(255, 0, 0); // Rouge
+    ofDrawRectangle(carre);
 
     gui.begin();
 
@@ -64,7 +71,7 @@ void ofApp::keyReleased(int key) {
 }
 
 void ofApp::mouseMoved(int x, int y) {
-
+    dynamicCursor.update(x, y, carre);
 }
 
 void ofApp::mouseDragged(int x, int y, int button) {

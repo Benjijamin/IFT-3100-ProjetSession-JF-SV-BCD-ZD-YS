@@ -9,6 +9,7 @@
 #include "AssetBrowser.h"
 #include "ScreenCapture.h"
 #include "MenuBar.h"
+#include "DynamicCursor.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -39,6 +40,9 @@ private:
 
     AssetBrowser assetBrowser;
     ScreenCapture screenCapture;
+
+    DynamicCursor dynamicCursor;
+    ofRectangle carre;
 
     MenuBar menuBar;
 

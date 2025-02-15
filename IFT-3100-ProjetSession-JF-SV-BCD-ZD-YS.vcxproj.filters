@@ -115,7 +115,7 @@
     <ClCompile Include="src\CustomSlider.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
-    <ClCompile Include="DynamicCursor.cpp">
+    <ClCompile Include="src\DynamicCursor.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -578,7 +578,7 @@
     <ClInclude Include="src\CustomSlider.h">
       <Filter>src\components</Filter>
     </ClInclude>
-    <ClInclude Include="DynamicCursor.h">
+    <ClInclude Include="src\DynamicCursor.h">
       <Filter>src\components</Filter>
     </ClInclude>
   </ItemGroup>

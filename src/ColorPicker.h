@@ -36,6 +36,8 @@ private:
 		float saturationSlider;
 		float brightnessSlider;
 
+		void drawHSBPicker();
+
 		/**
 		* \brief Transforme un rgb en hsb (Hue, Saturation, Brightness)
 		* Possiblement extraire en methode Utils si besoin ailleurs

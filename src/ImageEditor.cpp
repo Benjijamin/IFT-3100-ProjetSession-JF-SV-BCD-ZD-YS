@@ -159,10 +159,10 @@ void ImageEditor::adjustZoomAndPan() {
         int imageWidth = currentImage->getWidth();
         int imageHeight = currentImage->getHeight();
 
-        float targetWidth = screenWidth * 0.8f;
+        float targetWidth = screenWidth * 0.7f;
         zoomFactor = targetWidth / imageWidth;
 
-        panOffset.set((screenWidth - imageWidth * zoomFactor) / 2, (screenHeight - imageHeight * zoomFactor) / 2);
+        panOffset.set((screenWidth - imageWidth * zoomFactor) / 2 + 120, (screenHeight - imageHeight * zoomFactor) / 2 - 140);
     }
 }
 
@@ -194,6 +194,11 @@ void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
 void ImageEditor::copyRegion(int startX, int startY, int endX, int endY) {
     if (endX < startX) std::swap(startX, endX);
     if (endY < startY) std::swap(startY, endY);
+
+    startX = std::clamp(startX, 0, static_cast<int>(currentImage->getWidth() - 1));
+    startY = std::clamp(startY, 0, static_cast<int>(currentImage->getHeight() - 1));
+    endX = std::clamp(endX, 0, static_cast<int>(currentImage->getWidth() - 1));
+    endY = std::clamp(endY, 0, static_cast<int>(currentImage->getHeight() - 1));
 
     int width = endX - startX;
     int height = endY - startY;

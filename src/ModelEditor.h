@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxAssimpModelLoader.h"
+#include "ofxGizmo.h"
 #include "ofxImGui.h"
 #include "SceneGraph.h"
 #include "FreeFlightCamera.h"
@@ -26,13 +26,18 @@ public:
 private:
     void switchToOrbitCamera();
     void switchToFreeFlightCamera();
+    void updateGizmo();
+    ofCamera* getActiveCamera();
 
     ofLight light;
     ofMaterial material;
+
     ofEasyCam orbitCam;
     FreeFlightCamera freeFlightCam;
-    SceneGraph sceneGraph;
-
     bool isFreeFlightMode;
     bool shouldEnableMouseInput;
+
+    SceneGraph sceneGraph;
+    ofxGizmo gizmo;
+    ofxGizmo::ofxGizmoType gizmoType;
 };

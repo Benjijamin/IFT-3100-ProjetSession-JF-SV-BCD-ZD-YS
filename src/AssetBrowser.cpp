@@ -67,31 +67,29 @@ void AssetBrowser::drawGui() {
 
         auto filteredAssets = getFilteredAssets();
 
-        for (const auto& asset : filteredAssets) {
+        for (size_t i = 0; i < filteredAssets.size(); ++i) {
+            const auto& asset = filteredAssets[i];
             std::string displayText = showFullPaths ? asset : fs::path(asset).stem().string();
 
             if (strstr(displayText.c_str(), searchBuffer) != nullptr) {
                 ImVec2 selectableSize = ImVec2(0, ImGui::GetFrameHeightWithSpacing());
-                ImGui::BeginGroup();
 
-                if (ImGui::Selectable("##hidden", selectedAsset == asset, 0, selectableSize)) {
+                std::string selectableID = "##hidden" + std::to_string(i);
+                if (ImGui::Selectable(selectableID.c_str(), selectedAsset == asset, 0, selectableSize)) {
                     selectedAsset = asset;
                     if (onAssetSelection) onAssetSelection();
                 }
 
                 ImGui::SameLine();
-                ImVec2 textPos = ImGui::GetCursorPos();
-                textPos.y += (selectableSize.y - ImGui::GetTextLineHeight()) / 2;
-                ImGui::SetCursorPos(textPos);
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (selectableSize.y - ImGui::GetTextLineHeight()) / 2);
                 ImGui::Text(displayText.c_str());
 
                 if (!showFullPaths) {
                     ImGui::SameLine();
-                    ImGui::SetCursorPosX(textPos.x + ImGui::GetColumnWidth() * 0.5f);
                     ImGui::TextDisabled("[%s]", fs::path(asset).extension().string().c_str());
                 }
 
-                ImGui::EndGroup();
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (selectableSize.y - ImGui::GetTextLineHeight()) / 2);
             }
         }
 

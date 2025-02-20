@@ -12,6 +12,8 @@ void ColorPicker::draw() {
 
     ImGui::Combo("Mode", &currentItem, items, IM_ARRAYSIZE(items));
 
+    ImGui::Spacing();
+
     ImGuiColorEditFlags flags = (currentItem == 0) ? ImGuiColorEditFlags_DisplayRGB : ImGuiColorEditFlags_DisplayHSV;
     float col[4] = { color.r, color.g, color.b, color.a };
     ImGui::ColorPicker4(items[currentItem], col, flags);

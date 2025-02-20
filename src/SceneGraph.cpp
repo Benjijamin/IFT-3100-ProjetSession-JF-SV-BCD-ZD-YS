@@ -1,9 +1,7 @@
 #include "SceneGraph.h"
 
 SceneGraph::SceneGraph()
-    : gizmoType(ofxGizmo::OFX_GIZMO_MOVE), selectedIndex(-1) {
-    gizmo.setType(gizmoType);
-    gizmo.hide();
+    : selectedIndex(-1) {
 }
 
 void SceneGraph::setup() {
@@ -11,17 +9,12 @@ void SceneGraph::setup() {
 }
 
 void SceneGraph::update() {
-    if (selectedIndex != -1) {
-        gizmo.apply(nodes[selectedIndex]);
-    }
 }
 
-void SceneGraph::draw(ofCamera& camera) {
+void SceneGraph::draw() {
     for (auto& node : nodes) {
         node.draw();
     }
-
-    gizmo.draw(camera);
 }
 
 void SceneGraph::drawGui() {
@@ -29,58 +22,32 @@ void SceneGraph::drawGui() {
 
     drawNodeGui(0);
 
-    ImGui::End();
+    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - ImGui::GetFrameHeightWithSpacing() - ImGui::GetStyle().WindowPadding.y);
 
-    if (selectedIndex != -1) {
-        ImGui::Begin("Gizmo Controls");
-        ImGui::Text("Gizmo Controls for Node: %s", nodes[selectedIndex].getName().c_str());
-
-        bool translateSelected = (gizmoType == ofxGizmo::OFX_GIZMO_MOVE);
-        bool rotateSelected = (gizmoType == ofxGizmo::OFX_GIZMO_ROTATE);
-        bool scaleSelected = (gizmoType == ofxGizmo::OFX_GIZMO_SCALE);
-
-        if (ImGui::RadioButton("Translate", translateSelected)) {
-            gizmoType = ofxGizmo::OFX_GIZMO_MOVE;
+    if (selectedIndex > 0) {
+        if (ImGui::Button("Delete Selected Node")) {
+            deleteNode(selectedIndex);
+            selectedIndex = -1;
         }
-
-        if (ImGui::RadioButton("Rotate", rotateSelected)) {
-            gizmoType = ofxGizmo::OFX_GIZMO_ROTATE;
-        }
-
-        if (ImGui::RadioButton("Scale", scaleSelected)) {
-            gizmoType = ofxGizmo::OFX_GIZMO_SCALE;
-        }
-
-        gizmo.setType(gizmoType);
-
-        if (selectedIndex != 0) {
-            if (ImGui::Button("Delete Selected Node")) {
-                deleteNode(selectedIndex);
-            }
-        }
-
-        ImGui::End();
     }
+
+    ImGui::End();
 }
 
 void SceneGraph::exit() {
-
 }
 
 void SceneGraph::drawNodeGui(int index) {
     ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+
+    if (index == selectedIndex) {
+        nodeFlags |= ImGuiTreeNodeFlags_Selected;
+    }
+
     bool nodeOpen = ImGui::TreeNodeEx(nodes[index].getName().c_str(), nodeFlags);
 
     if (ImGui::IsItemClicked()) {
         selectedIndex = index;
-
-        if (selectedIndex != -1) {
-            gizmo.setNode(nodes[selectedIndex]);
-            gizmo.show();
-        }
-        else {
-            gizmo.hide();
-        }
     }
 
     if (nodeOpen) {
@@ -130,6 +97,14 @@ void SceneGraph::deleteNode(int index) {
     reassignChildrenToParent(index, parentIndex);
     removeNodeFromGraph(index);
     updateChildrenIndices(index);
+}
+
+SceneNode& SceneGraph::getNode(int index) {
+    return nodes.at(index);
+}
+
+int SceneGraph::getSelectedIndex() const {
+    return selectedIndex;
 }
 
 int SceneGraph::findParentIndex(int index) {

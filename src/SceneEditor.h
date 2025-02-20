@@ -22,5 +22,11 @@ public:
     void load(const std::string& path) override;
     void save(const std::string& path) override;
 private:
+    char* sceneName;
     SceneGraph sceneGraph;
+
+    bool justAddedNode;
+
+    void drawSceneGraph();
+    void drawSceneGraphNode(int index);
 };

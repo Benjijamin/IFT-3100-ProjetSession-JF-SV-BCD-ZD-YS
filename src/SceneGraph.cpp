@@ -8,6 +8,7 @@ SceneGraph::SceneGraph()
 
 void SceneGraph::setup() {
     nodes.emplace_back("Root");
+    selectedIndex = -1;
 }
 
 void SceneGraph::update() {
@@ -108,6 +109,20 @@ void SceneGraph::addModelNode(const std::string& name, std::shared_ptr<ofxAssimp
     childrenIndices[parentIndex].push_back(newIndex);
 }
 
+void SceneGraph::addEmptyNode(const std::string& name, SceneNode parent) 
+{
+    std::string uniqueName = generateUniqueName(name);
+    nodes.emplace_back(uniqueName);
+
+    int parentIndex = findIndexOf(parent);
+    int newIndex = nodes.size() - 1;
+
+    SceneNode& node = nodes.back();
+    node.setParent(nodes[parentIndex]);
+
+    childrenIndices[parentIndex].push_back(newIndex);
+}
+
 std::string SceneGraph::generateUniqueName(const std::string& baseName) {
     std::string uniqueName = baseName;
     int counter = 1;
@@ -142,6 +157,33 @@ int SceneGraph::findParentIndex(int index) {
         }
     }
     return -1;
+}
+
+int SceneGraph::findIndexOf(SceneNode node) 
+{
+    auto it = std::find(nodes.begin(), nodes.end(), node);
+    if (it != nodes.end()) 
+    {
+        return std::distance(nodes.begin(), it);
+    }
+
+    return -1;
+}
+
+/**
+Trouve les enfants du parent(index),
+retourne liste vide si aucun enfant
+*/
+std::vector<int> SceneGraph::getChildrenOf(int index)
+{
+    if (childrenIndices.find(index) != childrenIndices.end()) 
+    {
+        return childrenIndices[index];
+    }
+    else 
+    {
+        return {};
+    }
 }
 
 void SceneGraph::reassignChildrenToParent(int index, int parentIndex) {
@@ -179,4 +221,29 @@ void SceneGraph::updateChildrenIndices(int index) {
         newChildrenIndices[parentIndex] = newChildren;
     }
     childrenIndices = newChildrenIndices;
+}
+
+SceneNode SceneGraph::getNode(int index) const
+{
+    return nodes[index];
+}
+
+SceneNode SceneGraph::getSelectedNode() const
+{
+    return nodes[selectedIndex];
+}
+
+SceneNode SceneGraph::getRootNode() const
+{
+    return nodes[0];
+}
+
+void SceneGraph::setSelectedIndex(int index)
+{
+    selectedIndex = index;
+}
+
+int SceneGraph::getSelectedIndex() const
+{
+    return selectedIndex;
 }

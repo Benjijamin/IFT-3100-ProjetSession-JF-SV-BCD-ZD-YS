@@ -13,6 +13,8 @@ public:
 
     std::string getName() const;
 
+    bool operator ==(const SceneNode& other) const;
+
 private:
     std::string name;
     std::shared_ptr<ofxAssimpModelLoader> model;

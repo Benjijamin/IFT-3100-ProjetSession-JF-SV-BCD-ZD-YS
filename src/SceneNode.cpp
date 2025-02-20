@@ -19,3 +19,8 @@ void SceneNode::customDraw() {
 std::string SceneNode::getName() const {
     return name;
 }
+
+bool SceneNode::operator ==(const SceneNode& other) const 
+{
+    return (name == other.name);
+}

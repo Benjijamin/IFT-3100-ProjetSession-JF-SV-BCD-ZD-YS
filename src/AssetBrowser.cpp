@@ -39,8 +39,8 @@ void AssetBrowser::drawGui() {
             float mouseDelta = io.MouseDelta.y;
             assetBrowserHeight -= mouseDelta;
 
-            if (assetBrowserHeight < 100.0f) {
-                assetBrowserHeight = 100.0f;
+            if (assetBrowserHeight < 200.0f) {
+                assetBrowserHeight = 200.0f;
             }
             if (assetBrowserHeight > windowSize.y - 100.0f) {
                 assetBrowserHeight = windowSize.y - 100.0f;
@@ -55,14 +55,15 @@ void AssetBrowser::drawGui() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 
+        ImGui::Columns(2, nullptr, false);
+        ImGui::SetColumnWidth(0, windowSize.x * 0.75f);
+
         static char searchBuffer[128] = "";
+        ImGui::SetNextItemWidth(-1);
         ImGui::InputTextWithHint("##Search", "Search...", searchBuffer, IM_ARRAYSIZE(searchBuffer));
         ImGui::Dummy(ImVec2(0.0f, 4.0f));
 
-        ImVec2 contentRegion = ImGui::GetContentRegionAvail();
-        float availableHeight = contentRegion.y;
-
-        ImGui::BeginChild("AssetList", ImVec2(contentRegion.x * 0.75f, availableHeight), false);
+        ImGui::BeginChild("AssetList", ImVec2(0, 0), false);
 
         auto filteredAssets = getFilteredAssets();
 
@@ -85,8 +86,8 @@ void AssetBrowser::drawGui() {
                 ImGui::Text(displayText.c_str());
 
                 if (!showFullPaths) {
-                    ImGui::SameLine(contentRegion.x * 0.5f);
-                    ImGui::SetCursorPosY(textPos.y);
+                    ImGui::SameLine();
+                    ImGui::SetCursorPosX(textPos.x + ImGui::GetColumnWidth() * 0.5f);
                     ImGui::TextDisabled("[%s]", fs::path(asset).extension().string().c_str());
                 }
 
@@ -96,9 +97,11 @@ void AssetBrowser::drawGui() {
 
         ImGui::EndChild();
 
-        ImGui::SameLine();
+        ImGui::NextColumn();
 
-        ImGui::BeginChild("Controls", ImVec2(contentRegion.x * 0.25f, availableHeight), false);
+        ImGui::PopStyleColor(2);
+
+        ImGui::BeginChild("Controls", ImVec2(0, 0), false);
 
         if (!selectedAsset.empty()) {
             if (ImGui::Button("Delete")) {
@@ -129,11 +132,11 @@ void AssetBrowser::drawGui() {
 
         ImGui::EndChild();
 
+        ImGui::Columns(1);
         ImGui::PopStyleVar(2);
-        ImGui::PopStyleColor(2);
-
-        ImGui::End();
     }
+
+    ImGui::End();
 }
 
 void AssetBrowser::exit() {

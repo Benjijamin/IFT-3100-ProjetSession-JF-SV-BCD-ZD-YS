@@ -4,13 +4,12 @@ void ImageEditor::setup() {
     currentImage = new ofImage();
     panOffset.set(0, 0);
     zoomFactor = 1.0f;
-    isDrawing = false;
+    isDragging = false;
     drawRadius = 10;
     currentTool = Tool::PanZoom;
 
     colorPicker.setup();
-    drawColor = ofColor(colorPicker.selectedColor[0] * 255, colorPicker.selectedColor[1] * 255,
-        colorPicker.selectedColor[2] * 255);
+    drawColor = colorPicker.getColor();
 }
 
 void ImageEditor::update() {
@@ -31,62 +30,38 @@ void ImageEditor::draw() {
 }
 
 void ImageEditor::drawGui() {
-    ImGui::Begin("Toolbar", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+    ImVec2 windowSize = ImGui::GetIO().DisplaySize;
+    float toolbarHeight = windowSize.y * 0.25f;
+    ImGui::SetNextWindowSize(ImVec2(150, toolbarHeight));
+    ImGui::SetNextWindowPos(ImVec2(0, (windowSize.y - toolbarHeight) / 2), ImGuiCond_FirstUseEver);
+    ImGui::Begin("Toolbar", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
 
-    if (ImGui::Button("Pan/Zoom")) {
+    ImVec2 buttonSize = ImVec2(-1, 40);
+
+    if (ImGui::Button("Pan/Zoom", buttonSize)) {
         currentTool = Tool::PanZoom;
     }
 
-    ImGui::SameLine();
-
-    if (ImGui::Button("Circle")) {
-        currentTool = Tool::Circle;
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Square")) {
-        currentTool = Tool::Square;
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Copy Region")) {
+    if (ImGui::Button("Copy Region", buttonSize)) {
         currentTool = Tool::CopyRegion;
     }
 
-    ImGui::SameLine();
-
-    if (ImGui::Button("Paste Region")) {
+    if (ImGui::Button("Paste Region", buttonSize)) {
         currentTool = Tool::PasteRegion;
     }
 
-    if (currentTool == Tool::Circle || currentTool == Tool::Square) {
-
-        ImVec4 color(colorPicker.selectedColor[0], colorPicker.selectedColor[1], 
-            colorPicker.selectedColor[2], colorPicker.selectedColor[3]);
-
-        ImGui::PushStyleColor(ImGuiCol_Button, color);
-        if (ImGui::Button("", ImVec2(16, 16)))
-        {
-            colorPicker.showColorPicker = true;
-        }
-        ImGui::PopStyleColor(1);
-
-        ImGui::SameLine();
-
-        ImGui::SliderInt("Draw Radius", &drawRadius, 1, 50);
-        
+    if (ImGui::Button("Brush", buttonSize)) {
+        currentTool = Tool::Brush;
     }
 
-    if (colorPicker.showColorPicker) 
-    {
-        colorPicker.draw();
-        drawColor = ofColor(colorPicker.selectedColor[0] * 255, colorPicker.selectedColor[1] * 255,
-            colorPicker.selectedColor[2] * 255);
+    if (currentTool == Tool::Brush) {
+        ImGui::SliderInt("Brush Size", &drawRadius, 1, 50);
     }
 
     ImGui::End();
+
+    colorPicker.draw();
+    drawColor = colorPicker.getColor();
 }
 
 void ImageEditor::exit() {
@@ -95,21 +70,19 @@ void ImageEditor::exit() {
 }
 
 void ImageEditor::mouseDragged(int x, int y, int button) {
-    ofVec2f p = screenToPixelCoords(ofVec2f(x, y));
-
-    switch (currentTool) {
-    case Tool::PanZoom:
-        panImage(x - dragStartPos.x, y - dragStartPos.y);
-        dragStartPos = ofVec2f(x, y);
-        break;
-    case Tool::Circle:
-        drawCircle(p.x, p.y);
-        break;
-    case Tool::Square:
-        drawSquare(p.x, p.y);
-        break;
-    default:
-        break;
+    if (isNothingHovered() && isDragging) {
+        switch (currentTool) {
+        case Tool::PanZoom:
+            panImage(x - dragStartPos.x, y - dragStartPos.y);
+            dragStartPos = ofVec2f(x, y);
+            break;
+        case Tool::Brush:
+            drawBrush(dragStartPos.x, dragStartPos.y, x, y);
+            dragStartPos = ofVec2f(x, y);
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -135,7 +108,7 @@ void ImageEditor::mouseReleased(int x, int y, int button) {
 }
 
 void ImageEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
-    if (currentTool == Tool::PanZoom) {
+    if (currentTool == Tool::PanZoom && !ImGui::IsAnyWindowHovered()) {
         zoomImage(1.0f + scrollY * 0.1f, x, y);
     }
 }
@@ -193,28 +166,25 @@ void ImageEditor::adjustZoomAndPan() {
     }
 }
 
-void ImageEditor::drawCircle(int x, int y) {
-    for (int i = -drawRadius; i <= drawRadius; ++i) {
-        for (int j = -drawRadius; j <= drawRadius; ++j) {
-            if (i * i + j * j <= drawRadius * drawRadius) {
-                int drawX = x + i;
-                int drawY = y + j;
-                if (isWithinBounds(drawX, drawY)) {
-                    currentImage->setColor(drawX, drawY, drawColor);
-                }
-            }
-        }
-    }
-    currentImage->update();
-}
+void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
+    ofVec2f start = screenToPixelCoords(ofVec2f(startX, startY));
+    ofVec2f end = screenToPixelCoords(ofVec2f(endX, endY));
 
-void ImageEditor::drawSquare(int x, int y) {
-    for (int i = -drawRadius; i <= drawRadius; ++i) {
-        for (int j = -drawRadius; j <= drawRadius; ++j) {
-            int drawX = x + i;
-            int drawY = y + j;
-            if (isWithinBounds(drawX, drawY)) {
-                currentImage->setColor(drawX, drawY, drawColor);
+    int numSteps = std::max(abs(end.x - start.x), abs(end.y - start.y));
+    for (int step = 0; step <= numSteps; ++step) {
+        float t = static_cast<float>(step) / static_cast<float>(numSteps);
+        int x = static_cast<int>(ofLerp(start.x, end.x, t));
+        int y = static_cast<int>(ofLerp(start.y, end.y, t));
+
+        for (int i = -drawRadius; i <= drawRadius; ++i) {
+            for (int j = -drawRadius; j <= drawRadius; ++j) {
+                if (i * i + j * j <= drawRadius * drawRadius) {
+                    int drawX = x + i;
+                    int drawY = y + j;
+                    if (isWithinBounds(drawX, drawY)) {
+                        currentImage->setColor(drawX, drawY, drawColor);
+                    }
+                }
             }
         }
     }
@@ -279,6 +249,10 @@ void ImageEditor::drawPasteRegion() {
     ofFill();
     ofDrawRectangle(x, y, width, height);
     ofPopStyle();
+}
+
+bool ImageEditor::isNothingHovered() {
+    return !ImGui::IsAnyWindowHovered() && !ImGui::IsAnyItemHovered();
 }
 
 bool ImageEditor::isImageAllocated() const {

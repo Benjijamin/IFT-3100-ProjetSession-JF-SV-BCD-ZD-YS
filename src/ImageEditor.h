@@ -26,14 +26,14 @@ private:
     void zoomImage(float scale, float mouseX, float mouseY);
     void adjustZoomAndPan();
 
-    void drawCircle(int x, int y);
-    void drawSquare(int x, int y);
+    void drawBrush(int startX, int startY, int endX, int endY);
 
     void copyRegion(int startX, int startY, int endX, int endY);
     void pasteRegion(int x, int y);
     void drawCopyRegion();
     void drawPasteRegion();
 
+    bool isNothingHovered();
     bool isImageAllocated() const;
     bool isWithinBounds(int x, int y) const;
 
@@ -49,7 +49,7 @@ private:
     int drawRadius;
     ofColor drawColor;
     
-    enum class Tool { PanZoom, Circle, Square, CopyRegion, PasteRegion };
+    enum class Tool { PanZoom, CopyRegion, PasteRegion, Brush };
     Tool currentTool;
 
     ofVec2f dragStartPos;

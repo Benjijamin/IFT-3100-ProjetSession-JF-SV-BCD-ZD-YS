@@ -32,7 +32,7 @@ void ScreenCapture::drawGui() {
             ImGui::Text("Screenshot Preview:");
 
             float aspectRatio = static_cast<float>(screenshotImg.getWidth()) / screenshotImg.getHeight();
-            float newWidth = 400.0f;
+            float newWidth = 800.0f;
             float newHeight = newWidth / aspectRatio;
 
             ImGui::Image((void*)(intptr_t)screenshotTexture, ImVec2(newWidth, newHeight));

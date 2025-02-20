@@ -114,6 +114,7 @@
     <ClCompile Include="src\AssetBrowser.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
     <ClCompile Include="src\ModelEditor.cpp" />
+    <ClCompile Include="src\SceneEditor.cpp" />
     <ClCompile Include="src\SceneGraph.cpp" />
     <ClCompile Include="src\SceneNode.cpp" />
     <ClCompile Include="src\ScreenCapture.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="src\AssetBrowser.h" />
     <ClInclude Include="src\ImageEditor.h" />
     <ClInclude Include="src\ModelEditor.h" />
+    <ClInclude Include="src\SceneEditor.h" />
     <ClInclude Include="src\SceneGraph.h" />
     <ClInclude Include="src\SceneNode.h" />
     <ClInclude Include="src\ScreenCapture.h" />

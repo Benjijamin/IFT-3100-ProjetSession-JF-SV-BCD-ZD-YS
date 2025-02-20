@@ -5,6 +5,7 @@
 #include "Editor.h"
 #include "ImageEditor.h"
 #include "ModelEditor.h"
+#include "SceneEditor.h"
 #include "DessinVectoriel.h"
 #include "AssetBrowser.h"
 #include "ScreenCapture.h"

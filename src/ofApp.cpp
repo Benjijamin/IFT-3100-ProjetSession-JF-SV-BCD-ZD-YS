@@ -61,6 +61,18 @@ void ofApp::keyReleased(int key) {
     if (key == 90) {
         currentEditor.reset();
     }
+
+    //TODO Mettre dans la barre d'onglets
+    if (key == 's') 
+    {
+        if (currentEditor) {
+            currentEditor->exit();
+        }
+
+        currentEditor = std::make_unique<SceneEditor>();
+        
+        currentEditor->setup();
+    }
 }
 
 void ofApp::mouseMoved(int x, int y) {

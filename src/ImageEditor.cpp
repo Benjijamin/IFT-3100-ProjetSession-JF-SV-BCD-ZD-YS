@@ -223,7 +223,7 @@ void ImageEditor::drawPasteRegion() {
 }
 
 bool ImageEditor::isGuiHovered() {
-    return ImGui::IsAnyWindowHovered() && ImGui::IsAnyItemHovered();
+    return ImGui::IsAnyWindowHovered() || ImGui::IsAnyItemHovered();
 }
 
 bool ImageEditor::isImageAllocated() const {

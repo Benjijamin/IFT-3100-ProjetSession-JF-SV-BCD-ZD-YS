@@ -5,7 +5,10 @@
 namespace fs = std::filesystem;
 
 void AssetBrowser::setup() {
-
+    assetBrowserHeight = 300.0f;
+    resizing = false;
+    showFullPaths = false;
+    filterIndex = 0;
 }
 
 void AssetBrowser::update() {
@@ -19,9 +22,6 @@ void AssetBrowser::draw() {
 void AssetBrowser::drawGui() {
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 windowSize = io.DisplaySize;
-
-    static float assetBrowserHeight = 300.0f;
-    static bool resizing = false;
 
     ImGui::SetNextWindowPos(ImVec2(0, windowSize.y - assetBrowserHeight));
     ImGui::SetNextWindowSize(ImVec2(windowSize.x, assetBrowserHeight));
@@ -38,95 +38,33 @@ void AssetBrowser::drawGui() {
         if (resizing && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
             float mouseDelta = io.MouseDelta.y;
             assetBrowserHeight -= mouseDelta;
-
-            if (assetBrowserHeight < 200.0f) {
-                assetBrowserHeight = 200.0f;
-            }
-            if (assetBrowserHeight > windowSize.y - 100.0f) {
-                assetBrowserHeight = windowSize.y - 100.0f;
-            }
+            assetBrowserHeight = std::clamp(assetBrowserHeight, 200.0f, windowSize.y - 100.0f);
         }
         else if (resizing && !ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
             resizing = false;
         }
 
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(40, 40, 40, 255));
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(30, 30, 30, 255));
+        ImU32 childBgColor = IM_COL32(30, 30, 30, 200);
+        if (ImGui::GetStyle().Colors[ImGuiCol_WindowBg].x > 0.5f) {
+            childBgColor = IM_COL32(255, 255, 255, 200);
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, childBgColor);
+
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 
         ImGui::Columns(2, nullptr, false);
-        ImGui::SetColumnWidth(0, windowSize.x * 0.8f);
+        ImGui::SetColumnWidth(0, windowSize.x * 0.75f);
 
-        static char searchBuffer[128] = "";
-        ImGui::SetNextItemWidth(-1);
-        ImGui::InputTextWithHint("##Search", "Search...", searchBuffer, IM_ARRAYSIZE(searchBuffer));
-        ImGui::Dummy(ImVec2(0.0f, 4.0f));
-
-        ImGui::BeginChild("AssetList", ImVec2(0, 0), false);
-
-        auto filteredAssets = getFilteredAssets();
-
-        for (size_t i = 0; i < filteredAssets.size(); ++i) {
-            const auto& asset = filteredAssets[i];
-            std::string displayText = showFullPaths ? asset : fs::path(asset).stem().string();
-
-            if (strstr(displayText.c_str(), searchBuffer) != nullptr) {
-                ImVec2 selectableSize = ImVec2(0, ImGui::GetFrameHeightWithSpacing());
-
-                std::string selectableID = "##hidden" + std::to_string(i);
-                if (ImGui::Selectable(selectableID.c_str(), selectedAsset == asset, 0, selectableSize)) {
-                    selectAsset(asset);
-                }
-
-                ImGui::SameLine();
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (selectableSize.y - ImGui::GetTextLineHeight()) / 2);
-                ImGui::Text(displayText.c_str());
-
-                if (!showFullPaths) {
-                    ImGui::SameLine();
-                    ImGui::TextDisabled("[%s]", fs::path(asset).extension().string().c_str());
-                }
-
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (selectableSize.y - ImGui::GetTextLineHeight()) / 2);
-            }
-        }
-
-        ImGui::EndChild();
+        drawSearchBar();
+        drawAssetList();
 
         ImGui::NextColumn();
 
-        ImGui::PopStyleColor(2);
+        ImGui::PopStyleColor();
 
-        ImGui::BeginChild("Controls", ImVec2(0, 0), false);
-
-        if (!selectedAsset.empty()) {
-            if (ImGui::Button("Delete")) {
-                removeAsset(selectedAsset);
-                selectedAsset.clear();
-            }
-        }
-
-        if (ImGui::Button("Load New Asset")) {
-            ofFileDialogResult result = ofSystemLoadDialog("Select an asset");
-            if (result.bSuccess) {
-                addAsset(result.getPath());
-            }
-        }
-
-        if (ImGui::Button("Load Assets from Folder")) {
-            ofFileDialogResult result = ofSystemLoadDialog("Select a folder", true);
-            if (result.bSuccess) {
-                loadAssetsFromFolder(result.getPath());
-            }
-        }
-
-        const char* filterOptions[] = { "None", "Images", "Models" };
-        ImGui::Combo("Filter", &filterIndex, filterOptions, IM_ARRAYSIZE(filterOptions));
-
-        ImGui::Checkbox("Show Full Paths", &showFullPaths);
-
-        ImGui::EndChild();
+        drawControls();
 
         ImGui::Columns(1);
         ImGui::PopStyleVar(2);
@@ -135,8 +73,89 @@ void AssetBrowser::drawGui() {
     ImGui::End();
 }
 
+void AssetBrowser::drawSearchBar() {
+    ImGui::SetNextItemWidth(-1);
+    ImGui::InputTextWithHint("##Search", "Search...", searchBuffer, IM_ARRAYSIZE(searchBuffer));
+    ImGui::Dummy(ImVec2(0.0f, 4.0f));
+}
+
+void AssetBrowser::drawAssetList() {
+    ImGui::BeginChild("AssetList", ImVec2(0, 0), false);
+
+    auto filteredAssets = getFilteredAssets();
+
+    for (size_t i = 0; i < filteredAssets.size(); ++i) {
+        const auto& asset = filteredAssets[i];
+        std::string displayText = showFullPaths ? asset : fs::path(asset).stem().string();
+
+        if (strstr(displayText.c_str(), searchBuffer) != nullptr) {
+            ImVec2 selectableSize = ImVec2(0, ImGui::GetFrameHeightWithSpacing());
+
+            std::string selectableID = "##hidden" + std::to_string(i);
+            if (ImGui::Selectable(selectableID.c_str(), selectedAsset == asset, 0, selectableSize)) {
+                selectAsset(asset);
+            }
+
+            ImGui::SameLine();
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (selectableSize.y - ImGui::GetTextLineHeight()) / 2);
+            ImGui::Text(displayText.c_str());
+
+            if (!showFullPaths) {
+                ImGui::SameLine();
+                ImGui::TextDisabled("[%s]", fs::path(asset).extension().string().c_str());
+            }
+
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - (selectableSize.y - ImGui::GetTextLineHeight()) / 2);
+        }
+    }
+
+    ImGui::EndChild();
+}
+
+void AssetBrowser::drawControls() {
+    ImGui::BeginChild("Controls", ImVec2(0, 0), false);
+
+    ImVec2 buttonSize = ImVec2(-1, 0);
+
+    if (!selectedAsset.empty()) {
+        if (ImGui::Button("Delete", buttonSize)) {
+            removeAsset(selectedAsset);
+            selectedAsset.clear();
+        }
+    }
+
+    if (ImGui::Button("Load New Asset", buttonSize)) {
+        ofFileDialogResult result = ofSystemLoadDialog("Select an asset");
+        if (result.bSuccess) {
+            addAsset(result.getPath());
+        }
+    }
+
+    if (ImGui::Button("Load Assets from Folder", buttonSize)) {
+        ofFileDialogResult result = ofSystemLoadDialog("Select a folder", true);
+        if (result.bSuccess) {
+            loadAssetsFromFolder(result.getPath());
+        }
+    }
+
+    const char* filterOptions[] = { "None", "Images", "Models" };
+    ImGui::Combo("Filter", &filterIndex, filterOptions, IM_ARRAYSIZE(filterOptions));
+
+    ImGui::Checkbox("Show Full Paths", &showFullPaths);
+
+    ImGui::EndChild();
+}
+
 void AssetBrowser::exit() {
 
+}
+
+std::string AssetBrowser::getSelectedAssetPath() const {
+    return selectedAsset;
+}
+
+std::string AssetBrowser::getLastAssetPath() const {
+    return assets.back();
 }
 
 void AssetBrowser::addAsset(const std::string& assetPath) {
@@ -206,12 +225,4 @@ std::vector<std::string> AssetBrowser::getFilteredAssets() const {
         }
         });
     return filteredAssets;
-}
-
-std::string AssetBrowser::getSelectedAssetPath() const {
-    return selectedAsset;
-}
-
-std::string AssetBrowser::getLastAssetPath() const {
-    return assets.back();
 }

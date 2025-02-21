@@ -3,15 +3,14 @@
 void ofApp::setup() {
     ofSetFrameRate(60);
 
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-
     gui.setup();
+
+    ImGui::StyleColorsClassic();
 
     imageEditor.setup();
     modelEditor.setup();
     assetBrowser.setup();
-    screenCapture.setup();
+    menuBar.setup();
 
     currentEditor = nullptr;
 
@@ -31,8 +30,6 @@ void ofApp::draw() {
         currentEditor->draw();
     }
 
-    screenCapture.draw();
-
     gui.begin();
 
     if (currentEditor) {
@@ -40,8 +37,6 @@ void ofApp::draw() {
     }
 
     assetBrowser.drawGui();
-    screenCapture.drawGui();
-
     menuBar.drawGui();
 
     gui.end();
@@ -53,7 +48,6 @@ void ofApp::exit() {
     }
 
     assetBrowser.exit();
-    screenCapture.exit();
 }
 
 void ofApp::keyPressed(int key) {

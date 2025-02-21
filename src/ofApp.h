@@ -6,7 +6,6 @@
 #include "ImageEditor.h"
 #include "ModelEditor.h"
 #include "AssetBrowser.h"
-#include "ScreenCapture.h"
 #include "MenuBar.h"
 
 class ofApp : public ofBaseApp {
@@ -40,7 +39,6 @@ private:
     ImageEditor imageEditor;
     ModelEditor modelEditor;
     AssetBrowser assetBrowser;
-    ScreenCapture screenCapture;
     MenuBar menuBar;
 
     Editor* currentEditor;

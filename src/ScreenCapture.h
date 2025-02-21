@@ -13,14 +13,15 @@ public:
 
     void captureScreenshot();
     void saveScreenshot();
-
-private:
     void createScreenshotTexture();
     void deleteScreenshotTexture();
+    void showModal();
+    void hideModal();
+
+private:
+    bool showScreenshotModalFlag = false;
+    bool screenshotTaken = false;
 
     ofImage screenshotImg;
     GLuint screenshotTexture;
-
-    bool showScreenshotModal;
-    bool screenshotTaken;
 };

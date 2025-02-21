@@ -1,5 +1,4 @@
 #include "ModelEditor.h"
-#include <filesystem>
 
 void ModelEditor::setup() {
     light.setup();
@@ -16,6 +15,12 @@ void ModelEditor::setup() {
 
     switchToOrbitCamera();
     shouldEnableMouseInput = false;
+
+    sceneGraph.setSelectedNodeChangedCallback([this](std::shared_ptr<SceneNode> selectedNode) {
+        if (selectedNode) {
+            gizmo.setNode(*selectedNode);
+        }
+        });
 }
 
 void ModelEditor::update() {
@@ -57,9 +62,7 @@ void ModelEditor::draw() {
 
     bool isOrtho = activeCam->getOrtho();
 
-    if (isOrtho) {
-        activeCam->disableOrtho();
-    }
+    activeCam->disableOrtho();
 
     gizmo.draw(*activeCam);
 
@@ -76,11 +79,17 @@ void ModelEditor::draw() {
 void ModelEditor::drawGui() {
     sceneGraph.drawGui();
 
-    int selectedIndex = sceneGraph.getSelectedIndex();
+    drawGizmoControls();
+    drawCameraControls();
+}
 
-    if (selectedIndex != -1) {
+void ModelEditor::drawGizmoControls() {
+    auto selectedNode = sceneGraph.getSelectedNode();
+
+    if (selectedNode) {
         ImGui::Begin("Gizmo Controls");
-        ImGui::Text("Gizmo Controls for Node: %s", sceneGraph.getNode(selectedIndex).getName().c_str());
+
+        ImGui::Text("Gizmo Controls for Node: %s", selectedNode->getName().c_str());
 
         bool translateSelected = (gizmoType == ofxGizmo::OFX_GIZMO_MOVE);
         bool rotateSelected = (gizmoType == ofxGizmo::OFX_GIZMO_ROTATE);
@@ -106,7 +115,9 @@ void ModelEditor::drawGui() {
     else {
         gizmo.hide();
     }
+}
 
+void ModelEditor::drawCameraControls() {
     ImGui::Begin("Camera Controls");
 
     if (ImGui::RadioButton("Orbit Mode", !isFreeFlightMode)) {
@@ -136,62 +147,76 @@ void ModelEditor::drawGui() {
     }
 
     if (isFreeFlightMode) {
-        if (ImGui::CollapsingHeader("Free Flight Parameters")) {
-            float moveSpeed = freeFlightCam.getMoveSpeed();
-            if (ImGui::SliderFloat("Move Speed", &moveSpeed, 1.0f, 50.0f)) {
-                freeFlightCam.setMoveSpeed(moveSpeed);
-            }
-
-            float sensitivity = freeFlightCam.getSensitivity();
-            if (ImGui::SliderFloat("Sensitivity", &sensitivity, 0.01f, 1.0f)) {
-                freeFlightCam.setSensitivity(sensitivity);
-            }
-        }
+        drawFreeFlightParameters();
     }
 
     if (isPerspective) {
-        if (ImGui::CollapsingHeader("Perspective Parameters")) {
-            float fov = activeCam->getFov();
-            if (ImGui::SliderFloat("Field of View", &fov, 30.0f, 120.0f)) {
-                activeCam->setFov(fov);
-            }
-
-            float aspect = activeCam->getAspectRatio();
-            if (ImGui::SliderFloat("Aspect Ratio", &aspect, 1.0f, 2.0f)) {
-                activeCam->setAspectRatio(aspect);
-            }
-
-            float nearClip = activeCam->getNearClip();
-            if (ImGui::SliderFloat("Near Clip", &nearClip, 0.01f, 10.0f)) {
-                activeCam->setNearClip(nearClip);
-            }
-
-            float farClip = activeCam->getFarClip();
-            if (ImGui::SliderFloat("Far Clip", &farClip, 100.0f, 10000.0f)) {
-                activeCam->setFarClip(farClip);
-            }
-        }
+        drawPerspectiveParameters();
     }
     else {
-        if (ImGui::CollapsingHeader("Orthographic Parameters")) {
-            float nearClip = activeCam->getNearClip();
-            if (ImGui::SliderFloat("Near Clip", &nearClip, 0.01f, 10.0f)) {
-                activeCam->setNearClip(nearClip);
-            }
-
-            float farClip = activeCam->getFarClip();
-            if (ImGui::SliderFloat("Far Clip", &farClip, 100.0f, 10000.0f)) {
-                activeCam->setFarClip(farClip);
-            }
-        }
+        drawOrthographicParameters();
     }
 
     ImGui::End();
 }
 
-void ModelEditor::exit() {
-    sceneGraph.exit();
+void ModelEditor::drawFreeFlightParameters() {
+    if (ImGui::CollapsingHeader("Free Flight Parameters")) {
+        float moveSpeed = freeFlightCam.getMoveSpeed();
+        if (ImGui::SliderFloat("Move Speed", &moveSpeed, 1.0f, 50.0f)) {
+            freeFlightCam.setMoveSpeed(moveSpeed);
+        }
 
+        float sensitivity = freeFlightCam.getSensitivity();
+        if (ImGui::SliderFloat("Sensitivity", &sensitivity, 0.01f, 1.0f)) {
+            freeFlightCam.setSensitivity(sensitivity);
+        }
+    }
+}
+
+void ModelEditor::drawPerspectiveParameters() {
+    if (ImGui::CollapsingHeader("Perspective Parameters")) {
+        ofCamera* activeCam = getActiveCamera();
+
+        float fov = activeCam->getFov();
+        if (ImGui::SliderFloat("Field of View", &fov, 30.0f, 120.0f)) {
+            activeCam->setFov(fov);
+        }
+
+        float aspect = activeCam->getAspectRatio();
+        if (ImGui::SliderFloat("Aspect Ratio", &aspect, 1.0f, 2.0f)) {
+            activeCam->setAspectRatio(aspect);
+        }
+
+        float nearClip = activeCam->getNearClip();
+        if (ImGui::SliderFloat("Near Clip", &nearClip, 0.01f, 10.0f)) {
+            activeCam->setNearClip(nearClip);
+        }
+
+        float farClip = activeCam->getFarClip();
+        if (ImGui::SliderFloat("Far Clip", &farClip, 100.0f, 10000.0f)) {
+            activeCam->setFarClip(farClip);
+        }
+    }
+}
+
+void ModelEditor::drawOrthographicParameters() {
+    if (ImGui::CollapsingHeader("Orthographic Parameters")) {
+        ofCamera* activeCam = getActiveCamera();
+
+        float nearClip = activeCam->getNearClip();
+        if (ImGui::SliderFloat("Near Clip", &nearClip, 0.01f, 10.0f)) {
+            activeCam->setNearClip(nearClip);
+        }
+
+        float farClip = activeCam->getFarClip();
+        if (ImGui::SliderFloat("Far Clip", &farClip, 100.0f, 10000.0f)) {
+            activeCam->setFarClip(farClip);
+        }
+    }
+}
+
+void ModelEditor::exit() {
     orbitCam.disableMouseInput();
     freeFlightCam.disableMouseInput();
 
@@ -215,12 +240,11 @@ void ModelEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
 }
 
 void ModelEditor::load(const std::string& path) {
-    auto model = std::make_shared<ofxAssimpModelLoader>();
-    model->load(path);
-    model->setPosition(0, 0, 0);
+    sceneGraph.addModelNode(path);
+}
 
-    std::string stem = std::filesystem::path(path).stem().string();
-    sceneGraph.addModelNode(stem, model);
+void ModelEditor::unload(const std::string& path) {
+    sceneGraph.unloadNodes(path);
 }
 
 void ModelEditor::save(const std::string& path) {
@@ -241,10 +265,10 @@ void ModelEditor::switchToFreeFlightCamera() {
 }
 
 void ModelEditor::updateGizmo() {
-    int selectedIndex = sceneGraph.getSelectedIndex();
+    auto selectedNode = sceneGraph.getSelectedNode();
 
-    if (selectedIndex != -1) {
-        gizmo.apply(sceneGraph.getNode(selectedIndex));
+    if (selectedNode) {
+        gizmo.apply(*selectedNode);
     }
 }
 

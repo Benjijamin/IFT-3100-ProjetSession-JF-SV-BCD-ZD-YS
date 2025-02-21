@@ -87,6 +87,8 @@ public:
     */
     void load(const std::string& path) override;
 
+    void unload(const std::string& path) override;
+
     /**
     * \brief (Explications)
     *

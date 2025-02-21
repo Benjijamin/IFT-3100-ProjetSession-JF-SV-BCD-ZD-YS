@@ -125,6 +125,10 @@ void ImageEditor::load(const std::string& path) {
     adjustZoomAndPan();
 }
 
+void ImageEditor::unload(const std::string& path) {
+
+}
+
 void ImageEditor::save(const std::string& path) {
     if (isImageAllocated()) {
         currentImage->save(path);

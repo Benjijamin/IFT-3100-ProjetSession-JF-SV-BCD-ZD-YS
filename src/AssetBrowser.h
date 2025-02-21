@@ -20,9 +20,11 @@ public:
     bool isModelAsset(const std::string& asset) const;
 
     std::string getSelectedAssetPath() const;
+    std::string getLastAssetPath() const;
 
+    std::function<void()> onAssetAddition;
+    std::function<void()> onAssetRemoval;
     std::function<void()> onAssetSelection;
-    std::function<void()> onAssetDeletion;
 
 private:
     std::vector<std::string> getFilteredAssets() const;

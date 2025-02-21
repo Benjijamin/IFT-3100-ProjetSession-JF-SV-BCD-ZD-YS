@@ -8,13 +8,16 @@ void ofApp::setup() {
 
     gui.setup();
 
+    imageEditor.setup();
+    modelEditor.setup();
     assetBrowser.setup();
     screenCapture.setup();
 
     currentEditor = nullptr;
 
+    assetBrowser.onAssetAddition = std::bind(&ofApp::handleAssetAddition, this);
+    assetBrowser.onAssetRemoval = std::bind(&ofApp::handleAssetRemoval, this);
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
-    assetBrowser.onAssetDeletion = std::bind(&ofApp::handleAssetDeletion, this);
 }
 
 void ofApp::update() {
@@ -58,9 +61,7 @@ void ofApp::keyPressed(int key) {
 }
 
 void ofApp::keyReleased(int key) {
-    if (key == 90) {
-        currentEditor.reset();
-    }
+
 }
 
 void ofApp::mouseMoved(int x, int y) {
@@ -113,32 +114,38 @@ void ofApp::gotMessage(ofMessage msg) {
 
 void ofApp::switchEditor() {
     std::string selectedAsset = assetBrowser.getSelectedAssetPath();
+
     if (!selectedAsset.empty()) {
         if (currentEditor) {
             currentEditor->exit();
         }
 
         if (assetBrowser.isImageAsset(selectedAsset)) {
-            currentEditor = std::make_unique<ImageEditor>();
-        }
-        else if (assetBrowser.isModelAsset(selectedAsset)) {
-            currentEditor = std::make_unique<ModelEditor>();
-        }
-
-        if (currentEditor) {
-            currentEditor->setup();
+            currentEditor = &imageEditor;
             currentEditor->load(selectedAsset);
         }
+        else if (assetBrowser.isModelAsset(selectedAsset)) {
+            currentEditor = &modelEditor;
+        }
+    }
+}
+
+void ofApp::handleAssetAddition() {
+    std::string lastAsset = assetBrowser.getLastAssetPath();
+
+    if (assetBrowser.isModelAsset(lastAsset)) {
+        modelEditor.load(lastAsset);
+    }
+}
+
+void ofApp::handleAssetRemoval() {
+    std::string selectedAsset = assetBrowser.getSelectedAssetPath();
+
+    if (currentEditor) {
+        currentEditor->unload(selectedAsset);
     }
 }
 
 void ofApp::handleAssetSelection() {
     switchEditor();
-}
-
-void ofApp::handleAssetDeletion() {
-    if (currentEditor) {
-        currentEditor->exit();
-    }
-    currentEditor.reset();
 }

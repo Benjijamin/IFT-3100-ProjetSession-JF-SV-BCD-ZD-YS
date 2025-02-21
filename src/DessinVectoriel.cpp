@@ -54,6 +54,10 @@ void DessinVectoriel::load(const std::string& path) {
 
 }
 
+void DessinVectoriel::unload(const std::string& path) {
+
+}
+
 void DessinVectoriel::save(const std::string& path) {
 
 }

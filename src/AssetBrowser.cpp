@@ -56,7 +56,7 @@ void AssetBrowser::drawGui() {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 
         ImGui::Columns(2, nullptr, false);
-        ImGui::SetColumnWidth(0, windowSize.x * 0.75f);
+        ImGui::SetColumnWidth(0, windowSize.x * 0.8f);
 
         static char searchBuffer[128] = "";
         ImGui::SetNextItemWidth(-1);
@@ -76,8 +76,7 @@ void AssetBrowser::drawGui() {
 
                 std::string selectableID = "##hidden" + std::to_string(i);
                 if (ImGui::Selectable(selectableID.c_str(), selectedAsset == asset, 0, selectableSize)) {
-                    selectedAsset = asset;
-                    if (onAssetSelection) onAssetSelection();
+                    selectAsset(asset);
                 }
 
                 ImGui::SameLine();
@@ -104,7 +103,6 @@ void AssetBrowser::drawGui() {
         if (!selectedAsset.empty()) {
             if (ImGui::Button("Delete")) {
                 removeAsset(selectedAsset);
-                if (onAssetDeletion) onAssetDeletion();
                 selectedAsset.clear();
             }
         }
@@ -149,6 +147,8 @@ void AssetBrowser::addAsset(const std::string& assetPath) {
     if (std::find(assets.begin(), assets.end(), assetPath) == assets.end()) {
         assets.push_back(assetPath);
     }
+
+    if (onAssetAddition) onAssetAddition();
 }
 
 void AssetBrowser::removeAsset(const std::string& asset) {
@@ -156,12 +156,16 @@ void AssetBrowser::removeAsset(const std::string& asset) {
     if (it != assets.end()) {
         assets.erase(it, assets.end());
     }
+
+    if (onAssetRemoval) onAssetRemoval();
 }
 
 void AssetBrowser::selectAsset(const std::string& assetPath) {
     if (std::find(assets.begin(), assets.end(), assetPath) != assets.end()) {
         selectedAsset = assetPath;
     }
+
+    if (onAssetSelection) onAssetSelection();
 }
 
 void AssetBrowser::loadAssetsFromFolder(const std::string& folderPath) {
@@ -206,4 +210,8 @@ std::vector<std::string> AssetBrowser::getFilteredAssets() const {
 
 std::string AssetBrowser::getSelectedAssetPath() const {
     return selectedAsset;
+}
+
+std::string AssetBrowser::getLastAssetPath() const {
+    return assets.back();
 }

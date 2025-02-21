@@ -4,16 +4,24 @@
 #include "ofxImGui.h"
 #include "ofxAssimpModelLoader.h"
 
-class SceneNode : public ofNode {
+class SceneNode : public ofNode, public std::enable_shared_from_this<SceneNode> {
 public:
     SceneNode(const std::string& name);
 
     void setModel(std::shared_ptr<ofxAssimpModelLoader> model);
-    void customDraw() override;
+    void draw();
+
+    void addChild(std::shared_ptr<SceneNode> child);
+    void removeChild(std::shared_ptr<SceneNode> child);
+    std::vector<std::shared_ptr<SceneNode>> getChildren() const;
 
     std::string getName() const;
+    bool containsModel() const;
 
 private:
     std::string name;
     std::shared_ptr<ofxAssimpModelLoader> model;
+    std::vector<std::shared_ptr<SceneNode>> children;
+
+    void customDraw() override;
 };

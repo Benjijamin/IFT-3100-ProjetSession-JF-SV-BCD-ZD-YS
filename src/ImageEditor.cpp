@@ -2,9 +2,6 @@
 
 void ImageEditor::setup() {
     currentImage = new ofImage();
-    panOffset.set(0, 0);
-    zoomFactor = 1.0f;
-    isDragging = false;
     drawRadius = 10;
     currentTool = Tool::PanZoom;
 
@@ -18,13 +15,14 @@ void ImageEditor::update() {
 
 void ImageEditor::draw() {
     if (isImageAllocated()) {
-        currentImage->draw(panOffset.x, panOffset.y, currentImage->getWidth() * zoomFactor, currentImage->getHeight() * zoomFactor);
+        ofVec2f panOffset = viewer.getPanOffset();
+        currentImage->draw(panOffset.x, panOffset.y, currentImage->getWidth() * viewer.getZoomFactor(), currentImage->getHeight() * viewer.getZoomFactor());
     }
 
-    if (currentTool == Tool::CopyRegion && isDragging) {
+    if (currentTool == Tool::CopyRegion && viewer.isDraggingMouse() && !isGuiHovered()) {
         drawCopyRegion();
     }
-    else if (currentTool == Tool::PasteRegion && copiedRegion.isAllocated()) {
+    else if (currentTool == Tool::PasteRegion && copiedRegion.isAllocated() && !isGuiHovered()) {
         drawPasteRegion();
     }
 }
@@ -70,15 +68,14 @@ void ImageEditor::exit() {
 }
 
 void ImageEditor::mouseDragged(int x, int y, int button) {
-    if (isNothingHovered() && isDragging) {
+    if (viewer.isDraggingMouse() && !isGuiHovered()) {
         switch (currentTool) {
         case Tool::PanZoom:
-            panImage(x - dragStartPos.x, y - dragStartPos.y);
-            dragStartPos = ofVec2f(x, y);
+            viewer.mouseDragged(x, y, button);
             break;
         case Tool::Brush:
-            drawBrush(dragStartPos.x, dragStartPos.y, x, y);
-            dragStartPos = ofVec2f(x, y);
+            drawBrush(previousMousePos.x, previousMousePos.y, x, y);
+            previousMousePos = ofVec2f(x, y);
             break;
         default:
             break;
@@ -87,29 +84,29 @@ void ImageEditor::mouseDragged(int x, int y, int button) {
 }
 
 void ImageEditor::mousePressed(int x, int y, int button) {
-    dragStartPos.set(x, y);
-    isDragging = true;
+    viewer.mousePressed(x, y, button);
 
-    if (currentTool == Tool::PasteRegion) {
-        ofVec2f p = screenToPixelCoords(ofVec2f(x, y));
+    previousMousePos = ofVec2f(x, y);
+
+    if (currentTool == Tool::PasteRegion && !isGuiHovered()) {
+        ofVec2f p = viewer.screenToPixelCoords(ofVec2f(x, y));
         pasteRegion(p.x, p.y);
     }
 }
 
 void ImageEditor::mouseReleased(int x, int y, int button) {
-    dragEndPos.set(x, y);
-    isDragging = false;
+    viewer.mouseReleased(x, y, button);
 
-    if (currentTool == Tool::CopyRegion) {
-        ofVec2f start = screenToPixelCoords(dragStartPos);
-        ofVec2f end = screenToPixelCoords(dragEndPos);
+    if (currentTool == Tool::CopyRegion && !isGuiHovered()) {
+        ofVec2f start = viewer.screenToPixelCoords(viewer.getDragStartPos());
+        ofVec2f end = viewer.screenToPixelCoords(viewer.getDragEndPos());
         copyRegion(start.x, start.y, end.x, end.y);
     }
 }
 
 void ImageEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
-    if (currentTool == Tool::PanZoom && !ImGui::IsAnyWindowHovered()) {
-        zoomImage(1.0f + scrollY * 0.1f, x, y);
+    if (currentTool == Tool::PanZoom) {
+        viewer.mouseScrolled(x, y, scrollX, scrollY);
     }
 }
 
@@ -122,7 +119,7 @@ void ImageEditor::load(const std::string& path) {
         currentImage->load(path);
     }
 
-    adjustZoomAndPan();
+    viewer.adjustZoomAndPan(currentImage->getWidth(), currentImage->getHeight());
 }
 
 void ImageEditor::unload(const std::string& path) {
@@ -135,44 +132,9 @@ void ImageEditor::save(const std::string& path) {
     }
 }
 
-void ImageEditor::panImage(float dx, float dy) {
-    panOffset.x += dx;
-    panOffset.y += dy;
-}
-
-void ImageEditor::zoomImage(float scale, float mouseX, float mouseY) {
-    ofVec2f prevMousePos = (ofVec2f(mouseX, mouseY) - panOffset) / zoomFactor;
-
-    zoomFactor *= scale;
-    if (zoomFactor < 0.1f) {
-        zoomFactor = 0.1f;
-    }
-    else if (zoomFactor > 10.0f) {
-        zoomFactor = 10.0f;
-    }
-
-    ofVec2f newMousePos = (ofVec2f(mouseX, mouseY) - panOffset) / zoomFactor;
-    ofVec2f panAdjust = (newMousePos - prevMousePos) * zoomFactor;
-    panOffset += panAdjust;
-}
-
-void ImageEditor::adjustZoomAndPan() {
-    if (currentImage->isAllocated()) {
-        int screenWidth = ofGetWidth();
-        int screenHeight = ofGetHeight();
-        int imageWidth = currentImage->getWidth();
-        int imageHeight = currentImage->getHeight();
-
-        float targetWidth = screenWidth * 0.7f;
-        zoomFactor = targetWidth / imageWidth;
-
-        panOffset.set((screenWidth - imageWidth * zoomFactor) / 2 + 120, (screenHeight - imageHeight * zoomFactor) / 2 - 140);
-    }
-}
-
 void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
-    ofVec2f start = screenToPixelCoords(ofVec2f(startX, startY));
-    ofVec2f end = screenToPixelCoords(ofVec2f(endX, endY));
+    ofVec2f start = viewer.screenToPixelCoords(ofVec2f(startX, startY));
+    ofVec2f end = viewer.screenToPixelCoords(ofVec2f(endX, endY));
 
     int numSteps = std::max(abs(end.x - start.x), abs(end.y - start.y));
     for (int step = 0; step <= numSteps; ++step) {
@@ -232,7 +194,7 @@ void ImageEditor::pasteRegion(int x, int y) {
 }
 
 void ImageEditor::drawCopyRegion() {
-    ofVec2f corner1 = dragStartPos;
+    ofVec2f corner1 = viewer.getDragStartPos();
     ofVec2f corner2 = ofVec2f(ofGetMouseX(), ofGetMouseY());
 
     int x = std::min(corner1.x, corner2.x);
@@ -250,8 +212,8 @@ void ImageEditor::drawCopyRegion() {
 void ImageEditor::drawPasteRegion() {
     int x = ofGetMouseX();
     int y = ofGetMouseY();
-    int width = copiedRegion.getWidth() * zoomFactor;
-    int height = copiedRegion.getHeight() * zoomFactor;
+    int width = copiedRegion.getWidth() * viewer.getZoomFactor();
+    int height = copiedRegion.getHeight() * viewer.getZoomFactor();
 
     ofPushStyle();
     ofSetColor(128, 128, 128, 128);
@@ -260,8 +222,8 @@ void ImageEditor::drawPasteRegion() {
     ofPopStyle();
 }
 
-bool ImageEditor::isNothingHovered() {
-    return !ImGui::IsAnyWindowHovered() && !ImGui::IsAnyItemHovered();
+bool ImageEditor::isGuiHovered() {
+    return ImGui::IsAnyWindowHovered() && ImGui::IsAnyItemHovered();
 }
 
 bool ImageEditor::isImageAllocated() const {
@@ -270,12 +232,4 @@ bool ImageEditor::isImageAllocated() const {
 
 bool ImageEditor::isWithinBounds(int x, int y) const {
     return x >= 0 && y >= 0 && x < currentImage->getWidth() && y < currentImage->getHeight();
-}
-
-ofVec2f ImageEditor::screenToPixelCoords(const ofVec2f& screenCoords) const {
-    return (screenCoords - panOffset) / zoomFactor;
-}
-
-ofVec2f ImageEditor::pixelToScreenCoords(const ofVec2f& pixelCoords) const {
-    return pixelCoords * zoomFactor + panOffset;
 }

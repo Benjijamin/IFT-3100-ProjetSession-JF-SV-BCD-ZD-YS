@@ -4,6 +4,7 @@
 #include "ofxImGui.h"
 #include "Editor.h"
 #include "ColorPicker.h"
+#include "Viewer2D.h"
 
 class ImageEditor : public Editor {
 public:
@@ -23,41 +24,23 @@ public:
     void save(const std::string& path) override;
 
 private:
-    void panImage(float dx, float dy);
-    void zoomImage(float scale, float mouseX, float mouseY);
-    void adjustZoomAndPan();
-
     void drawBrush(int startX, int startY, int endX, int endY);
-
     void copyRegion(int startX, int startY, int endX, int endY);
     void pasteRegion(int x, int y);
     void drawCopyRegion();
     void drawPasteRegion();
-
-    bool isNothingHovered();
+    bool isGuiHovered();
     bool isImageAllocated() const;
     bool isWithinBounds(int x, int y) const;
 
-    ofVec2f screenToPixelCoords(const ofVec2f& screenCoords) const;
-    ofVec2f pixelToScreenCoords(const ofVec2f& pixelCoords) const;
-
+    Viewer2D viewer;
     ofImage* currentImage;
-
-    ofVec2f panOffset;
-    float zoomFactor;
-
-    bool isDrawing;
-    int drawRadius;
+    ofImage copiedRegion;
+    ColorPicker colorPicker;
     ofColor drawColor;
-    
+    ofVec2f previousMousePos;
+    int drawRadius;
+
     enum class Tool { PanZoom, CopyRegion, PasteRegion, Brush };
     Tool currentTool;
-
-    ofVec2f dragStartPos;
-    ofVec2f dragEndPos;
-    bool isDragging;
-
-    ofImage copiedRegion;
-
-    ColorPicker colorPicker;
 };

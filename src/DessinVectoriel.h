@@ -124,8 +124,11 @@ private:
     ofColor fillColor;
     ofColor bgColor;
 
+    bool clic;
     float clicX;
     float clicY;
+    float curseurX;
+    float curseurY;
 
     bool hoverDessin;
     ofImage dessin;

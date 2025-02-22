@@ -27,12 +27,20 @@ void DessinVectoriel::drawMainWindow() {
 
     ImGui::Begin("Canevas de dessin");
     hoverDessin = ImGui::IsWindowHovered();
+    clic = ImGui::IsMouseDown(ImGuiMouseButton_Left);
 
     ofFill();
     ofDrawRectangle(100, 100, 800, 600);
     
     for (auto it = primitives.begin(); it != primitives.end(); ++it) {
         drawPrimitive(*it);
+    }
+
+    if (clic && hoverDessin) {
+        ofSetLineWidth(4.0f);
+        ofSetColor(255);
+        ofNoFill();
+        ofDrawRectangle(clicX, clicY, curseurX, curseurY);
     }
 
     ImGui::End();
@@ -53,13 +61,18 @@ void DessinVectoriel::exit() {
 }
 
 void DessinVectoriel::mouseDragged(int x, int y, int button) {
-
+    if (hoverDessin) {
+        curseurX = x;
+        curseurY = y;
+    }
 }
 
 void DessinVectoriel::mousePressed(int x, int y, int button) {
     if (hoverDessin) {
         clicX = x;
         clicY = y;
+        curseurX = x;
+        curseurY = y;
     }
 }
 

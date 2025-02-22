@@ -2,7 +2,6 @@
 
 void MenuBar::setup() {
     screenCapture.setup();
-    dessinVectoriel.setup();
 }
 
 void MenuBar::update() {
@@ -20,14 +19,11 @@ void MenuBar::drawGui() {
         drawHelpMenu();
         ImGui::EndMainMenuBar();
     }
-
     screenCapture.drawGui();
-    dessinVectoriel.drawGui();
 }
 
 void MenuBar::exit() {
     screenCapture.exit();
-    dessinVectoriel.exit();
 }
 
 void MenuBar::drawFileMenu() {
@@ -35,15 +31,9 @@ void MenuBar::drawFileMenu() {
         if (ImGui::MenuItem("Capture Screenshot")) {
             screenCapture.captureScreenshot();
         }
-
-        if (ImGui::MenuItem("Nouveau dessin..")) {
-            dessinVectoriel.start();
-        }
-
         if (ImGui::MenuItem("Exit")) {
             ofExit();
         }
-
         ImGui::EndMenu();
     }
 }
@@ -82,7 +72,6 @@ void MenuBar::drawHelpMenu() {
         if (ImGui::MenuItem("Documentation")) {
             ofLaunchBrowser("https://openframeworks.cc/documentation/");
         }
-
         ImGui::EndMenu();
     }
 }

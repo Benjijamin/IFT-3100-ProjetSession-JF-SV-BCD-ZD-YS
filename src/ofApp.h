@@ -7,6 +7,7 @@
 #include "ModelEditor.h"
 #include "AssetBrowser.h"
 #include "MenuBar.h"
+#include "DessinVectoriel.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -40,6 +41,7 @@ private:
     ModelEditor modelEditor;
     AssetBrowser assetBrowser;
     MenuBar menuBar;
+    DessinVectoriel dessinVectoriel;
 
     Editor* currentEditor;
 };

@@ -4,7 +4,26 @@
 #include "DessinVectoriel.h"
 
 void DessinVectoriel::setup() {
-    mode = TypePrimitive2D::rectangle;
+
+    // Taille et espacement des fenêtres
+    windowGap = 30.0f;
+    initWindowPos = ImVec2(windowGap / 2, windowGap);
+    blankWindowSize = ImVec2(100, 100);
+    mainWindowSize = ImVec2(800, 600);
+    toolbarSize = ImVec2(300, mainWindowSize.y);
+
+    // Attributs des outils de dessin
+    shapes = {};
+    shapeType = ShapeType::rectangle;
+    strokeWidth = 4.0f;
+    strokeColor = ofColor(0);
+    fillColor = ofColor(0, 255, 0);
+    bgColor = ofColor(128);
+
+    // Variables d'état
+    active = false;
+    hovering = false;
+    mouseHeld = false;
 }
 
 void DessinVectoriel::update() {
@@ -12,80 +31,38 @@ void DessinVectoriel::update() {
 }
 
 void DessinVectoriel::draw() {
+
 }
 
 void DessinVectoriel::drawGui() {
-    if (nouveauDessin) {
+    if (active) {
         drawMainWindow();
-        drawSettings();
-    }
-}
-
-void DessinVectoriel::drawMainWindow() {
-    ImGui::SetNextWindowPos(ImVec2(100, 100));
-    ImGui::SetNextWindowSize(ImVec2(800, 600));
-
-    ImGui::Begin("Canevas de dessin");
-    hoverDessin = ImGui::IsWindowHovered();
-    clic = ImGui::IsMouseDown(ImGuiMouseButton_Left);
-
-    ofFill();
-    ofDrawRectangle(100, 100, 800, 600);
-    
-    for (auto it = primitives.begin(); it != primitives.end(); ++it) {
-        drawPrimitive(*it);
-    }
-
-    if (clic && hoverDessin) {
-        ofSetLineWidth(4.0f);
-        ofSetColor(255);
-        ofNoFill();
-        ofDrawRectangle(clicX, clicY, curseurX, curseurY);
-    }
-
-    ImGui::End();
-}
-
-void DessinVectoriel::drawSettings() {
-    ImGui::SetNextWindowPos(ImVec2(ofGetWidth() - 100, 100));
-    ImGui::Begin("Outils de dessin");
-    ImGui::SliderFloat("Épaisseur de trait", &strokeWidth, 0.0f, 64.0f);
-    if (ImGui::Button("Save")) {
-        exit();
-    }
-    ImGui::End();
+        drawToolbar();
+    } else
+        drawBlankWindow();
 }
 
 void DessinVectoriel::exit() {
-    nouveauDessin = false;
+    active = false;
 }
 
 void DessinVectoriel::mouseDragged(int x, int y, int button) {
-    if (hoverDessin) {
-        curseurX = x;
-        curseurY = y;
-    }
+    if (hovering)
+        mousePos = ImVec2(x, y);
 }
 
 void DessinVectoriel::mousePressed(int x, int y, int button) {
-    if (hoverDessin) {
-        clicX = x;
-        clicY = y;
-        curseurX = x;
-        curseurY = y;
+    if (hovering) {
+        mouseHeld = true;
+        mouseInit = ImVec2(x, y);
+        mousePos = mouseInit;
     }
 }
 
 void DessinVectoriel::mouseReleased(int x, int y, int button) {
-    if (hoverDessin) {
-        Primitive2D p;
-        p.type = mode;
-        p.pos1 = ImVec2(clicX, clicY);
-        p.pos2 = ImVec2(x, y);
-        p.strokeWidth = strokeWidth;
-        p.strokeColor = strokeColor;
-        p.fillColor = fillColor;
-        primitives.push_back(p);
+    if (hovering) {
+        mouseHeld = false;
+        addShape();
     }
 }
 
@@ -105,53 +82,104 @@ void DessinVectoriel::save(const std::string& path) {
 
 }
 
-void DessinVectoriel::start() {
-    nouveauDessin = true;
+void DessinVectoriel::newDrawing() {
+    active = true;
 }
 
-void DessinVectoriel::fillPrimitive(const Primitive2D& p) {
-    ofFill();
-    ofSetLineWidth(0);
-    ofSetColor(p.fillColor);
+bool DessinVectoriel::isActive() {
+    return active;
 }
 
-void DessinVectoriel::strokePrimitive(const Primitive2D& p) {
+void DessinVectoriel::drawBlankWindow() {
+    ImGui::SetNextWindowPos(initWindowPos);
+    ImGui::SetNextWindowSize(blankWindowSize);
+
+    ImGui::Begin("Dessin vectoriel");
+    if (ImGui::Button("Nouveau"))
+        active = true;
+    ImGui::End();
+}
+
+void DessinVectoriel::drawMainWindow() {
+    ImGui::SetNextWindowPos(initWindowPos);
+    ImGui::SetNextWindowSize(mainWindowSize);
+
+    ImGui::Begin("Canevas de dessin");
+
+    for (auto it = shapes.begin(); it != shapes.end(); ++it)
+        buildShape(*it);
+
+    hovering = ImGui::IsWindowHovered();
+
+    if (hovering && mouseHeld)
+        ImGui::Text("coucou"); // Debug
+        drawZone();
+
+    ImGui::End();
+}
+
+void DessinVectoriel::drawToolbar() {
+    ImGui::SetNextWindowPos(ImVec2(mainWindowSize.x + windowGap, initWindowPos.y));
+    ImGui::SetNextWindowSize(toolbarSize);
+
+    ImGui::Begin("Outils de dessin");
+    ImGui::SliderFloat("Épaisseur de trait", &strokeWidth, 0.0f, 32.0f);
+
+    if (ImGui::Button("Annuler"))
+        exit();
+    ImGui::End();
+}
+
+void DessinVectoriel::drawZone() {
     ofNoFill();
-    ofSetColor(p.strokeColor);
-    ofSetLineWidth(p.strokeWidth);
+    ofSetLineWidth(strokeWidth);
+    ofSetColor(255);
+    ofDrawRectangle(mouseInit.x, mouseInit.y, mousePos.x - mouseInit.x, mousePos.y - mouseInit.y);
 }
 
-void DessinVectoriel::drawPrimitive(const Primitive2D& p) {
-    switch (p.type) {
-    case TypePrimitive2D::point:
-        fillPrimitive(p);
-        ofDrawEllipse(p.pos1.x, p.pos1.y, p.strokeWidth, p.strokeWidth);
-        strokePrimitive(p);
-        ofDrawEllipse(p.pos1.x, p.pos1.y, p.strokeWidth, p.strokeWidth);
+void DessinVectoriel::addShape() {
+    Shape shape;
+    shape.type = shapeType;
+    shape.initPos = mouseInit;
+    shape.currPos = mousePos;
+    shape.strokeWidth = strokeWidth;
+    shape.strokeColor = strokeColor;
+    shape.fillColor = fillColor;
+    shapes.push_back(shape);
+}
+
+void DessinVectoriel::drawShape(const Shape& s) {
+    ImVec2 dim = ImVec2(s.currPos.x - s.initPos.x, s.currPos.y - s.initPos.y);
+    switch (s.type) {
+    case ShapeType::point:
+        ofDrawEllipse(s.initPos.x, s.initPos.y, s.strokeWidth, s.strokeWidth);
         break;
-    case TypePrimitive2D::ligne:
-        strokePrimitive(p);
-        ofDrawLine(p.pos1.x, p.pos1.y, p.pos2.x, p.pos2.y);
+    case ShapeType::line:
+        ofDrawLine(s.initPos.x, s.initPos.y, s.currPos.x, s.currPos.y);
         break;
-    case TypePrimitive2D::rectangle:
-        fillPrimitive(p);
-        ofDrawRectangle(p.pos1.x, p.pos1.y, p.pos2.x, p.pos2.y);
-        strokePrimitive(p);
-        ofDrawRectangle(p.pos1.x, p.pos1.y, p.pos2.x, p.pos2.y);
+    case ShapeType::rectangle:
+        ofDrawRectangle(s.initPos.x, s.initPos.y, dim.x, dim.y);
         break;
-    case TypePrimitive2D::ellipse:
-        fillPrimitive(p);
-        ofDrawEllipse(p.pos1.x, p.pos1.y, p.pos2.x - p.pos1.x, p.pos2.y - p.pos1.y);
-        strokePrimitive(p);
-        ofDrawEllipse(p.pos1.x, p.pos1.y, p.pos2.x - p.pos1.x, p.pos2.y - p.pos1.y);
+    case ShapeType::ellipse:
+        ofDrawEllipse(s.initPos.x + dim.x / 2.0f, s.initPos.y + dim.y / 2.0f , dim.x, dim.y);
         break;
-    case TypePrimitive2D::triangle:
-        fillPrimitive(p);
-        ofDrawTriangle(p.pos1.x, p.pos1.x, p.pos2.x / 2, p.pos2.y, p.pos2.x, p.pos1.y);
-        strokePrimitive(p);
-        ofDrawTriangle(p.pos1.x, p.pos1.x, p.pos2.x / 2, p.pos2.y, p.pos2.x, p.pos1.y);
+    case ShapeType::triangle:
+        ofDrawTriangle(s.initPos.x, s.initPos.x, s.currPos.x / 2, s.currPos.y, s.currPos.x, s.initPos.y);
         break;
     default:
         break;
     }
+}
+
+void DessinVectoriel::buildShape(const Shape& s) {
+    if (s.type != ShapeType::line) {
+        ofFill();
+        ofSetLineWidth(0);
+        ofSetColor(s.fillColor);
+        drawShape(s);
+    }
+    ofNoFill();
+    ofSetLineWidth(s.strokeWidth);
+    ofSetColor(s.strokeColor);
+    drawShape(s);
 }

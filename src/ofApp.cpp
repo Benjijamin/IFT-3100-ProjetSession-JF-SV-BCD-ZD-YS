@@ -11,6 +11,7 @@ void ofApp::setup() {
     modelEditor.setup();
     assetBrowser.setup();
     menuBar.setup();
+    dessinVectoriel.setup();
 
     currentEditor = nullptr;
 
@@ -38,6 +39,7 @@ void ofApp::draw() {
 
     assetBrowser.drawGui();
     menuBar.drawGui();
+    dessinVectoriel.drawGui();
 
     gui.end();
 }
@@ -46,8 +48,8 @@ void ofApp::exit() {
     if (currentEditor) {
         currentEditor->exit();
     }
-
     assetBrowser.exit();
+    dessinVectoriel.exit();
 }
 
 void ofApp::keyPressed(int key) {
@@ -72,12 +74,16 @@ void ofApp::mousePressed(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mousePressed(x, y, button);
     }
+    else if (dessinVectoriel.isActive())
+        dessinVectoriel.mousePressed(x, y, button);
 }
 
 void ofApp::mouseReleased(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseReleased(x, y, button);
     }
+    else if (dessinVectoriel.isActive())
+        dessinVectoriel.mouseReleased(x, y, button);
 }
 
 void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {

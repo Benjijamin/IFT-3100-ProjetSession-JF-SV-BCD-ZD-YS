@@ -8,17 +8,17 @@ void DessinVectoriel::setup() {
     // Taille et espacement des fenêtres
     windowGap = 30.0f;
     initWindowPos = ImVec2(windowGap / 2, windowGap);
-    blankWindowSize = ImVec2(100, 100);
-    mainWindowSize = ImVec2(800, 600);
-    toolbarSize = ImVec2(300, mainWindowSize.y);
+    blankWindowSize = ImVec2(100.0f, 100.0f);
+    mainWindowSize = ImVec2(800.0f, 600.0f);
+    toolbarSize = ImVec2(300.0f, mainWindowSize.y);
 
     // Attributs des outils de dessin
     shapes = {};
     shapeType = ShapeType::rectangle;
-    strokeWidth = 4.0f;
-    strokeColor = ofColor(0);
-    fillColor = ofColor(0, 255, 0);
-    bgColor = ofColor(128);
+    strokeWidth = 16.0f;
+    strokeColor = ofColor(0.0f);
+    fillColor = ofColor(0.0f, 255.0f, 0.0f);
+    bgColor = ofColor(128.0f);
 
     // Variables d'état
     active = false;
@@ -112,21 +112,8 @@ void DessinVectoriel::drawMainWindow() {
     hovering = ImGui::IsWindowHovered();
 
     if (hovering && mouseHeld)
-        ImGui::Text("coucou"); // Debug
         drawZone();
 
-    ImGui::End();
-}
-
-void DessinVectoriel::drawToolbar() {
-    ImGui::SetNextWindowPos(ImVec2(mainWindowSize.x + windowGap, initWindowPos.y));
-    ImGui::SetNextWindowSize(toolbarSize);
-
-    ImGui::Begin("Outils de dessin");
-    ImGui::SliderFloat("Épaisseur de trait", &strokeWidth, 0.0f, 32.0f);
-
-    if (ImGui::Button("Annuler"))
-        exit();
     ImGui::End();
 }
 
@@ -135,6 +122,17 @@ void DessinVectoriel::drawZone() {
     ofSetLineWidth(strokeWidth);
     ofSetColor(255);
     ofDrawRectangle(mouseInit.x, mouseInit.y, mousePos.x - mouseInit.x, mousePos.y - mouseInit.y);
+}
+
+void DessinVectoriel::drawToolbar() {
+    ImGui::SetNextWindowPos(ImVec2(mainWindowSize.x + windowGap, initWindowPos.y));
+    ImGui::SetNextWindowSize(toolbarSize);
+
+    ImGui::Begin("Outils de dessin");
+
+    if (ImGui::Button("Annuler"))
+        exit();
+    ImGui::End();
 }
 
 void DessinVectoriel::addShape() {
@@ -149,7 +147,10 @@ void DessinVectoriel::addShape() {
 }
 
 void DessinVectoriel::drawShape(const Shape& s) {
+
+    // Largeur et hauteur du rectangle
     ImVec2 dim = ImVec2(s.currPos.x - s.initPos.x, s.currPos.y - s.initPos.y);
+
     switch (s.type) {
     case ShapeType::point:
         ofDrawEllipse(s.initPos.x, s.initPos.y, s.strokeWidth, s.strokeWidth);
@@ -164,7 +165,7 @@ void DessinVectoriel::drawShape(const Shape& s) {
         ofDrawEllipse(s.initPos.x + dim.x / 2.0f, s.initPos.y + dim.y / 2.0f , dim.x, dim.y);
         break;
     case ShapeType::triangle:
-        ofDrawTriangle(s.initPos.x, s.initPos.x, s.currPos.x / 2, s.currPos.y, s.currPos.x, s.initPos.y);
+        ofDrawTriangle(s.initPos.x, s.initPos.x, s.currPos.x / 2.0f, s.currPos.y, s.currPos.x, s.initPos.y);
         break;
     default:
         break;

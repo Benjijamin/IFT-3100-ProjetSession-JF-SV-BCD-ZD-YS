@@ -113,8 +113,8 @@ public:
     // Affichage des fenêtres et de la zone de sélection
     void drawBlankWindow();
     void drawMainWindow();
-    void drawToolbar();
     void drawZone();
+    void drawToolbar();
 
     // Fonctions liées aux formes vectorielles
     void addShape();

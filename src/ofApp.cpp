@@ -68,6 +68,8 @@ void ofApp::mouseDragged(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseDragged(x, y, button);
     }
+    else if (dessinVectoriel.isActive())
+        dessinVectoriel.mouseDragged(x, y, button);
 }
 
 void ofApp::mousePressed(int x, int y, int button) {

@@ -4,10 +4,20 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxImGui.h"
 #include "Editor.h"
 
 // Types de primitive 2D : point, ligne, rectangle, ellipse et triangle équilatéral
 enum class TypePrimitive2D { none, point, ligne, rectangle, ellipse, triangle };
+
+struct Primitive2D {
+    TypePrimitive2D type;
+    ImVec2 pos1;
+    ImVec2 pos2;
+    float strokeWidth;
+    ofColor strokeColor;
+    ofColor fillColor;
+};
 
 /**
 * \class DessinVectoriel
@@ -96,14 +106,27 @@ public:
     */
     void save(const std::string& path) override;
 
+    void start();
+    void drawMainWindow();
+    void drawSettings();
+
+    void fillPrimitive(const Primitive2D& p);
+    void strokePrimitive(const Primitive2D& p);
+    void drawPrimitive(const Primitive2D& p);
+
 private:
+    bool nouveauDessin;
     TypePrimitive2D mode;
-    float epaisseur_trait;
+    vector<Primitive2D> primitives;
 
-    int clicX;
-    int clicY;
-    bool clic;
+    float strokeWidth;
+    ofColor strokeColor;
+    ofColor fillColor;
+    ofColor bgColor;
 
-    int curseurX;
-    int curseurY;
+    float clicX;
+    float clicY;
+
+    bool hoverDessin;
+    ofImage dessin;
 };

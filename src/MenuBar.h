@@ -2,6 +2,7 @@
 
 #include "ofxImGui.h"
 #include "ScreenCapture.h"
+#include "DessinVectoriel.h"
 
 class MenuBar {
 public:
@@ -17,4 +18,5 @@ private:
     void drawHelpMenu();
 
     ScreenCapture screenCapture;
+    DessinVectoriel dessinVectoriel;
 };

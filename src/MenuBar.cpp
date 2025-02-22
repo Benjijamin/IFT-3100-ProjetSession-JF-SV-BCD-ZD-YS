@@ -2,6 +2,7 @@
 
 void MenuBar::setup() {
     screenCapture.setup();
+    dessinVectoriel.setup();
 }
 
 void MenuBar::update() {
@@ -21,16 +22,22 @@ void MenuBar::drawGui() {
     }
 
     screenCapture.drawGui();
+    dessinVectoriel.drawGui();
 }
 
 void MenuBar::exit() {
     screenCapture.exit();
+    dessinVectoriel.exit();
 }
 
 void MenuBar::drawFileMenu() {
     if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("Capture Screenshot")) {
             screenCapture.captureScreenshot();
+        }
+
+        if (ImGui::MenuItem("Nouveau dessin..")) {
+            dessinVectoriel.start();
         }
 
         if (ImGui::MenuItem("Exit")) {

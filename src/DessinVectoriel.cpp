@@ -13,7 +13,7 @@ void DessinVectoriel::setup()
 
     // Attributs des outils de dessin
     shapes = {};
-    types = {"Point", "Ligne", "Rectangle", "Ellipse", "Triangle"};
+    types = {"Point", "Ligne", "Rectangle", "Ellipse", "Triangle", "Suite de points"};
     typeIndex = 0;
     strokeWidth = 16;
     zoneColor = ofColor(255.0f);
@@ -40,9 +40,18 @@ void DessinVectoriel::setup()
 void DessinVectoriel::draw()
 {
     ofSetCircleResolution(circRes);
+
+    // Tracer toutes les formes stockées en mémoire
     for (auto it = shapes.begin(); it != shapes.end(); ++it)
         buildShape(*it, true);
-    if (mouseHeld && !hovering) drawZone();
+
+    // Tracer la zone de sélection
+    if (mouseHeld && !hovering)
+    {
+        Shape s = initShape();
+        s.strokeColor = zoneColor;
+        buildShape(s, false);
+    };
 }
 
 void DessinVectoriel::drawGui()
@@ -67,21 +76,25 @@ void DessinVectoriel::mouseDragged(int x, int y, int button)
 {
     mousePos.x = min(max(mouseGap, x), ofGetWidth() - mouseGap);
     mousePos.y = min(max(mouseGap, y), ofGetHeight() - mouseGap);
-}
 
-void DessinVectoriel::mouseReleased(int x, int y, int button)
-{
-    mouseHeld = false;
-    if (!hovering)
+    // Tracer la courbe si le mode Suite de points est sélectionné
+    if (typeIndex == 5)
     {
         Shape s = initShape();
         shapes.push_back(s);
     }
 }
 
-void DessinVectoriel::save(const std::string& path)
+void DessinVectoriel::mouseReleased(int x, int y, int button)
 {
+    mouseHeld = false;
 
+    // Ajouter la nouvelle forme en mémoire
+    if (!hovering)
+    {
+        Shape s = initShape();
+        shapes.push_back(s);
+    }
 }
 
 void DessinVectoriel::begin()
@@ -98,7 +111,6 @@ void DessinVectoriel::drawInit()
 {
     ImGui::SetNextWindowPos(windowPos);
     ImGui::SetNextWindowSize(initSize);
-
     ImGui::Begin("Dessin vectoriel");
     if (ImGui::Button("Nouveau dessin")) active = true;
     ImGui::End();
@@ -112,20 +124,28 @@ void DessinVectoriel::drawToolbar()
     ImGui::Begin("Outils de dessin");
     hovering = ImGui::IsWindowHovered();
 
+    // Paramètres des outils de dessin
     ofxImGui::VectorCombo("Type de primitive", &typeIndex, types);
     ImGui::SliderInt("Épaisseur de trait", &strokeWidth, minWidth, maxWidth);
-
     ImGui::ColorEdit3("Couleur de trait", (float*) &strokeColor);
     ImGui::ColorEdit3("Couleur de remplissage", (float*) &fillColor);
     ImGui::ColorEdit3("Couleur d'arrière-plan", (float*) &bgColor);
 
-    if (ImGui::Button("Annuler l'action") && shapes.size() > 2)
+    // Bouton de retour en arrière ("Undo")
+    if (ImGui::Button("Annuler l'action"))
     {
         shapes.pop_back();
-        shapes.pop_back();
+
+        // Si le dernier élément est une courbe, retirer tous les points
+        bool isCurve = true;
+        while (isCurve && shapes.size() > 1)
+        {
+            int i = shapes.size() - 1;
+            isCurve = shapes[i].type == 5;
+            shapes.pop_back();
+        }
     };
 
-    if (ImGui::Button("Sauvegarder")) exit(); // TODO
     if (ImGui::Button("Quitter")) exit();
 
     ImGui::End();
@@ -166,9 +186,6 @@ void DessinVectoriel::drawShape(const Shape& s)
 
     switch (s.type)
     {
-    case 0:
-        ofDrawEllipse(s.currPos.x, s.currPos.y, s.strokeWidth, s.strokeWidth);
-        break;
     case 1:
         ofDrawLine(s.initPos.x, s.initPos.y, s.currPos.x, s.currPos.y);
         break;
@@ -180,6 +197,9 @@ void DessinVectoriel::drawShape(const Shape& s)
         break;
     case 4:
         ofDrawTriangle(s.initPos.x, s.initPos.y, d3.x, d3.y, d3.z, d3.w);
+        break;
+    default:
+        ofDrawEllipse(s.currPos.x, s.currPos.y, s.strokeWidth, s.strokeWidth);
         break;
     }
 }
@@ -197,11 +217,4 @@ void DessinVectoriel::buildShape(const Shape& s, const bool& fill)
     ofSetLineWidth(s.strokeWidth);
     ofSetColor(s.strokeColor);
     drawShape(s);
-}
-
-void DessinVectoriel::drawZone()
-{
-    Shape s = initShape();
-    s.strokeColor = zoneColor;
-    buildShape(s, false);
 }

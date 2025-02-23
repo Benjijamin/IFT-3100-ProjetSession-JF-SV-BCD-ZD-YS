@@ -77,13 +77,6 @@ public:
     */
     void mouseReleased(int x, int y, int button);
 
-    /**
-    * \brief (Explications)
-    *
-    * \param string path
-    */
-    void save(const std::string& path);
-
     // Initialisation
     void begin();
     bool isActive() const;
@@ -100,6 +93,8 @@ public:
     // Construction des formes vectorielles
     Shape initShape() const;
     void drawShape(const Shape& s);
+    void drawFullShape(const Shape& s);
+    void drawEmptyShape(const Shape& s);
     void buildShape(const Shape& s, const bool& fill);
     void drawZone();
 

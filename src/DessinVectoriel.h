@@ -37,11 +37,6 @@ public:
     void drawGui();
 
     /**
-    * \brief Override la méthode exit
-    */
-    void exit();
-
-    /**
     * \brief (Explications)
     *
     * \param int x position
@@ -80,6 +75,9 @@ public:
     // Initialisation
     void begin();
     bool isActive() const;
+    void undo();
+    void save();
+    void quit();
 
     // Affichage des fenêtres
     void drawInit();
@@ -93,10 +91,7 @@ public:
     // Construction des formes vectorielles
     Shape initShape() const;
     void drawShape(const Shape& s);
-    void drawFullShape(const Shape& s);
-    void drawEmptyShape(const Shape& s);
     void buildShape(const Shape& s, const bool& fill);
-    void drawZone();
 
 private:
 
@@ -120,6 +115,7 @@ private:
     int minWidth;
     int maxWidth;
     int circRes;
+    ofColor prevBg;
 
     // Variables d'état
     bool active;

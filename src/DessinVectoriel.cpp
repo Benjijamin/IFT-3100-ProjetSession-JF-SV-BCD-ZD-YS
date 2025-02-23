@@ -1,6 +1,10 @@
 // DessinVectoriel.cpp
 // Implémentation de la création de primitives 2D
 
+// TODO:
+// - Bugfix outils de dessin (couleur, épaisseur de trait)
+// - Bouton de sauvegarde (.svg?)
+
 #include "DessinVectoriel.h"
 
 void DessinVectoriel::setup()
@@ -39,6 +43,8 @@ void DessinVectoriel::setup()
 
 void DessinVectoriel::draw()
 {
+    // Paramètres globaux
+    ofSetBackgroundColor(bgColor);
     ofSetCircleResolution(circRes);
 
     // Tracer toutes les formes stockées en mémoire
@@ -59,12 +65,6 @@ void DessinVectoriel::drawGui()
     active ? drawToolbar() : drawInit();
 }
 
-void DessinVectoriel::exit()
-{
-    shapes.clear();
-    active = false;
-}
-
 void DessinVectoriel::mousePressed(int x, int y, int button)
 {
     mouseHeld = true;
@@ -74,6 +74,7 @@ void DessinVectoriel::mousePressed(int x, int y, int button)
 
 void DessinVectoriel::mouseDragged(int x, int y, int button)
 {
+    // Restreindre la sélection à la fenêtre
     mousePos.x = min(max(mouseGap, x), ofGetWidth() - mouseGap);
     mousePos.y = min(max(mouseGap, y), ofGetHeight() - mouseGap);
 
@@ -88,8 +89,6 @@ void DessinVectoriel::mouseDragged(int x, int y, int button)
 void DessinVectoriel::mouseReleased(int x, int y, int button)
 {
     mouseHeld = false;
-
-    // Ajouter la nouvelle forme en mémoire
     if (!hovering)
     {
         Shape s = initShape();
@@ -99,12 +98,37 @@ void DessinVectoriel::mouseReleased(int x, int y, int button)
 
 void DessinVectoriel::begin()
 {
+    prevBg = ofGetBackgroundColor();
     active = true;
 }
 
 bool DessinVectoriel::isActive() const
 {
     return active;
+}
+
+void DessinVectoriel::undo()
+{
+    shapes.pop_back();
+    bool isCurve = true;
+    while (isCurve && shapes.size() > 1)
+    {
+        int i = shapes.size() - 1;
+        isCurve = shapes[i].type == 5;
+        shapes.pop_back();
+    }
+}
+
+void DessinVectoriel::save()
+{
+    quit(); // TODO
+}
+
+void DessinVectoriel::quit()
+{
+    shapes.clear();
+    ofSetBackgroundColor(prevBg);
+    active = false;
 }
 
 void DessinVectoriel::drawInit()
@@ -118,35 +142,23 @@ void DessinVectoriel::drawInit()
 
 void DessinVectoriel::drawToolbar()
 {
+    // Paramètres de la fenêtre
     ImGui::SetNextWindowPos(windowPos);
     ImGui::SetNextWindowSize(toolbarSize);
-
     ImGui::Begin("Outils de dessin");
     hovering = ImGui::IsWindowHovered();
 
-    // Paramètres des outils de dessin
+    // Paramètres des outils de dessin (bug??)
     ofxImGui::VectorCombo("Type de primitive", &typeIndex, types);
     ImGui::SliderInt("Épaisseur de trait", &strokeWidth, minWidth, maxWidth);
     ImGui::ColorEdit3("Couleur de trait", (float*) &strokeColor);
     ImGui::ColorEdit3("Couleur de remplissage", (float*) &fillColor);
     ImGui::ColorEdit3("Couleur d'arrière-plan", (float*) &bgColor);
 
-    // Bouton de retour en arrière ("Undo")
-    if (ImGui::Button("Annuler l'action"))
-    {
-        shapes.pop_back();
-
-        // Si le dernier élément est une courbe, retirer tous les points
-        bool isCurve = true;
-        while (isCurve && shapes.size() > 1)
-        {
-            int i = shapes.size() - 1;
-            isCurve = shapes[i].type == 5;
-            shapes.pop_back();
-        }
-    };
-
-    if (ImGui::Button("Quitter")) exit();
+    // Boutons d'action
+    if (ImGui::Button("Annuler l'action")) undo();
+    if (ImGui::Button("Sauvegarder")) save();
+    if (ImGui::Button("Quitter")) quit();
 
     ImGui::End();
 }
@@ -186,19 +198,19 @@ void DessinVectoriel::drawShape(const Shape& s)
 
     switch (s.type)
     {
-    case 1:
+    case 1: // Ligne
         ofDrawLine(s.initPos.x, s.initPos.y, s.currPos.x, s.currPos.y);
         break;
-    case 2:
+    case 2: // Rectangle
         ofDrawRectangle(s.initPos.x, s.initPos.y, d1.x, d1.y);
         break;
-    case 3:
+    case 3: // Ellipse
         ofDrawEllipse(d2.x, d2.y, d1.x, d1.y);
         break;
-    case 4:
+    case 4: // Triangle
         ofDrawTriangle(s.initPos.x, s.initPos.y, d3.x, d3.y, d3.z, d3.w);
         break;
-    default:
+    default: // Point et suite de points
         ofDrawEllipse(s.currPos.x, s.currPos.y, s.strokeWidth, s.strokeWidth);
         break;
     }

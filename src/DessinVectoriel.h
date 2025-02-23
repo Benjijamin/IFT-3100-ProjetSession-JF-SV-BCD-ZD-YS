@@ -6,14 +6,11 @@
 #include "ofMain.h"
 #include "ofxImGui.h"
 
-// Types de primitive 2D : point, ligne, rectangle, ellipse et triangle isocèle
-enum class ShapeType { none, point, line, rectangle, ellipse, triangle };
-
 struct Shape {
-    ShapeType type;
     ImVec2 initPos;
     ImVec2 currPos;
-    float strokeWidth;
+    int type;
+    int strokeWidth;
     ofColor strokeColor;
     ofColor fillColor;
 };
@@ -28,11 +25,6 @@ public:
     * \brief Override la méthode setup
     */
     void setup();
-
-    /**
-    * \brief Override la méthode update
-    */
-    void update();
 
     /**
     * \brief Override la méthode draw
@@ -50,19 +42,6 @@ public:
     void exit();
 
     /**
-    * \brief This function gets called when the mouse is moving and the button is down. The button (left 0, center 1, right 2) variable can be used to test against left or right button drags. You also receive the x and y coordinates of the mouse.
-    * 
-    * Called on the active window when the mouse is dragged, i.e. moved with a button pressed
-    * \param int x position
-    * \param int y position
-    * \param int boutton
-    * 
-    * 
-    * P.S. Override pour s'assurer que l'on prend cette méthode et non celle d'openframworks 'ofBaseApp::mouseDragged(ofMouseEventArgs &mouse)'
-    */
-    void mouseDragged(int x, int y, int button);
-
-    /**
     * \brief (Explications)
     *
     * \param int x position
@@ -70,6 +49,24 @@ public:
     * \param int boutton
     */
     void mousePressed(int x, int y, int button);
+
+    /**
+    * \brief This function gets called when the mouse is moving and the button 
+    * is down. The button (left 0, center 1, right 2) variable can be used to 
+    * test against left or right button drags. You also receive the x and y 
+    * coordinates of the mouse.
+    *
+    * Called on the active window when the mouse is dragged, i.e. moved with a 
+    * button pressed
+    * \param int x position
+    * \param int y position
+    * \param int boutton
+    *
+    *
+    * P.S. Override pour s'assurer que l'on prend cette méthode et non celle 
+    * d'openframworks 'ofBaseApp::mouseDragged(ofMouseEventArgs &mouse)'
+    */
+    void mouseDragged(int x, int y, int button);
 
     /**
     * \brief (Explications)
@@ -83,46 +80,28 @@ public:
     /**
     * \brief (Explications)
     *
-    * \param int x position
-    * \param int y position
-    * \param int float
-    */
-    void mouseScrolled(int x, int y, float scrollX, float scrollY);
-
-    /**
-    * \brief (Explications)
-    *
-    * \param string path
-    */
-    void load(const std::string& path);
-
-    void unload(const std::string& path);
-
-    /**
-    * \brief (Explications)
-    *
     * \param string path
     */
     void save(const std::string& path);
 
     // Initialisation
-    void newDrawing();
-    bool isActive();
+    void begin();
+    bool isActive() const;
 
-    // Affichage des fenêtres et de la zone de sélection
+    // Affichage des fenêtres
     void drawInit();
-    void drawZone();
     void drawToolbar();
 
-    // Fonctions liées aux formes vectorielles
-    void addShape();
-    void drawShape(const Shape& s);
-    void buildShape(const Shape& p);
-
     // Fonctions liées aux dimensions des formes
-    ImVec2 findRectDims(const ImVec2& init, const ImVec2& pos);
-    ImVec2 findEllipseDims(const ImVec2& init, const ImVec2& pos);
-    ImVec4 findTriangleDims(const ImVec2& init, const ImVec2& pos);
+    ImVec2 rectangleDims(const ImVec2& init, const ImVec2& pos);
+    ImVec2 ellipseDims(const ImVec2& init, const ImVec2& pos);
+    ImVec4 triangleDims(const ImVec2& init, const ImVec2& pos);
+
+    // Construction des formes vectorielles
+    Shape initShape() const;
+    void drawShape(const Shape& s);
+    void buildShape(const Shape& s, const bool& fill);
+    void drawZone();
 
 private:
 
@@ -134,18 +113,26 @@ private:
 
     // Attributs des outils de dessin
     vector<Shape> shapes;
-    ShapeType shapeType;
-    float strokeWidth;
+    vector<string> types;
+    int typeIndex;
+    int strokeWidth;
+    ofColor zoneColor;
     ofColor strokeColor;
     ofColor fillColor;
     ofColor bgColor;
 
+    // Autres attributs
+    int minWidth;
+    int maxWidth;
+    int circRes;
+
+    // Variables d'état
+    bool active;
+    bool hovering;
+
     // Contrôle de la souris
     bool mouseHeld;
+    int mouseGap;
     ImVec2 mouseInit;
     ImVec2 mousePos;
-    int mouseGap;
-
-    // Variable d'état
-    bool active;
 };

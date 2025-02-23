@@ -5,9 +5,8 @@
 
 #include "ofMain.h"
 #include "ofxImGui.h"
-#include "Editor.h"
 
-// Types de primitive 2D : point, ligne, rectangle, ellipse et triangle équilatéral
+// Types de primitive 2D : point, ligne, rectangle, ellipse et triangle isocèle
 enum class ShapeType { none, point, line, rectangle, ellipse, triangle };
 
 struct Shape {
@@ -111,8 +110,7 @@ public:
     bool isActive();
 
     // Affichage des fenêtres et de la zone de sélection
-    void drawBlankWindow();
-    void drawMainWindow();
+    void drawInit();
     void drawZone();
     void drawToolbar();
 
@@ -121,13 +119,17 @@ public:
     void drawShape(const Shape& s);
     void buildShape(const Shape& p);
 
+    // Fonctions liées aux dimensions des formes
+    ImVec2 findRectDims(const ImVec2& init, const ImVec2& pos);
+    ImVec2 findEllipseDims(const ImVec2& init, const ImVec2& pos);
+    ImVec4 findTriangleDims(const ImVec2& init, const ImVec2& pos);
+
 private:
 
     // Taille et emplacement des fenêtres
     float windowGap;
-    ImVec2 initWindowPos;
-    ImVec2 blankWindowSize;
-    ImVec2 mainWindowSize;
+    ImVec2 windowPos;
+    ImVec2 initSize;
     ImVec2 toolbarSize;
 
     // Attributs des outils de dessin
@@ -142,8 +144,8 @@ private:
     bool mouseHeld;
     ImVec2 mouseInit;
     ImVec2 mousePos;
+    int mouseGap;
 
-    // Variables d'état
+    // Variable d'état
     bool active;
-    bool hovering;
 };

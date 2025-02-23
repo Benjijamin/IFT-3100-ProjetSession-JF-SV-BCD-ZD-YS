@@ -11,8 +11,8 @@ struct Shape {
     ImVec2 currPos;
     int type;
     int strokeWidth;
-    ofColor strokeColor;
-    ofColor fillColor;
+    ofFloatColor strokeColor;
+    ofFloatColor fillColor;
 };
 
 /**
@@ -77,7 +77,7 @@ public:
     bool isActive() const;
     void undo();
     void save();
-    void quit();
+    void exit();
 
     // Affichage des fenêtres
     void drawInit();
@@ -106,10 +106,10 @@ private:
     vector<string> types;
     int typeIndex;
     int strokeWidth;
-    ofColor zoneColor;
-    ofColor strokeColor;
-    ofColor fillColor;
-    ofColor bgColor;
+    ofFloatColor zoneColor;
+    ofFloatColor strokeColor;
+    ofFloatColor fillColor;
+    ofFloatColor bgColor;
 
     // Autres attributs
     int minWidth;

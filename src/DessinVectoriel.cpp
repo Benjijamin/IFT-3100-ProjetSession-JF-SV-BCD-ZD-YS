@@ -2,8 +2,9 @@
 // Implémentation de la création de primitives 2D
 
 // TODO:
-// - Bugfix outils de dessin (couleur, épaisseur de trait)
-// - Bouton de sauvegarde (.svg?)
+// - Bugfix épaisseur de trait
+// - Bugfix couleur d'arrière-plan
+// - Implémenter bouton de sauvegarde
 
 #include "DessinVectoriel.h"
 
@@ -12,8 +13,8 @@ void DessinVectoriel::setup()
     // Taille et espacement des fenêtres
     windowGap = 30.0f;
     windowPos = ImVec2(windowGap / 2, windowGap);
-    initSize = ImVec2(100.0f, 100.0f);
-    toolbarSize = ImVec2(500.f, 200.0f);
+    initSize = ImVec2(40.0f, 20.0f);
+    toolbarSize = ImVec2(500.f, 150.0f);
 
     // Attributs des outils de dessin
     shapes = {};
@@ -23,7 +24,7 @@ void DessinVectoriel::setup()
     zoneColor = ofColor(255.0f);
     strokeColor = ofColor(0.0f);
     fillColor = ofColor(255.0f);
-    bgColor = ofColor(96.0f);
+    bgColor = ofColor(60.0f);
 
     // Autres attributs
     minWidth = 0;
@@ -99,6 +100,7 @@ void DessinVectoriel::mouseReleased(int x, int y, int button)
 void DessinVectoriel::begin()
 {
     prevBg = ofGetBackgroundColor();
+    ofLog() << prevBg; // Debug
     active = true;
 }
 
@@ -121,10 +123,10 @@ void DessinVectoriel::undo()
 
 void DessinVectoriel::save()
 {
-    quit(); // TODO
+    exit(); // TODO
 }
 
-void DessinVectoriel::quit()
+void DessinVectoriel::exit()
 {
     shapes.clear();
     ofSetBackgroundColor(prevBg);
@@ -157,8 +159,10 @@ void DessinVectoriel::drawToolbar()
 
     // Boutons d'action
     if (ImGui::Button("Annuler l'action")) undo();
-    if (ImGui::Button("Sauvegarder")) save();
-    if (ImGui::Button("Quitter")) quit();
+    ImGui::SameLine();
+    if (ImGui::Button("Sauvegarder et quitter")) save();
+    ImGui::SameLine();
+    if (ImGui::Button("Quitter sans sauvegarder")) exit();
 
     ImGui::End();
 }

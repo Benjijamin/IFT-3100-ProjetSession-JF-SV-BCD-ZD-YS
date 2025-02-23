@@ -6,6 +6,7 @@ void ofApp::setup() {
     gui.setup();
 
     ImGui::StyleColorsClassic();
+    ofSetBackgroundColor(ofColor(60, 60, 60));
 
     imageEditor.setup();
     modelEditor.setup();

@@ -29,4 +29,5 @@ private:
 
     void drawSceneGraph();
     void drawSceneGraphNode(int index);
+    void drawInfo();
 };

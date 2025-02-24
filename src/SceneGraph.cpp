@@ -1,249 +1,188 @@
 #include "SceneGraph.h"
 
-SceneGraph::SceneGraph()
-    : gizmoType(ofxGizmo::OFX_GIZMO_MOVE), selectedIndex(-1) {
-    gizmo.setType(gizmoType);
-    gizmo.hide();
-}
+SceneGraph::SceneGraph() : selectedNode(nullptr) {}
 
 void SceneGraph::setup() {
-    nodes.emplace_back("Root");
-    selectedIndex = -1;
+    rootNode = std::make_shared<SceneNode>("Root");
+    setSelectedNode(rootNode);
 }
 
 void SceneGraph::update() {
-    if (selectedIndex != -1) {
-        gizmo.apply(nodes[selectedIndex]);
-    }
+
 }
 
-void SceneGraph::draw(ofCamera& camera) {
-    for (auto& node : nodes) {
-        node.draw();
+void SceneGraph::draw() {
+    if (rootNode) {
+        rootNode->draw();
     }
-
-    gizmo.draw(camera);
 }
 
 void SceneGraph::drawGui() {
     ImGui::Begin("Scene Graph");
 
-    drawNodeGui(0);
+    if (rootNode) {
+        drawNodeGui(rootNode);
+    }
+
+    float footerHeight = 50;
+    ImGui::SetCursorPosY(ImGui::GetWindowHeight() - footerHeight);
+
+    ImGui::Separator();
+
+    static char nodeName[128] = "";
+    ImGui::InputText("Node Name", nodeName, IM_ARRAYSIZE(nodeName));
+
+    if (ImGui::Button("Add Empty Node") && strlen(nodeName) > 0) {
+        addEmptyNode(nodeName);
+        nodeName[0] = '\0';
+    }
+
+    if (selectedNode && selectedNode != rootNode && !selectedNode->containsModel()) {
+        ImGui::SameLine();
+        if (ImGui::Button("Delete Empty Node")) {
+            deleteNode(selectedNode);
+            selectedNode = nullptr;
+        }
+    }
 
     ImGui::End();
-
-    if (selectedIndex != -1) {
-        ImGui::Begin("Gizmo Controls");
-        ImGui::Text("Gizmo Controls for Node: %s", nodes[selectedIndex].getName().c_str());
-
-        bool translateSelected = (gizmoType == ofxGizmo::OFX_GIZMO_MOVE);
-        bool rotateSelected = (gizmoType == ofxGizmo::OFX_GIZMO_ROTATE);
-        bool scaleSelected = (gizmoType == ofxGizmo::OFX_GIZMO_SCALE);
-
-        if (ImGui::RadioButton("Translate", translateSelected)) {
-            gizmoType = ofxGizmo::OFX_GIZMO_MOVE;
-        }
-
-        if (ImGui::RadioButton("Rotate", rotateSelected)) {
-            gizmoType = ofxGizmo::OFX_GIZMO_ROTATE;
-        }
-
-        if (ImGui::RadioButton("Scale", scaleSelected)) {
-            gizmoType = ofxGizmo::OFX_GIZMO_SCALE;
-        }
-
-        gizmo.setType(gizmoType);
-
-        if (selectedIndex != 0) {
-            if (ImGui::Button("Delete Selected Node")) {
-                deleteNode(selectedIndex);
-            }
-        }
-
-        ImGui::End();
-    }
 }
 
 void SceneGraph::exit() {
 
 }
 
-void SceneGraph::drawNodeGui(int index) {
+void SceneGraph::addModelNode(const std::string& path) {
+    auto model = std::make_shared<ofxAssimpModelLoader>();
+    model->load(path);
+    model->setPosition(0, 0, 0);
+
+    std::string baseName = std::filesystem::path(path).stem().string();
+    std::string uniqueName = generateUniqueName(baseName);
+
+    auto newNode = std::make_shared<SceneNode>(uniqueName);
+    newNode->setModel(model);
+
+    if (rootNode) {
+        rootNode->addChild(newNode);
+    }
+}
+
+void SceneGraph::addEmptyNode(const std::string& name) {
+    auto newNode = std::make_shared<SceneNode>(name);
+
+    if (rootNode) {
+        rootNode->addChild(newNode);
+    }
+}
+
+void SceneGraph::unloadNodes(const std::string& path) {
+    std::string baseName = std::filesystem::path(path).stem().string();
+    deleteNodesByBaseName(baseName);
+}
+
+std::shared_ptr<SceneNode> SceneGraph::getRootNode() const {
+    return rootNode;
+}
+
+std::shared_ptr<SceneNode> SceneGraph::getSelectedNode() const {
+    return selectedNode;
+}
+
+void SceneGraph::setSelectedNode(std::shared_ptr<SceneNode> node) 
+{
+    selectedNode = node;
+
+    if (selectedNodeChangedCallback) {
+        selectedNodeChangedCallback(node);
+    }
+}
+
+void SceneGraph::setSelectedNodeChangedCallback(std::function<void(std::shared_ptr<SceneNode>)> callback) {
+    selectedNodeChangedCallback = std::move(callback);
+}
+
+void SceneGraph::drawNodeGui(std::shared_ptr<SceneNode> node) {
     ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-    bool nodeOpen = ImGui::TreeNodeEx(nodes[index].getName().c_str(), nodeFlags);
+
+    if (node == selectedNode) {
+        nodeFlags |= ImGuiTreeNodeFlags_Selected;
+    }
+
+    bool nodeOpen = ImGui::TreeNodeEx(node->getName().c_str(), nodeFlags);
 
     if (ImGui::IsItemClicked()) {
-        selectedIndex = index;
+        setSelectedNode(node);
+    }
 
-        if (selectedIndex != -1) {
-            gizmo.setNode(nodes[selectedIndex]);
-            gizmo.show();
+    if (ImGui::BeginDragDropSource()) {
+        SceneNode* nodePointer = node.get();
+        ImGui::SetDragDropPayload("DND_DEMO_CELL", &nodePointer, sizeof(SceneNode*));
+        ImGui::Text("Move %s", node->getName().c_str());
+        ImGui::EndDragDropSource();
+    }
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_CELL")) {
+            SceneNode* sourceNode = *(SceneNode**)payload->Data;
+            transferNode(sourceNode->shared_from_this(), node);
         }
-        else {
-            gizmo.hide();
-        }
+        ImGui::EndDragDropTarget();
     }
 
     if (nodeOpen) {
-        if (childrenIndices.find(index) != childrenIndices.end()) {
-            for (int childIndex : childrenIndices[index]) {
-                drawNodeGui(childIndex);
-            }
+        for (const auto& child : node->getChildren()) {
+            drawNodeGui(child);
         }
-
         ImGui::TreePop();
     }
 }
 
-void SceneGraph::addModelNode(const std::string& name, std::shared_ptr<ofxAssimpModelLoader> model) {
-    std::string uniqueName = generateUniqueName(name);
-    nodes.emplace_back(uniqueName);
-
-    int parentIndex = 0;
-    int newIndex = nodes.size() - 1;
-
-    SceneNode& node = nodes.back();
-    node.setModel(model);
-    node.setParent(nodes[parentIndex]);
-
-    childrenIndices[parentIndex].push_back(newIndex);
+void SceneGraph::addNode(std::shared_ptr<SceneNode> node, std::shared_ptr<SceneNode> parent) {
+    parent->addChild(node);
 }
 
-void SceneGraph::addEmptyNode(const std::string& name, SceneNode parent) 
-{
-    std::string uniqueName = generateUniqueName(name);
-    nodes.emplace_back(uniqueName);
+void SceneGraph::deleteNode(std::shared_ptr<SceneNode> node) {
+    if (node && node->getParent()) {
+        auto parent = dynamic_cast<SceneNode*>(node->getParent());
+        if (parent) {
+            parent->removeChild(node);
+        }
+    }
+}
 
-    int parentIndex = findIndexOf(parent);
-    int newIndex = nodes.size() - 1;
+void SceneGraph::transferNode(std::shared_ptr<SceneNode> node, std::shared_ptr<SceneNode> newParent) {
+    deleteNode(node);
+    addNode(node, newParent);
+}
 
-    SceneNode& node = nodes.back();
-    node.setParent(nodes[parentIndex]);
+void SceneGraph::deleteNodesByBaseName(const std::string& baseName) {
+    auto children = rootNode->getChildren();
+    for (const auto& child : children) {
+        if (child->getName().find(baseName) != std::string::npos) {
+            deleteNode(child);
+        }
+    }
+}
 
-    childrenIndices[parentIndex].push_back(newIndex);
+bool SceneGraph::isNameUnique(const std::shared_ptr<SceneNode>& node, const std::string& name) {
+    if (node->getName() == name) {
+        return false;
+    }
+    for (const auto& child : node->getChildren()) {
+        if (!isNameUnique(child, name)) {
+            return false;
+        }
+    }
 }
 
 std::string SceneGraph::generateUniqueName(const std::string& baseName) {
     std::string uniqueName = baseName;
     int counter = 1;
-    while (std::any_of(nodes.begin(), nodes.end(), [&uniqueName](const SceneNode& node) {
-        return node.getName() == uniqueName;
-        })) {
-        std::stringstream ss;
-        ss << baseName << counter++;
-        uniqueName = ss.str();
+
+    while (!isNameUnique(rootNode, uniqueName)) {
+        uniqueName = baseName + std::to_string(counter++);
     }
+
     return uniqueName;
-}
-
-void SceneGraph::deleteNode(int index) {
-    if (index <= 0 || index >= nodes.size()) {
-        return;
-    }
-
-    int parentIndex = findParentIndex(index);
-    reassignChildrenToParent(index, parentIndex);
-    removeNodeFromGraph(index);
-    updateChildrenIndices(index);
-}
-
-int SceneGraph::findParentIndex(int index) {
-    for (auto& pair : childrenIndices) {
-        auto& siblings = pair.second;
-        auto it = std::find(siblings.begin(), siblings.end(), index);
-        if (it != siblings.end()) {
-            siblings.erase(it);
-            return pair.first;
-        }
-    }
-    return -1;
-}
-
-int SceneGraph::findIndexOf(SceneNode node) 
-{
-    auto it = std::find(nodes.begin(), nodes.end(), node);
-    if (it != nodes.end()) 
-    {
-        return std::distance(nodes.begin(), it);
-    }
-
-    return -1;
-}
-
-/**
-Trouve les enfants du parent(index),
-retourne liste vide si aucun enfant
-*/
-std::vector<int> SceneGraph::getChildrenOf(int index)
-{
-    if (childrenIndices.find(index) != childrenIndices.end()) 
-    {
-        return childrenIndices[index];
-    }
-    else 
-    {
-        return {};
-    }
-}
-
-void SceneGraph::reassignChildrenToParent(int index, int parentIndex) {
-    if (childrenIndices.find(index) != childrenIndices.end()) {
-        auto& children = childrenIndices[index];
-        if (parentIndex != -1) {
-            childrenIndices[parentIndex].insert(
-                childrenIndices[parentIndex].end(), children.begin(), children.end());
-        }
-        childrenIndices.erase(index);
-    }
-}
-
-void SceneGraph::removeNodeFromGraph(int index) {
-    nodes.erase(nodes.begin() + index);
-
-    if (selectedIndex == index) {
-        selectedIndex = -1;
-    }
-    else if (selectedIndex > index) {
-        selectedIndex--;
-    }
-}
-
-void SceneGraph::updateChildrenIndices(int index) {
-    std::unordered_map<int, std::vector<int>> newChildrenIndices;
-    for (auto& pair : childrenIndices) {
-        int parentIndex = pair.first;
-        if (parentIndex > index) parentIndex--;
-        std::vector<int> newChildren;
-        for (int childIndex : pair.second) {
-            if (childIndex > index) childIndex--;
-            newChildren.push_back(childIndex);
-        }
-        newChildrenIndices[parentIndex] = newChildren;
-    }
-    childrenIndices = newChildrenIndices;
-}
-
-SceneNode SceneGraph::getNode(int index) const
-{
-    return nodes[index];
-}
-
-SceneNode SceneGraph::getSelectedNode() const
-{
-    return nodes[selectedIndex];
-}
-
-SceneNode SceneGraph::getRootNode() const
-{
-    return nodes[0];
-}
-
-void SceneGraph::setSelectedIndex(int index)
-{
-    selectedIndex = index;
-}
-
-int SceneGraph::getSelectedIndex() const
-{
-    return selectedIndex;
 }

@@ -105,7 +105,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ColorPicker.cpp" />
-    <ClCompile Include="src\CustomSlider.cpp" />
     <ClCompile Include="src\DessinVectoriel.cpp" />
     <ClCompile Include="src\FreeFlightCamera.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -141,10 +140,10 @@
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_demo.cpp" />
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_widgets.cpp" />
+    <ClCompile Include="src\Viewer2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ColorPicker.h" />
-    <ClInclude Include="src\CustomSlider.h" />
     <ClInclude Include="src\DessinVectoriel.h" />
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\FreeFlightCamera.h" />
@@ -272,6 +271,7 @@
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_textedit.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_truetype.h" />
+    <ClInclude Include="src\Viewer2D.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

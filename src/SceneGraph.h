@@ -1,6 +1,8 @@
 #pragma once
 
-#include "ofxGizmo.h"
+#include <string>
+#include <memory>
+#include <functional>
 #include "SceneNode.h"
 
 class SceneGraph {
@@ -9,35 +11,32 @@ public:
 
     void setup();
     void update();
-    void draw(ofCamera& camera);
+    void draw();
     void drawGui();
     void exit();
 
-    void addModelNode(const std::string& name, std::shared_ptr<ofxAssimpModelLoader> model);
-    void addEmptyNode(const std::string& name, SceneNode parent);
-    void deleteNode(int index);
+    void addModelNode(const std::string& path);
+    void addEmptyNode(const std::string& name);
+    void unloadNodes(const std::string& path);
 
-    void setSelectedIndex(int index);
-    int getSelectedIndex() const;
-
-    std::vector<int> getChildrenOf(int index);
-    SceneNode getNode(int index) const;
-    SceneNode getSelectedNode() const;
-    SceneNode getRootNode() const;
-private:
-    void drawNodeGui(int index);
+    std::shared_ptr<SceneNode> getRootNode() const;
+    std::shared_ptr<SceneNode> getSelectedNode() const;
+    void setSelectedNode(std::shared_ptr<SceneNode> node);
+    void setSelectedNodeChangedCallback(std::function<void(std::shared_ptr<SceneNode>)> callback);
 
     std::string generateUniqueName(const std::string& baseName);
+private:
+    void drawNodeGui(std::shared_ptr<SceneNode> node);
 
-    int findParentIndex(int index);
-    int findIndexOf(SceneNode node);
-    void reassignChildrenToParent(int index, int parentIndex);
-    void removeNodeFromGraph(int index);
-    void updateChildrenIndices(int index);
+    void addNode(std::shared_ptr<SceneNode> node, std::shared_ptr<SceneNode> parent);
+    void transferNode(std::shared_ptr<SceneNode> node, std::shared_ptr<SceneNode> newParent);
+    void deleteNode(std::shared_ptr<SceneNode> node);
+    void deleteNodesByBaseName(const std::string& baseName);
 
-    std::vector<SceneNode> nodes;
-    std::unordered_map<int, std::vector<int>> childrenIndices;
-    ofxGizmo gizmo;
-    ofxGizmo::ofxGizmoType gizmoType;
-    int selectedIndex;
+    bool isNameUnique(const std::shared_ptr<SceneNode>& node, const std::string& name);
+
+    std::shared_ptr<SceneNode> rootNode;
+    std::shared_ptr<SceneNode> selectedNode;
+
+    std::function<void(std::shared_ptr<SceneNode>)> selectedNodeChangedCallback;
 };

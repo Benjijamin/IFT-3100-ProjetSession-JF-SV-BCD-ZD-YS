@@ -18,5 +18,6 @@ public:
     virtual void mouseScrolled(int x, int y, float scrollX, float scrollY) = 0;
 
     virtual void load(const std::string& path) = 0;
+    virtual void unload(const std::string& path) = 0;
     virtual void save(const std::string& path) = 0;
 };

@@ -19,7 +19,8 @@ public:
     void mouseReleased(int x, int y, int button) override;
     void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
-    void load(const std::string& path) override;
+    void load(const std::string& path) override; 
+    void unload(const std::string& path);
     void save(const std::string& path) override;
 private:
     char* sceneName;
@@ -28,6 +29,6 @@ private:
     bool justAddedNode;
 
     void drawSceneGraph();
-    void drawSceneGraphNode(int index);
+    void drawSceneGraphNode(std::shared_ptr<SceneNode> node);
     void drawInfo();
 };

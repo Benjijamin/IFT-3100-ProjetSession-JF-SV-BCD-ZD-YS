@@ -11,25 +11,34 @@ public:
     void drawGui();
     void exit();
 
+    std::string getSelectedAssetPath() const;
+    std::string getLastAssetPath() const;
+
+    bool isImageAsset(const std::string& asset) const;
+    bool isModelAsset(const std::string& asset) const;
+
+    std::function<void()> onAssetAddition;
+    std::function<void()> onAssetRemoval;
+    std::function<void()> onAssetSelection;
+
+private:
+    void drawSearchBar();
+    void drawAssetList();
+    void drawControls();
+
     void addAsset(const std::string& assetPath);
     void removeAsset(const std::string& asset);
     void selectAsset(const std::string& assetPath);
     void loadAssetsFromFolder(const std::string& folderPath);
 
-    bool isImageAsset(const std::string& asset) const;
-    bool isModelAsset(const std::string& asset) const;
-
-    std::string getSelectedAssetPath() const;
-
-    std::function<void()> onAssetSelection;
-    std::function<void()> onAssetDeletion;
-
-private:
     std::vector<std::string> getFilteredAssets() const;
 
     std::vector<std::string> assets;
     std::string selectedAsset;
 
-    bool showFullPaths = false;
-    int filterIndex = 0;
+    char searchBuffer[128];
+    float assetBrowserHeight;
+    bool resizing;
+    bool showFullPaths;
+    int filterIndex;
 };

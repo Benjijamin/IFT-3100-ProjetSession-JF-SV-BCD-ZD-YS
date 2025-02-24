@@ -8,7 +8,6 @@
 #include "SceneEditor.h"
 #include "DessinVectoriel.h"
 #include "AssetBrowser.h"
-#include "ScreenCapture.h"
 #include "MenuBar.h"
 
 class ofApp : public ofBaseApp {
@@ -33,15 +32,17 @@ public:
 
 private:
     void switchEditor();
+    void handleAssetAddition();
+    void handleAssetRemoval();
     void handleAssetSelection();
-    void handleAssetDeletion();
 
     ofxImGui::Gui gui;
 
+    ImageEditor imageEditor;
+    ModelEditor modelEditor;
+    SceneEditor sceneEditor;
     AssetBrowser assetBrowser;
-    ScreenCapture screenCapture;
-
     MenuBar menuBar;
 
-    std::unique_ptr<Editor> currentEditor;
+    Editor* currentEditor;
 };

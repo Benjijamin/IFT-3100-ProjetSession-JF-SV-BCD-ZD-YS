@@ -95,6 +95,12 @@ void AssetBrowser::drawAssetList() {
             if (ImGui::Selectable(selectableID.c_str(), selectedAsset == asset, 0, selectableSize)) {
                 selectAsset(asset);
             }
+            if (ImGui::BeginDragDropSource()) 
+            {
+                ImGui::SetDragDropPayload("ASSET", &asset, sizeof(asset));
+                ImGui::Text("This is an asset");
+                ImGui::EndDragDropSource();
+            }
 
             ImGui::SameLine();
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (selectableSize.y - ImGui::GetTextLineHeight()) / 2);

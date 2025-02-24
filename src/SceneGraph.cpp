@@ -186,3 +186,16 @@ std::string SceneGraph::generateUniqueName(const std::string& baseName) {
 
     return uniqueName;
 }
+
+bool SceneGraph::editNodeName(std::shared_ptr<SceneNode> node, std::string &name) 
+{
+    if(isNameUnique(rootNode, name))
+    {
+        node->setName(name);
+        return true;
+    }
+    else 
+    {
+        return false;
+    }
+}

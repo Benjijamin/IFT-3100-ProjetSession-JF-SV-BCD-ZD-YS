@@ -26,14 +26,16 @@ void SceneEditor::drawGui()
         sceneGraph.setSelectedNode(sceneGraph.getRootNode());
     }
 
+    auto selected = sceneGraph.getSelectedNode();
+
     //Ajouter une node vide sous la node courante
     if (ImGui::Button("Add empty")) 
     {
         auto emptyNode = std::make_shared<SceneNode>(sceneGraph.generateUniqueName("New Object"));
 
-        if (sceneGraph.getRootNode() != sceneGraph.getSelectedNode()) 
+        if (selected != sceneGraph.getRootNode()) 
         {
-            sceneGraph.getSelectedNode()->addChild(emptyNode);
+            selected->addChild(emptyNode);
             justAddedNode = true;
         }
         else 
@@ -42,29 +44,33 @@ void SceneEditor::drawGui()
         }
     }
 
-    //On dessine le graphe
     drawSceneGraph();
 
     ImGui::End();
 
     //On affiche les infos de la node courante
-    if (sceneGraph.getSelectedNode() != sceneGraph.getRootNode()) {
-        drawInfo();
+    if (selected != sceneGraph.getRootNode()) {
+        drawInfo(selected);
     }
 }
 
-void SceneEditor::drawInfo() 
+void SceneEditor::drawInfo(std::shared_ptr<SceneNode> node) 
 {
     ImGui::Begin("Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoFocusOnAppearing);
 
-    auto selected = sceneGraph.getSelectedNode();
-
-    ImGui::Text(selected->getName().c_str());
+    static char name[255] = "";
+    strncpy(name, node->getName().c_str(), sizeof(name) - 1);
+    ImGui::InputText("", name, IM_ARRAYSIZE(name));
+    if (ImGui::IsItemDeactivatedAfterEdit()) 
+    {
+        std::string newName = name;
+        sceneGraph.editNodeName(node, newName);
+    }
 
     ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
     ImGui::Text("Position");
-    glm::vec3 position = selected->getPosition();
+    glm::vec3 position = node->getPosition();
     ImGui::Text("x: %f", position.x);
     ImGui::Text("y: %f", position.y);
     ImGui::Text("z: %f", position.z);
@@ -72,7 +78,7 @@ void SceneEditor::drawInfo()
     ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
     ImGui::Text("Scale");
-    glm::vec3 scale = selected->getScale();
+    glm::vec3 scale = node->getScale();
     ImGui::Text("x: %f", scale.x);
     ImGui::Text("y: %f", scale.y);
     ImGui::Text("z: %f", scale.z);
@@ -80,10 +86,12 @@ void SceneEditor::drawInfo()
     ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
     ImGui::Text("Rotation");
-    glm::vec3 rotation = selected->getOrientationEuler();
+    glm::vec3 rotation = node->getOrientationEuler();
     ImGui::Text("x: %f", rotation.x);
     ImGui::Text("y: %f", rotation.y);
     ImGui::Text("z: %f", rotation.z);
+
+    //Ajouter autre infos et controls
 
     ImGui::End();
 }

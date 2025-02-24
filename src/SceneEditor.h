@@ -30,5 +30,5 @@ private:
 
     void drawSceneGraph();
     void drawSceneGraphNode(std::shared_ptr<SceneNode> node);
-    void drawInfo();
+    void drawInfo(std::shared_ptr<SceneNode> node);
 };

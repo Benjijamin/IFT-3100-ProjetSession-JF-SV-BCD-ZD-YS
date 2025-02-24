@@ -25,6 +25,7 @@ public:
     void setSelectedNodeChangedCallback(std::function<void(std::shared_ptr<SceneNode>)> callback);
 
     std::string generateUniqueName(const std::string& baseName);
+    bool editNodeName(std::shared_ptr<SceneNode> node, std::string& name);
 private:
     void drawNodeGui(std::shared_ptr<SceneNode> node);
 

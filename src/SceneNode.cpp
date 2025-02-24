@@ -25,6 +25,11 @@ std::string SceneNode::getName() const {
     return name;
 }
 
+void SceneNode::setName(std::string& newName)
+{
+    name = newName;
+}
+
 bool SceneNode::containsModel() const {
     return model != nullptr;
 }

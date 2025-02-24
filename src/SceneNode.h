@@ -16,6 +16,7 @@ public:
     std::vector<std::shared_ptr<SceneNode>> getChildren() const;
 
     std::string getName() const;
+    void setName(std::string& newName);
     bool containsModel() const;
 
     bool operator ==(const SceneNode& other) const;

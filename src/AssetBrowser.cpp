@@ -95,10 +95,11 @@ void AssetBrowser::drawAssetList() {
             if (ImGui::Selectable(selectableID.c_str(), selectedAsset == asset, 0, selectableSize)) {
                 selectAsset(asset);
             }
+
             if (ImGui::BeginDragDropSource()) 
             {
-                ImGui::SetDragDropPayload("ASSET", &asset, sizeof(asset));
-                ImGui::Text("This is an asset");
+                ImGui::SetDragDropPayload("ASSET", asset.c_str(), asset.size()+1);
+                ImGui::Text(asset.c_str());
                 ImGui::EndDragDropSource();
             }
 
@@ -208,12 +209,12 @@ void AssetBrowser::loadAssetsFromFolder(const std::string& folderPath) {
     }
 }
 
-bool AssetBrowser::isImageAsset(const std::string& asset) const {
+bool AssetBrowser::isImageAsset(const std::string& asset){
     static const std::set<std::string> imageExtensions = { ".png", ".jpg", ".jpeg" };
     return imageExtensions.find(fs::path(asset).extension().string()) != imageExtensions.end();
 }
 
-bool AssetBrowser::isModelAsset(const std::string& asset) const {
+bool AssetBrowser::isModelAsset(const std::string& asset){
     static const std::set<std::string> modelExtensions = { ".obj", ".dae", ".fbx" };
     return modelExtensions.find(fs::path(asset).extension().string()) != modelExtensions.end();
 }

@@ -39,7 +39,7 @@ void SceneNode::customDraw() {
         model->drawFaces();
     }
     else {
-        ofDrawSphere(glm::vec3(0), 10);
+        ofDrawSphere(glm::vec3(0), 2);
     }
 }
 

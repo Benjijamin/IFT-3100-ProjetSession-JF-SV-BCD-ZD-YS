@@ -14,8 +14,8 @@ public:
     std::string getSelectedAssetPath() const;
     std::string getLastAssetPath() const;
 
-    bool isImageAsset(const std::string& asset) const;
-    bool isModelAsset(const std::string& asset) const;
+    static bool isImageAsset(const std::string& asset);
+    static bool isModelAsset(const std::string& asset);
 
     std::function<void()> onAssetAddition;
     std::function<void()> onAssetRemoval;

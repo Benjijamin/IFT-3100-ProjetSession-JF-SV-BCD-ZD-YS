@@ -1,4 +1,5 @@
 #include "SceneGraph.h"
+#include "AssetBrowser.h"
 
 SceneGraph::SceneGraph() : selectedNode(nullptr) {}
 
@@ -74,6 +75,19 @@ void SceneGraph::addEmptyNode(const std::string& name) {
     if (rootNode) {
         rootNode->addChild(newNode);
     }
+}
+
+void SceneGraph::loadAsset(std::shared_ptr<SceneNode> node, std::string assetPath) 
+{
+    if (AssetBrowser::isModelAsset(assetPath)) 
+    {
+        auto model = std::make_shared<ofxAssimpModelLoader>();
+        model->load(assetPath);
+        model->setPosition(0, 0, 0);
+        node->setModel(model);
+    }
+
+    //Ajoutez comportements pour les autres types d'assets
 }
 
 void SceneGraph::unloadNodes(const std::string& path) {

@@ -14,6 +14,23 @@ void SceneEditor::update()
 
 void SceneEditor::draw() 
 {
+    ofEnableDepthTest();
+    ofEnableLighting();
+
+    camera.begin();
+
+    light.enable();
+    material.begin();
+
+    sceneGraph.draw();
+
+    material.end();
+    light.disable();
+
+    camera.end();
+
+    ofDisableDepthTest();
+    ofDisableLighting();
 }
 
 void SceneEditor::drawGui() 
@@ -41,6 +58,17 @@ void SceneEditor::drawGui()
         else 
         {
             sceneGraph.getRootNode()->addChild(emptyNode);
+        }
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Delete")) 
+    {
+        if (selected != sceneGraph.getRootNode()) 
+        {
+            sceneGraph.deleteNode(selected);
+            sceneGraph.setSelectedNode(sceneGraph.getRootNode());
         }
     }
 
@@ -120,7 +148,7 @@ void SceneEditor::drawSceneGraphNode(std::shared_ptr<SceneNode> node)
     }
 
     bool nodeOpen = ImGui::TreeNodeEx(node->getName().c_str(), nodeFlags);
-
+    nodeDragDropBehaviour(node);
 
     if (ImGui::IsItemClicked())
     {
@@ -140,6 +168,37 @@ void SceneEditor::drawSceneGraphNode(std::shared_ptr<SceneNode> node)
     justAddedNode = false;
 }
 
+void SceneEditor::nodeDragDropBehaviour(std::shared_ptr<SceneNode> node) 
+{
+    //Source
+    if (ImGui::BeginDragDropSource()) {
+        SceneNode* nodePointer = node.get();
+        ImGui::SetDragDropPayload("MOVE_NODE", &nodePointer, sizeof(SceneNode*));
+        ImGui::Text("%s", node->getName().c_str());
+        ImGui::EndDragDropSource();
+    }
+
+    //Target
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MOVE_NODE")) {
+            SceneNode* sourceNode = *(SceneNode**)payload->Data;
+            sceneGraph.transferNode(sourceNode->shared_from_this(), node);
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET")) {
+            const char* asset = (const char*)payload->Data;
+            std::string assetPath(asset);
+
+            ofLog() << "Loading " + assetPath + " into " + node->getName();
+            sceneGraph.loadAsset(node, assetPath);
+        }
+        ImGui::EndDragDropTarget();
+    }
+}
+
 void SceneEditor::exit() {}
 
 void SceneEditor::mouseDragged(int x, int y, int button) {}
@@ -152,9 +211,6 @@ void SceneEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {}
 
 void SceneEditor::load(const std::string& path) {}
 
-void SceneEditor::unload(const std::string& path) 
-{
-    //delete all nodes
-}
+void SceneEditor::unload(const std::string& path) {}
 
 void SceneEditor::save(const std::string& path) {}

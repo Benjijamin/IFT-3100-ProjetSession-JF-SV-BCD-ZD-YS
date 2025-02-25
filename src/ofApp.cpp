@@ -56,19 +56,19 @@ void ofApp::keyPressed(int key) {
 }
 
 void ofApp::keyReleased(int key) {
-    
+
     //TODO Mettre dans la barre d'onglets
-    if (key == 's') 
+    if (key == 's')
     {
         if (currentEditor) {
             currentEditor->exit();
         }
 
         currentEditor = &sceneEditor;
-        
+
         currentEditor->setup();
     }
-    
+
 }
 
 void ofApp::mouseMoved(int x, int y) {

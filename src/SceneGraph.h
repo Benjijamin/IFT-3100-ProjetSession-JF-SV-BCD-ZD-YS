@@ -18,6 +18,9 @@ public:
     void addModelNode(const std::string& path);
     void addEmptyNode(const std::string& name);
     void unloadNodes(const std::string& path);
+    void deleteNode(std::shared_ptr<SceneNode> node);
+    void transferNode(std::shared_ptr<SceneNode> node, std::shared_ptr<SceneNode> newParent);
+    void loadAsset(std::shared_ptr<SceneNode> node, std::string assetPath);
 
     std::shared_ptr<SceneNode> getRootNode() const;
     std::shared_ptr<SceneNode> getSelectedNode() const;
@@ -30,8 +33,6 @@ private:
     void drawNodeGui(std::shared_ptr<SceneNode> node);
 
     void addNode(std::shared_ptr<SceneNode> node, std::shared_ptr<SceneNode> parent);
-    void transferNode(std::shared_ptr<SceneNode> node, std::shared_ptr<SceneNode> newParent);
-    void deleteNode(std::shared_ptr<SceneNode> node);
     void deleteNodesByBaseName(const std::string& baseName);
 
     bool isNameUnique(const std::shared_ptr<SceneNode>& node, const std::string& name);

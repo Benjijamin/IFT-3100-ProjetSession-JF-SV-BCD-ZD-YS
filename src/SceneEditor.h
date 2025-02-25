@@ -19,7 +19,7 @@ public:
     void mouseReleased(int x, int y, int button) override;
     void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
-    void load(const std::string& path) override; 
+    void load(const std::string& path) override;
     void unload(const std::string& path);
     void save(const std::string& path) override;
 private:
@@ -28,7 +28,12 @@ private:
 
     bool justAddedNode;
 
+    ofEasyCam camera;
+    ofLight light;
+    ofMaterial material;
+
     void drawSceneGraph();
     void drawSceneGraphNode(std::shared_ptr<SceneNode> node);
     void drawInfo(std::shared_ptr<SceneNode> node);
+    void nodeDragDropBehaviour(std::shared_ptr<SceneNode> node);
 };

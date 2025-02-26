@@ -35,5 +35,12 @@ private:
     void drawSceneGraph();
     void drawSceneGraphNode(std::shared_ptr<SceneNode> node);
     void drawInfo(std::shared_ptr<SceneNode> node);
+    void newObjectMenu(std::shared_ptr<SceneNode> node);
     void nodeDragDropBehaviour(std::shared_ptr<SceneNode> node);
+
+    void newEmptyObject(std::shared_ptr<SceneNode> parent);
+    void newSphereObject(std::shared_ptr<SceneNode> parent);
+    void newCubeObject(std::shared_ptr<SceneNode> parent);
+    void newQuadObject(std::shared_ptr<SceneNode> parent);
+    void newCameraObject(std::shared_ptr<SceneNode> parent);
 };

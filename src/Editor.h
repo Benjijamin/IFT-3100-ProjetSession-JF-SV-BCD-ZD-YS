@@ -2,11 +2,6 @@
 
 #include <string>
 
-enum class EditorType
-{
-    ImageEditor, DessinVectoriel, ModelEditor, SceneEditor
-};
-
 class Editor {
 public:
     virtual ~Editor() {}

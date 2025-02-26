@@ -48,17 +48,7 @@ void SceneEditor::drawGui()
     //Ajouter une node vide sous la node courante
     if (ImGui::Button("Add empty")) 
     {
-        auto emptyNode = std::make_shared<SceneNode>(sceneGraph.generateUniqueName("New Object"));
-
-        if (selected != sceneGraph.getRootNode()) 
-        {
-            selected->addChild(emptyNode);
-            justAddedNode = true;
-        }
-        else 
-        {
-            sceneGraph.getRootNode()->addChild(emptyNode);
-        }
+        newEmptyObject(selected);
     }
 
     ImGui::SameLine();
@@ -88,7 +78,7 @@ void SceneEditor::drawInfo(std::shared_ptr<SceneNode> node)
 
     static char name[255] = "";
     strncpy(name, node->getName().c_str(), sizeof(name) - 1);
-    ImGui::InputText("", name, IM_ARRAYSIZE(name));
+    ImGui::InputText("##NameInput", name, IM_ARRAYSIZE(name));
     if (ImGui::IsItemDeactivatedAfterEdit()) 
     {
         std::string newName = name;
@@ -97,29 +87,66 @@ void SceneEditor::drawInfo(std::shared_ptr<SceneNode> node)
 
     ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
+    //Position
     ImGui::Text("Position");
     glm::vec3 position = node->getPosition();
-    ImGui::Text("x: %f", position.x);
-    ImGui::Text("y: %f", position.y);
-    ImGui::Text("z: %f", position.z);
+
+    ImGui::Text("x: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##PosXInput", &position.x);
+    if (ImGui::IsItemDeactivatedAfterEdit()) node->setPosition(position);
+
+    ImGui::Text("y: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##PosYInput", &position.y);
+    if (ImGui::IsItemDeactivatedAfterEdit()) node->setPosition(position);
+
+    ImGui::Text("z: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##PosZInput", &position.z);
+    if (ImGui::IsItemDeactivatedAfterEdit()) node->setPosition(position);
 
     ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
+    //Scale
     ImGui::Text("Scale");
     glm::vec3 scale = node->getScale();
-    ImGui::Text("x: %f", scale.x);
-    ImGui::Text("y: %f", scale.y);
-    ImGui::Text("z: %f", scale.z);
+
+    ImGui::Text("x: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##ScaleXInput", &scale.x);
+    if (ImGui::IsItemDeactivatedAfterEdit()) node->setScale(scale);
+
+    ImGui::Text("y: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##ScaleYInput", &scale.y);
+    if (ImGui::IsItemDeactivatedAfterEdit()) node->setScale(scale);
+
+    ImGui::Text("z: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##ScaleZInput", &scale.z);
+    if (ImGui::IsItemDeactivatedAfterEdit()) node->setScale(scale);
 
     ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
+    //Rotation
     ImGui::Text("Rotation");
     glm::vec3 rotation = node->getOrientationEuler();
-    ImGui::Text("x: %f", rotation.x);
-    ImGui::Text("y: %f", rotation.y);
-    ImGui::Text("z: %f", rotation.z);
 
-    //Ajouter autre infos et controls
+    ImGui::Text("x: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##RotationXInput", &rotation.x);
+    if (ImGui::IsItemDeactivatedAfterEdit()) node->setOrientation(rotation);
+
+    ImGui::Text("y: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##RotationYInput", &rotation.y);
+    if (ImGui::IsItemDeactivatedAfterEdit()) node->setOrientation(rotation);
+
+    ImGui::Text("z: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##RotationZInput", &rotation.z);
+    if (ImGui::IsItemDeactivatedAfterEdit()) node->setOrientation(rotation);
 
     ImGui::End();
 }
@@ -144,6 +171,7 @@ void SceneEditor::drawSceneGraphNode(std::shared_ptr<SceneNode> node)
         if (justAddedNode)
         {
             ImGui::SetNextTreeNodeOpen(true);
+            justAddedNode = false;
         }
     }
 
@@ -155,6 +183,13 @@ void SceneEditor::drawSceneGraphNode(std::shared_ptr<SceneNode> node)
         sceneGraph.setSelectedNode(node);
     }
 
+    //Opens on right click
+    if (ImGui::BeginPopupContextItem()) 
+    {
+        newObjectMenu(node);
+        ImGui::EndPopup();
+    }
+
     if (nodeOpen) 
     {
         for (auto child : node->getChildren()) 
@@ -164,8 +199,19 @@ void SceneEditor::drawSceneGraphNode(std::shared_ptr<SceneNode> node)
 
         ImGui::TreePop();
     }
+}
 
-    justAddedNode = false;
+void SceneEditor::newObjectMenu(std::shared_ptr<SceneNode> node) 
+{
+    if (ImGui::Selectable("New Empty")) newEmptyObject(node);
+
+    if (ImGui::Selectable("New Sphere")) newSphereObject(node);
+
+    if (ImGui::Selectable("New Cube")) newCubeObject(node);
+
+    if (ImGui::Selectable("New Quad")) newQuadObject(node);
+
+    if (ImGui::Selectable("New Camera")) newCameraObject(node);
 }
 
 void SceneEditor::nodeDragDropBehaviour(std::shared_ptr<SceneNode> node) 
@@ -197,6 +243,36 @@ void SceneEditor::nodeDragDropBehaviour(std::shared_ptr<SceneNode> node)
         }
         ImGui::EndDragDropTarget();
     }
+}
+
+void SceneEditor::newEmptyObject(std::shared_ptr<SceneNode> parent) 
+{
+    sceneGraph.addEmptyNode(sceneGraph.generateUniqueName("New Object"), parent);
+    justAddedNode = true;
+}
+
+void SceneEditor::newSphereObject(std::shared_ptr<SceneNode> parent) 
+{
+    //TODO
+    justAddedNode = true;
+}
+
+void SceneEditor::newCubeObject(std::shared_ptr<SceneNode> parent) 
+{
+    //TODO
+    justAddedNode = true;
+}
+
+void SceneEditor::newQuadObject(std::shared_ptr<SceneNode> parent) 
+{
+    //TODO
+    justAddedNode = true;
+}
+
+void SceneEditor::newCameraObject(std::shared_ptr<SceneNode> parent) 
+{
+    //TODO
+    justAddedNode = true;
 }
 
 void SceneEditor::exit() {}

@@ -70,10 +70,15 @@ void SceneGraph::addModelNode(const std::string& path) {
 }
 
 void SceneGraph::addEmptyNode(const std::string& name) {
-    auto newNode = std::make_shared<SceneNode>(name);
+    addEmptyNode(name, rootNode);
+}
 
-    if (rootNode) {
-        rootNode->addChild(newNode);
+void SceneGraph::addEmptyNode(const std::string& name, std::shared_ptr<SceneNode> parent) 
+{
+    auto newNode = std::make_shared<SceneNode>(name);
+    if (parent) 
+    {
+        parent->addChild(newNode);
     }
 }
 

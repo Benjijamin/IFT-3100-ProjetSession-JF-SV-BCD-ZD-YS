@@ -38,9 +38,9 @@ void ofApp::draw() {
         currentEditor->drawGui();
     }
 
-    menuBar.drawGui();
     dessinVectoriel.drawGui();
     dessinVectoriel.isActive() ? dessinVectoriel.draw() : assetBrowser.drawGui();
+    menuBar.drawGui();
 
     gui.end();
 }

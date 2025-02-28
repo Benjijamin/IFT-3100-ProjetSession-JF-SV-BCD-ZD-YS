@@ -9,8 +9,8 @@
 struct Shape {
     ImVec2 initPos;
     ImVec2 currPos;
-    int type;
-    int strokeWidth;
+    int shapeType;
+    int dotSize;
     ofFloatColor strokeColor;
     ofFloatColor fillColor;
 };
@@ -76,7 +76,6 @@ public:
     void begin();
     bool isActive() const;
     void undo();
-    void save();
     void exit();
 
     // Affichage des fenêtres
@@ -89,7 +88,7 @@ public:
     ImVec4 triangleDims(const ImVec2& init, const ImVec2& pos);
 
     // Construction des formes vectorielles
-    Shape initShape() const;
+    Shape initShape(const bool& cover) const;
     void drawShape(const Shape& s);
     void buildShape(const Shape& s, const bool& fill);
 
@@ -105,7 +104,7 @@ private:
     vector<Shape> shapes;
     vector<string> types;
     int typeIndex;
-    int strokeWidth;
+    int dotSize;
     ofFloatColor zoneColor;
     ofFloatColor strokeColor;
     ofFloatColor fillColor;

@@ -19,7 +19,6 @@ void MenuBar::drawGui() {
         drawHelpMenu();
         ImGui::EndMainMenuBar();
     }
-
     screenCapture.drawGui();
 }
 
@@ -32,11 +31,9 @@ void MenuBar::drawFileMenu() {
         if (ImGui::MenuItem("Capture Screenshot")) {
             screenCapture.captureScreenshot();
         }
-
         if (ImGui::MenuItem("Exit")) {
             ofExit();
         }
-
         ImGui::EndMenu();
     }
 }
@@ -75,7 +72,6 @@ void MenuBar::drawHelpMenu() {
         if (ImGui::MenuItem("Documentation")) {
             ofLaunchBrowser("https://openframeworks.cc/documentation/");
         }
-
         ImGui::EndMenu();
     }
 }

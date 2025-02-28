@@ -6,12 +6,14 @@ void ofApp::setup() {
     gui.setup();
 
     ImGui::StyleColorsClassic();
+    ofSetBackgroundColor(ofColor(60, 60, 60));
 
     imageEditor.setup();
     modelEditor.setup();
     sceneEditor.setup();
     assetBrowser.setup();
     menuBar.setup();
+    dessinVectoriel.setup();
 
     currentEditor = nullptr;
 
@@ -37,7 +39,8 @@ void ofApp::draw() {
         currentEditor->drawGui();
     }
 
-    assetBrowser.drawGui();
+    dessinVectoriel.drawGui();
+    dessinVectoriel.isActive() ? dessinVectoriel.draw() : assetBrowser.drawGui();
     menuBar.drawGui();
 
     gui.end();
@@ -47,8 +50,8 @@ void ofApp::exit() {
     if (currentEditor) {
         currentEditor->exit();
     }
-
     assetBrowser.exit();
+    dessinVectoriel.exit();
 }
 
 void ofApp::keyPressed(int key) {
@@ -79,18 +82,24 @@ void ofApp::mouseDragged(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseDragged(x, y, button);
     }
+    else if (dessinVectoriel.isActive())
+        dessinVectoriel.mouseDragged(x, y, button);
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mousePressed(x, y, button);
     }
+    else if (dessinVectoriel.isActive())
+        dessinVectoriel.mousePressed(x, y, button);
 }
 
 void ofApp::mouseReleased(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseReleased(x, y, button);
     }
+    else if (dessinVectoriel.isActive())
+        dessinVectoriel.mouseReleased(x, y, button);
 }
 
 void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {

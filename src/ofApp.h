@@ -9,6 +9,7 @@
 #include "DessinVectoriel.h"
 #include "AssetBrowser.h"
 #include "MenuBar.h"
+#include "DessinVectoriel.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -43,6 +44,7 @@ private:
     SceneEditor sceneEditor;
     AssetBrowser assetBrowser;
     MenuBar menuBar;
+    DessinVectoriel dessinVectoriel;
 
     Editor* currentEditor;
 };

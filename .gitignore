@@ -4,3 +4,4 @@
 bin/
 icon.rc
 obj/
+*.ini

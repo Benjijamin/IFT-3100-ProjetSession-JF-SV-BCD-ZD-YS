@@ -30,6 +30,11 @@ void SceneNode::setName(std::string& newName)
     name = newName;
 }
 
+void SceneNode::setPrimitive(PrimitiveType newPrimitiveType) 
+{
+    primitiveType = newPrimitiveType;
+}
+
 bool SceneNode::containsModel() const {
     return model != nullptr;
 }
@@ -38,8 +43,24 @@ void SceneNode::customDraw() {
     if (model) {
         model->drawFaces();
     }
-    else {
-        ofDrawSphere(glm::vec3(0), 2);
+    else if(primitiveType != PrimitiveType::None){
+        switch (primitiveType)
+        {
+        case PrimitiveType::Sphere:
+            ofDrawSphere(glm::vec3(0), 1);
+            break;
+        case PrimitiveType::Cube:
+            ofDrawBox(glm::vec3(0), 1);
+            break;
+        case PrimitiveType::Cylinder:
+            ofDrawCylinder(glm::vec3(0), 1, 2);
+            break;
+        case PrimitiveType::Cone:
+            ofDrawCone(glm::vec3(0), 1, 2);
+            break;
+        default:
+            break;
+        }
     }
 }
 

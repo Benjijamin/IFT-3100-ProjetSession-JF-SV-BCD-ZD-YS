@@ -205,11 +205,13 @@ void SceneEditor::newObjectMenu(std::shared_ptr<SceneNode> node)
 {
     if (ImGui::Selectable("New Empty")) newEmptyObject(node);
 
-    if (ImGui::Selectable("New Sphere")) newSphereObject(node);
+    if (ImGui::Selectable("New Sphere")) newPrimitiveObject(PrimitiveType::Sphere, "Sphere", node);
 
-    if (ImGui::Selectable("New Cube")) newCubeObject(node);
+    if (ImGui::Selectable("New Cube")) newPrimitiveObject(PrimitiveType::Cube, "Cube", node);
 
-    if (ImGui::Selectable("New Quad")) newQuadObject(node);
+    if (ImGui::Selectable("New Cylinder")) newPrimitiveObject(PrimitiveType::Cylinder, "Cylinder", node);
+
+    if (ImGui::Selectable("New Cone")) newPrimitiveObject(PrimitiveType::Cone, "Cone", node);
 
     if (ImGui::Selectable("New Camera")) newCameraObject(node);
 }
@@ -247,25 +249,13 @@ void SceneEditor::nodeDragDropBehaviour(std::shared_ptr<SceneNode> node)
 
 void SceneEditor::newEmptyObject(std::shared_ptr<SceneNode> parent) 
 {
-    sceneGraph.addEmptyNode(sceneGraph.generateUniqueName("New Object"), parent);
+    sceneGraph.addEmptyNode("New Object", parent);
     justAddedNode = true;
 }
 
-void SceneEditor::newSphereObject(std::shared_ptr<SceneNode> parent) 
+void SceneEditor::newPrimitiveObject(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent) 
 {
-    //TODO
-    justAddedNode = true;
-}
-
-void SceneEditor::newCubeObject(std::shared_ptr<SceneNode> parent) 
-{
-    //TODO
-    justAddedNode = true;
-}
-
-void SceneEditor::newQuadObject(std::shared_ptr<SceneNode> parent) 
-{
-    //TODO
+    sceneGraph.addPrimitiveNode(primitiveType, name, parent);
     justAddedNode = true;
 }
 

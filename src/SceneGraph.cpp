@@ -75,7 +75,18 @@ void SceneGraph::addEmptyNode(const std::string& name) {
 
 void SceneGraph::addEmptyNode(const std::string& name, std::shared_ptr<SceneNode> parent) 
 {
-    auto newNode = std::make_shared<SceneNode>(name);
+    auto newNode = std::make_shared<SceneNode>(generateUniqueName(name));
+    if (parent) 
+    {
+        parent->addChild(newNode);
+    }
+}
+
+void SceneGraph::addPrimitiveNode(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent) 
+{
+    auto newNode = std::make_shared<SceneNode>(generateUniqueName(name));
+    newNode->setPrimitive(primitiveType);
+
     if (parent) 
     {
         parent->addChild(newNode);

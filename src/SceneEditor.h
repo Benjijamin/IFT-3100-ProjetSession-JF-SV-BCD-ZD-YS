@@ -39,8 +39,6 @@ private:
     void nodeDragDropBehaviour(std::shared_ptr<SceneNode> node);
 
     void newEmptyObject(std::shared_ptr<SceneNode> parent);
-    void newSphereObject(std::shared_ptr<SceneNode> parent);
-    void newCubeObject(std::shared_ptr<SceneNode> parent);
-    void newQuadObject(std::shared_ptr<SceneNode> parent);
+    void newPrimitiveObject(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent);
     void newCameraObject(std::shared_ptr<SceneNode> parent);
 };

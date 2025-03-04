@@ -3,32 +3,33 @@
 #include "ofxImGui.h"
 #include "ofMain.h"
 #include "imageEditor.h"
+#include "ScreenCapture.h"
 
 /*
 * \brief Classe qui gère la barre de menu.
 */
-class MenuBar 
-{
-	public:
-		/*
-		* \brief Méthode de la librairie openframeworks
-		*/
-		void drawGui();
+class MenuBar {
 
-		/*
-		* \brief Gestion de la sauvegarde des projets
-		* \param filePath --> Type .json
-		*/
-		void saveProject(const std::string& filePath);
+public:
+	void setup();
+	void update();
+	void draw();
+	void drawGui();
+	void exit();
 
-		/*
-		* \brief Gestion du chargement de projets existants
-		* \param filePath --> Type .json
-		*/
-		void openProject(const std::string& filePath);
 
-		/*
-		* \brief Instance de 'ImageEditor' pour accéder à ses méthodes
-		*/
-		ImageEditor imageEditor;
+
+	void saveProject(const std::string& filePath);
+	void openProject(const std::string& filePath);
+
+	ScreenCapture screenCapture;
+	ImageEditor imageEditor;
+
+private:
+	void drawFileMenu();
+	void drawEditMenu();
+	void drawSettingsMenu();
+	void drawRenderMenu();
+	void drawWindowMenu();
+	void drawHelpMenu();
 };

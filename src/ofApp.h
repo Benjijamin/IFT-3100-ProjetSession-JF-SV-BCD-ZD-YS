@@ -5,10 +5,11 @@
 #include "Editor.h"
 #include "ImageEditor.h"
 #include "ModelEditor.h"
+#include "SceneEditor.h"
 #include "DessinVectoriel.h"
 #include "AssetBrowser.h"
-#include "ScreenCapture.h"
 #include "MenuBar.h"
+#include "DessinVectoriel.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -32,15 +33,18 @@ public:
 
 private:
     void switchEditor();
+    void handleAssetAddition();
+    void handleAssetRemoval();
     void handleAssetSelection();
-    void handleAssetDeletion();
 
     ofxImGui::Gui gui;
 
+    ImageEditor imageEditor;
+    ModelEditor modelEditor;
+    SceneEditor sceneEditor;
     AssetBrowser assetBrowser;
-    ScreenCapture screenCapture;
-
     MenuBar menuBar;
+    DessinVectoriel dessinVectoriel;
 
-    std::unique_ptr<Editor> currentEditor;
+    Editor* currentEditor;
 };

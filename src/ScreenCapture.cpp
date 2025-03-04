@@ -1,11 +1,8 @@
 #include "ScreenCapture.h"
 
 void ScreenCapture::setup() {
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-
     screenshotTexture = 0;
-    showScreenshotModal = false;
+    showScreenshotModalFlag = false;
     screenshotTaken = false;
 }
 
@@ -18,21 +15,14 @@ void ScreenCapture::draw() {
 }
 
 void ScreenCapture::drawGui() {
-    ImGui::Begin("Screen Capture");
-
-    if (ImGui::Button("Capture Screenshot")) {
-        captureScreenshot();
-        showScreenshotModal = true;
-    }
-
-    if (showScreenshotModal && screenshotTaken) {
+    if (showScreenshotModalFlag && screenshotTaken) {
         ImGui::OpenPopup("Screenshot");
 
         if (ImGui::BeginPopupModal("Screenshot", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Text("Screenshot Preview:");
 
             float aspectRatio = static_cast<float>(screenshotImg.getWidth()) / screenshotImg.getHeight();
-            float newWidth = 400.0f;
+            float newWidth = 800.0f;
             float newHeight = newWidth / aspectRatio;
 
             ImGui::Image((void*)(intptr_t)screenshotTexture, ImVec2(newWidth, newHeight));
@@ -40,21 +30,19 @@ void ScreenCapture::drawGui() {
             if (ImGui::Button("Save Screenshot")) {
                 saveScreenshot();
                 ImGui::CloseCurrentPopup();
-                showScreenshotModal = false;
+                hideModal();
             }
 
             ImGui::SameLine();
 
             if (ImGui::Button("Cancel")) {
                 ImGui::CloseCurrentPopup();
-                showScreenshotModal = false;
+                hideModal();
             }
 
             ImGui::EndPopup();
         }
     }
-
-    ImGui::End();
 }
 
 void ScreenCapture::exit() {
@@ -66,6 +54,7 @@ void ScreenCapture::captureScreenshot() {
     screenshotImg.update();
     createScreenshotTexture();
     screenshotTaken = true;
+    showModal();
 }
 
 void ScreenCapture::saveScreenshot() {
@@ -93,4 +82,12 @@ void ScreenCapture::deleteScreenshotTexture() {
         glDeleteTextures(1, &screenshotTexture);
         screenshotTexture = 0;
     }
+}
+
+void ScreenCapture::showModal() {
+    showScreenshotModalFlag = true;
+}
+
+void ScreenCapture::hideModal() {
+    showScreenshotModalFlag = false;
 }

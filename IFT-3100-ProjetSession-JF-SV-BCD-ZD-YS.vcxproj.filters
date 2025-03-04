@@ -112,6 +112,12 @@
     <ClCompile Include="src\ColorPicker.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
+    <ClCompile Include="src\Viewer2D.cpp">
+      <Filter>src\editors</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneEditor.cpp">
+      <Filter>src\editors</Filter>
+    </ClCompile>
     <ClCompile Include="src\CustomSlider.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
@@ -571,6 +577,12 @@
     </ClInclude>
     <ClInclude Include="src\ColorPicker.h">
       <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Viewer2D.h">
+      <Filter>src\editors</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneEditor.h">
+      <Filter>src\editors</Filter>
     </ClInclude>
     <ClInclude Include="src\CustomSlider.h">
       <Filter>src\components</Filter>

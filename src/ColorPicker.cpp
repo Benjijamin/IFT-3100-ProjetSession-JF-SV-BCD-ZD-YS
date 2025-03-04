@@ -1,7 +1,7 @@
 #include "ColorPicker.h"
 #include "CustomSlider.h"
 
-void ColorPicker::setup() 
+void ColorPicker::setup()
 {
 	selectedColor[0] = 1.0f;
 	selectedColor[1] = 1.0f;
@@ -9,83 +9,95 @@ void ColorPicker::setup()
 	selectedColor[3] = 1.0f;
 }
 
-void ColorPicker::draw() 
+void ColorPicker::draw()
 {
-	if (showColorPicker) 
+	ImGui::Begin("ColorPicker", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+
+	if (ImGui::Button("RGB"))
 	{
-		ImGui::Begin("ColorPicker", &showColorPicker, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+		colorPickerMode = ColorPickerMode::RGB;
+	}
 
-		if (ImGui::Button("RGB")) 
-			colorPickerMode = ColorPickerMode::RGB;
-		ImGui::SameLine();
-		if (ImGui::Button("HSB")) 
-		{
-			colorPickerMode = ColorPickerMode::HSB;
-			HSB hsb = RGBToHSB(selectedColor[0], selectedColor[1], selectedColor[2]);
-			hueSlider = hsb.h;
-			saturationSlider = hsb.s;
-			brightnessSlider = hsb.b;
-		} 
+	ImGui::SameLine();
 
-		switch (colorPickerMode) 
-		{
-		default:
-			break;
-		case ColorPickerMode::RGB:
-			ImGui::ColorPicker4("RGB", selectedColor, ImGuiColorEditFlags_DisplayRGB);
-			break;
-		case ColorPickerMode::HSB:
-			float prevHue = hueSlider, prevSaturation = saturationSlider, prevBrightness = brightnessSlider;
+	if (ImGui::Button("HSB"))
+	{
+		colorPickerMode = ColorPickerMode::HSB;
+		hsb = RGBToHSB(selectedColor[0], selectedColor[1], selectedColor[2]);
+		hueSlider = hsb.h;
+		saturationSlider = hsb.s;
+		brightnessSlider = hsb.b;
+	}
 
-			ImDrawList* drawList = ImGui::GetWindowDrawList();
+	switch (colorPickerMode)
+	{
+	case ColorPickerMode::RGB:
+		ImGui::ColorPicker4("RGB", selectedColor, ImGuiColorEditFlags_DisplayRGB);
+		break;
+	case ColorPickerMode::HSB:
+		drawHSBPicker();
+		break;
+	default:
+		break;
+	}
 
-			ImVec2 p = ImGui::GetCursorScreenPos();
-			drawList->AddRectFilled(p, ImVec2(p.x + 200, p.y + 200), 
-				ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], selectedColor[3])));
-			ImGui::Dummy(ImVec2(0.0f, 200.0f));
+	ImGui::End();
+}
 
+ofColor ColorPicker::getColor() const
+{
+	ofColor color(selectedColor[0], selectedColor[1], selectedColor[2], selectedColor[3]);
+	return color;
+}
 
-			HSB saturationHSBNone, saturationHSBFull = hsb;
-			saturationHSBNone.s = 0.0f;
-			saturationHSBFull.s = 1.0f;
-			RGB saturationRGBStart = HSBToRGB(saturationHSBNone.h, saturationHSBNone.s, saturationHSBNone.b);
-			RGB saturationRGBEnd = HSBToRGB(saturationHSBFull.h, saturationHSBFull.s, saturationHSBFull.b);
+void ColorPicker::drawHSBPicker()
+{
+	float prevHue = hueSlider;
+	float prevSaturation = saturationSlider;
+	float prevBrightness = brightnessSlider;
 
-			ImU32 saturationColorStart = ImGui::GetColorU32(ImVec4(saturationRGBStart.r, saturationRGBStart.g, saturationRGBStart.b, 1.0f));
-			ImU32 saturationColorEnd = ImGui::GetColorU32(ImVec4(saturationRGBEnd.r, saturationRGBEnd.g, saturationRGBEnd.b, 1.0f));
+	ImDrawList* drawList = ImGui::GetWindowDrawList();
+	ImVec2 p = ImGui::GetCursorScreenPos();
+	drawList->AddRectFilled(p, ImVec2(p.x + 208.0f, p.y + 208.0f), ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], selectedColor[3])));
+	ImGui::Dummy(ImVec2(0.0f, 208.0f));
 
-			ImU32 brightnessColorStart = ImGui::GetColorU32(ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-			ImU32 brightnessColorEnd = ImGui::GetColorU32(ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+	HSB saturationHSBNone{}, saturationHSBFull = hsb;
+	saturationHSBNone.s = 0.0f;
+	saturationHSBFull.s = 1.0f;
+	RGB saturationRGBStart = HSBToRGB(saturationHSBNone.h, saturationHSBNone.s, saturationHSBNone.b);
+	RGB saturationRGBEnd = HSBToRGB(saturationHSBFull.h, saturationHSBFull.s, saturationHSBFull.b);
 
-			ImU32 alphaColorStart = ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], 0.0f));
-			ImU32 alphaColorEnd = ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], 1.0f));
+	ImU32 saturationColorStart = ImGui::GetColorU32(ImVec4(saturationRGBStart.r, saturationRGBStart.g, saturationRGBStart.b, 1.0f));
+	ImU32 saturationColorEnd = ImGui::GetColorU32(ImVec4(saturationRGBEnd.r, saturationRGBEnd.g, saturationRGBEnd.b, 1.0f));
 
-			CustomSlider::HueSlider("Hue", &hueSlider, 0.0f, 360.0f);
-			CustomSlider::GradientSlider("Saturation", &saturationSlider, 0.0f, 1.0f, saturationColorStart, saturationColorEnd);
-			CustomSlider::GradientSlider("Brightness", &brightnessSlider, 0.0f, 1.0f, brightnessColorStart, brightnessColorEnd);
-			CustomSlider::GradientSlider("Alpha", &selectedColor[3], 0.0f, 1.0f, alphaColorStart, alphaColorEnd);
+	ImU32 brightnessColorStart = ImGui::GetColorU32(ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+	ImU32 brightnessColorEnd = ImGui::GetColorU32(ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-			if (prevHue != hueSlider || prevSaturation != saturationSlider || prevBrightness != brightnessSlider) 
-			{
-				rgb = HSBToRGB(hueSlider, saturationSlider, brightnessSlider);
-				hsb = { hueSlider, saturationSlider, brightnessSlider };
-				selectedColor[0] = rgb.r, selectedColor[1] = rgb.g, selectedColor[2] = rgb.b;
-			}
+	ImU32 alphaColorStart = ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], 0.0f));
+	ImU32 alphaColorEnd = ImGui::GetColorU32(ImVec4(selectedColor[0], selectedColor[1], selectedColor[2], 1.0f));
 
-			break;
-		}
+	CustomSlider::HueSlider("Hue", &hueSlider, 0.0f, 360.0f);
+	CustomSlider::GradientSlider("Saturation", &saturationSlider, 0.0f, 1.0f, saturationColorStart, saturationColorEnd);
+	CustomSlider::GradientSlider("Brightness", &brightnessSlider, 0.0f, 1.0f, brightnessColorStart, brightnessColorEnd);
+	CustomSlider::GradientSlider("Alpha", &selectedColor[3], 0.0f, 1.0f, alphaColorStart, alphaColorEnd);
 
-		ImGui::End();
+	if (prevHue != hueSlider || prevSaturation != saturationSlider || prevBrightness != brightnessSlider)
+	{
+		rgb = HSBToRGB(hueSlider, saturationSlider, brightnessSlider);
+		hsb = { hueSlider, saturationSlider, brightnessSlider };
+		selectedColor[0] = rgb.r;
+		selectedColor[1] = rgb.g;
+		selectedColor[2] = rgb.b;
 	}
 }
 
-ColorPicker::HSB ColorPicker::RGBToHSB(float r, float g, float b) 
+ColorPicker::HSB ColorPicker::RGBToHSB(float r, float g, float b)
 {
 	float max = std::max({ r, g, b });
 	float min = std::min({ r, g, b });
 	float delta = max - min;
 
-	HSB hsb;
+	HSB hsb{};
 	hsb.b = max;
 
 	if (delta < 0.001 || max == 0) //grayscale 
@@ -117,9 +129,9 @@ ColorPicker::HSB ColorPicker::RGBToHSB(float r, float g, float b)
 	return hsb;
 }
 
-ColorPicker::RGB ColorPicker::HSBToRGB(float h, float s, float b) 
+ColorPicker::RGB ColorPicker::HSBToRGB(float h, float s, float b)
 {
-	RGB rgb;
+	RGB rgb{};
 
 	if (s == 0) //grayscale
 	{
@@ -139,7 +151,7 @@ ColorPicker::RGB ColorPicker::HSBToRGB(float h, float s, float b)
 	float q = b * (1.0f - (s * ff));
 	float t = b * (1.0f - (s * (1.0f - ff)));
 
-	switch (i) 
+	switch (i)
 	{
 	case 0:
 		rgb.r = b;

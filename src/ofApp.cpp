@@ -3,18 +3,23 @@
 void ofApp::setup() {
     ofSetFrameRate(60);
 
-    ImGui::CreateContext();
-    ImGui::StyleColorsDark();
-
     gui.setup();
 
+    ImGui::StyleColorsClassic();
+    ofSetBackgroundColor(ofColor(60, 60, 60));
+
+    imageEditor.setup();
+    modelEditor.setup();
+    sceneEditor.setup();
     assetBrowser.setup();
-    screenCapture.setup();
+    menuBar.setup();
+    dessinVectoriel.setup();
 
     currentEditor = nullptr;
 
+    assetBrowser.onAssetAddition = std::bind(&ofApp::handleAssetAddition, this);
+    assetBrowser.onAssetRemoval = std::bind(&ofApp::handleAssetRemoval, this);
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
-    assetBrowser.onAssetDeletion = std::bind(&ofApp::handleAssetDeletion, this);
 }
 
 void ofApp::update() {
@@ -28,17 +33,14 @@ void ofApp::draw() {
         currentEditor->draw();
     }
 
-    screenCapture.draw();
-
     gui.begin();
 
     if (currentEditor) {
         currentEditor->drawGui();
     }
 
-    assetBrowser.drawGui();
-    screenCapture.drawGui();
-
+    dessinVectoriel.drawGui();
+    dessinVectoriel.isActive() ? dessinVectoriel.draw() : assetBrowser.drawGui();
     menuBar.drawGui();
 
     gui.end();
@@ -48,9 +50,8 @@ void ofApp::exit() {
     if (currentEditor) {
         currentEditor->exit();
     }
-
     assetBrowser.exit();
-    screenCapture.exit();
+    dessinVectoriel.exit();
 }
 
 void ofApp::keyPressed(int key) {
@@ -58,9 +59,19 @@ void ofApp::keyPressed(int key) {
 }
 
 void ofApp::keyReleased(int key) {
-    if (key == 90) {
-        currentEditor.reset();
+
+    //TODO Mettre dans la barre d'onglets
+    if (key == 's')
+    {
+        if (currentEditor) {
+            currentEditor->exit();
+        }
+
+        currentEditor = &sceneEditor;
+
+        currentEditor->setup();
     }
+
 }
 
 void ofApp::mouseMoved(int x, int y) {
@@ -71,18 +82,24 @@ void ofApp::mouseDragged(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseDragged(x, y, button);
     }
+    else if (dessinVectoriel.isActive())
+        dessinVectoriel.mouseDragged(x, y, button);
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mousePressed(x, y, button);
     }
+    else if (dessinVectoriel.isActive())
+        dessinVectoriel.mousePressed(x, y, button);
 }
 
 void ofApp::mouseReleased(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseReleased(x, y, button);
     }
+    else if (dessinVectoriel.isActive())
+        dessinVectoriel.mouseReleased(x, y, button);
 }
 
 void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
@@ -113,32 +130,38 @@ void ofApp::gotMessage(ofMessage msg) {
 
 void ofApp::switchEditor() {
     std::string selectedAsset = assetBrowser.getSelectedAssetPath();
+
     if (!selectedAsset.empty()) {
         if (currentEditor) {
             currentEditor->exit();
         }
 
         if (assetBrowser.isImageAsset(selectedAsset)) {
-            currentEditor = std::make_unique<ImageEditor>();
-        }
-        else if (assetBrowser.isModelAsset(selectedAsset)) {
-            currentEditor = std::make_unique<ModelEditor>();
-        }
-
-        if (currentEditor) {
-            currentEditor->setup();
+            currentEditor = &imageEditor;
             currentEditor->load(selectedAsset);
         }
+        else if (assetBrowser.isModelAsset(selectedAsset)) {
+            currentEditor = &modelEditor;
+        }
+    }
+}
+
+void ofApp::handleAssetAddition() {
+    std::string lastAsset = assetBrowser.getLastAssetPath();
+
+    if (assetBrowser.isModelAsset(lastAsset)) {
+        modelEditor.load(lastAsset);
+    }
+}
+
+void ofApp::handleAssetRemoval() {
+    std::string selectedAsset = assetBrowser.getSelectedAssetPath();
+
+    if (currentEditor) {
+        currentEditor->unload(selectedAsset);
     }
 }
 
 void ofApp::handleAssetSelection() {
     switchEditor();
-}
-
-void ofApp::handleAssetDeletion() {
-    if (currentEditor) {
-        currentEditor->exit();
-    }
-    currentEditor.reset();
 }

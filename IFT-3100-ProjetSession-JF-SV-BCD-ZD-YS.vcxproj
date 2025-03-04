@@ -114,6 +114,7 @@
     <ClCompile Include="src\AssetBrowser.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
     <ClCompile Include="src\ModelEditor.cpp" />
+    <ClCompile Include="src\SceneEditor.cpp" />
     <ClCompile Include="src\SceneGraph.cpp" />
     <ClCompile Include="src\SceneNode.cpp" />
     <ClCompile Include="src\ScreenCapture.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_demo.cpp" />
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\addons\ofxImGui\libs\imgui\src\imgui_widgets.cpp" />
+    <ClCompile Include="src\Viewer2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ColorPicker.h" />
@@ -152,6 +154,7 @@
     <ClInclude Include="src\AssetBrowser.h" />
     <ClInclude Include="src\ImageEditor.h" />
     <ClInclude Include="src\ModelEditor.h" />
+    <ClInclude Include="src\SceneEditor.h" />
     <ClInclude Include="src\SceneGraph.h" />
     <ClInclude Include="src\SceneNode.h" />
     <ClInclude Include="src\ScreenCapture.h" />
@@ -270,6 +273,7 @@
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_textedit.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_truetype.h" />
+    <ClInclude Include="src\Viewer2D.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "ofxGizmo.h"
+#include <string>
+#include <memory>
+#include <functional>
 #include "SceneNode.h"
 
 class SceneGraph {
@@ -9,26 +11,37 @@ public:
 
     void setup();
     void update();
-    void draw(ofCamera& camera);
+    void draw();
     void drawGui();
     void exit();
 
-    void addModelNode(const std::string& name, std::shared_ptr<ofxAssimpModelLoader> model);
-    void deleteNode(int index);
+    void addModelNode(const std::string& path);
+    void addEmptyNode(const std::string& name);
+    void addEmptyNode(const std::string& name, std::shared_ptr<SceneNode> parent);
+    void addPrimitiveNode(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent);
 
+    void unloadNodes(const std::string& path);
+    void deleteNode(std::shared_ptr<SceneNode> node);
+    void transferNode(std::shared_ptr<SceneNode> node, std::shared_ptr<SceneNode> newParent);
+    void loadAsset(std::shared_ptr<SceneNode> node, std::string assetPath);
+
+    std::shared_ptr<SceneNode> getRootNode() const;
+    std::shared_ptr<SceneNode> getSelectedNode() const;
+    void setSelectedNode(std::shared_ptr<SceneNode> node);
+    void setSelectedNodeChangedCallback(std::function<void(std::shared_ptr<SceneNode>)> callback);
+
+    bool editNodeName(std::shared_ptr<SceneNode> node, std::string& name);
 private:
-    void drawNodeGui(int index);
+    void drawNodeGui(std::shared_ptr<SceneNode> node);
+
+    void addNode(std::shared_ptr<SceneNode> node, std::shared_ptr<SceneNode> parent);
+    void deleteNodesByBaseName(const std::string& baseName);
 
     std::string generateUniqueName(const std::string& baseName);
+    bool isNameUnique(const std::shared_ptr<SceneNode>& node, const std::string& name);
 
-    int findParentIndex(int index);
-    void reassignChildrenToParent(int index, int parentIndex);
-    void removeNodeFromGraph(int index);
-    void updateChildrenIndices(int index);
+    std::shared_ptr<SceneNode> rootNode;
+    std::shared_ptr<SceneNode> selectedNode;
 
-    std::vector<SceneNode> nodes;
-    std::unordered_map<int, std::vector<int>> childrenIndices;
-    ofxGizmo gizmo;
-    ofxGizmo::ofxGizmoType gizmoType;
-    int selectedIndex;
+    std::function<void(std::shared_ptr<SceneNode>)> selectedNodeChangedCallback;
 };

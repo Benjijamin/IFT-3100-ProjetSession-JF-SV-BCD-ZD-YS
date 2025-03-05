@@ -4,8 +4,7 @@
 #include "ofxImGui.h"
 #include "ofxAssimpModelLoader.h"
 
-enum class PrimitiveType 
-{
+enum class PrimitiveType {
     None, Sphere, Cube, Cylinder, Cone 
 };
 
@@ -25,13 +24,14 @@ public:
     void setPrimitive(PrimitiveType newPrimitiveType);
     bool containsModel() const;
 
-    bool operator ==(const SceneNode& other) const;
+    bool operator==(const SceneNode& other) const;
 
 private:
+    void customDraw() override;
+
     std::string name;
+    PrimitiveType primitiveType;
     std::shared_ptr<ofxAssimpModelLoader> model;
     std::vector<std::shared_ptr<SceneNode>> children;
-    PrimitiveType primitiveType;
 
-    void customDraw() override;
 };

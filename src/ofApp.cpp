@@ -17,6 +17,8 @@ void ofApp::setup() {
 
     currentEditor = nullptr;
 
+    dessinVectoriel.onNewDrawing = std::bind(&ofApp::handleNewDrawing, this);
+
     assetBrowser.onAssetAddition = std::bind(&ofApp::handleAssetAddition, this);
     assetBrowser.onAssetRemoval = std::bind(&ofApp::handleAssetRemoval, this);
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
@@ -39,8 +41,11 @@ void ofApp::draw() {
         currentEditor->drawGui();
     }
 
-    dessinVectoriel.drawGui();
-    dessinVectoriel.isActive() ? dessinVectoriel.draw() : assetBrowser.drawGui();
+    if (!dessinVectoriel.isActive()) {
+        dessinVectoriel.drawInit();
+    }
+
+    assetBrowser.drawGui();
     menuBar.drawGui();
 
     gui.end();
@@ -51,7 +56,6 @@ void ofApp::exit() {
         currentEditor->exit();
     }
     assetBrowser.exit();
-    dessinVectoriel.exit();
 }
 
 void ofApp::keyPressed(int key) {
@@ -61,7 +65,7 @@ void ofApp::keyPressed(int key) {
 void ofApp::keyReleased(int key) {
 
     //TODO Mettre dans la barre d'onglets
-    if (key == 's')
+    if (key == 'o')
     {
         if (currentEditor) {
             currentEditor->exit();
@@ -71,7 +75,6 @@ void ofApp::keyReleased(int key) {
 
         currentEditor->setup();
     }
-
 }
 
 void ofApp::mouseMoved(int x, int y) {
@@ -82,24 +85,18 @@ void ofApp::mouseDragged(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseDragged(x, y, button);
     }
-    else if (dessinVectoriel.isActive())
-        dessinVectoriel.mouseDragged(x, y, button);
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mousePressed(x, y, button);
     }
-    else if (dessinVectoriel.isActive())
-        dessinVectoriel.mousePressed(x, y, button);
 }
 
 void ofApp::mouseReleased(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseReleased(x, y, button);
     }
-    else if (dessinVectoriel.isActive())
-        dessinVectoriel.mouseReleased(x, y, button);
 }
 
 void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
@@ -128,7 +125,23 @@ void ofApp::gotMessage(ofMessage msg) {
 
 }
 
-void ofApp::switchEditor() {
+void ofApp::handleNewDrawing() {
+    currentEditor = &dessinVectoriel;
+}
+
+void ofApp::handleAssetAddition() {
+    std::string lastAsset = assetBrowser.getLastAssetPath();
+
+    if (assetBrowser.isModelAsset(lastAsset)) {
+        modelEditor.load(lastAsset);
+    }
+}
+
+void ofApp::handleAssetRemoval() {
+
+}
+
+void ofApp::handleAssetSelection() {
     std::string selectedAsset = assetBrowser.getSelectedAssetPath();
 
     if (!selectedAsset.empty()) {
@@ -144,24 +157,4 @@ void ofApp::switchEditor() {
             currentEditor = &modelEditor;
         }
     }
-}
-
-void ofApp::handleAssetAddition() {
-    std::string lastAsset = assetBrowser.getLastAssetPath();
-
-    if (assetBrowser.isModelAsset(lastAsset)) {
-        modelEditor.load(lastAsset);
-    }
-}
-
-void ofApp::handleAssetRemoval() {
-    std::string selectedAsset = assetBrowser.getSelectedAssetPath();
-
-    if (currentEditor) {
-        currentEditor->unload(selectedAsset);
-    }
-}
-
-void ofApp::handleAssetSelection() {
-    switchEditor();
 }

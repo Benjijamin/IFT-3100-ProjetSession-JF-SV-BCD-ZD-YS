@@ -37,6 +37,11 @@ void DessinVectoriel::setup()
     mousePos = {};
 }
 
+void DessinVectoriel::update()
+{
+
+}
+
 void DessinVectoriel::draw()
 {
     // Paramètres globaux
@@ -46,7 +51,9 @@ void DessinVectoriel::draw()
 
     // Tracer toutes les formes stockées en mémoire
     for (auto it = shapes.begin(); it != shapes.end(); ++it)
+    {
         buildShape(*it, true);
+    }
 
     // Tracer la zone de sélection
     if (mouseHeld && !hovering)
@@ -62,7 +69,16 @@ void DessinVectoriel::draw()
 
 void DessinVectoriel::drawGui()
 {
-    active ? drawToolbar() : drawInit();
+    if (active) {
+        drawToolbar();
+    }
+}
+
+void DessinVectoriel::exit()
+{
+    shapes.clear();
+    ofSetBackgroundColor(prevBg);
+    active = false;
 }
 
 void DessinVectoriel::mousePressed(int x, int y, int button)
@@ -92,10 +108,27 @@ void DessinVectoriel::mouseReleased(int x, int y, int button)
     }
 }
 
+void DessinVectoriel::mouseScrolled(int x, int y, float scrollX, float scrollY)
+{
+
+}
+
+void DessinVectoriel::load(const std::string& path)
+{
+
+}
+
+void DessinVectoriel::save(const std::string& path)
+{
+
+}
+
 void DessinVectoriel::begin()
 {
     prevBg = ofGetBackgroundColor();
     active = true;
+
+    if (onNewDrawing) onNewDrawing();
 }
 
 bool DessinVectoriel::isActive() const
@@ -113,13 +146,6 @@ void DessinVectoriel::undo()
         isCurve = shapes[i].shapeType == 5;
         shapes.pop_back();
     }
-}
-
-void DessinVectoriel::exit()
-{
-    shapes.clear();
-    ofSetBackgroundColor(prevBg);
-    active = false;
 }
 
 void DessinVectoriel::drawInit()

@@ -38,7 +38,7 @@ void AssetBrowser::drawGui() {
         if (resizing && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
             float mouseDelta = io.MouseDelta.y;
             assetBrowserHeight -= mouseDelta;
-            assetBrowserHeight = std::clamp(assetBrowserHeight, 200.0f, windowSize.y - 100.0f);
+            assetBrowserHeight = std::clamp(assetBrowserHeight, 175.0f, windowSize.y - 100.0f);
         }
         else if (resizing && !ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
             resizing = false;

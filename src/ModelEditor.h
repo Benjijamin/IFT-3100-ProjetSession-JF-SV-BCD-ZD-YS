@@ -1,11 +1,11 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxGizmo.h"
 #include "ofxImGui.h"
-#include "SceneGraph.h"
-#include "FreeFlightCamera.h"
 #include "Editor.h"
+#include "SceneGraph.h"
+#include "CameraManager.h"
+#include "GizmoManager.h"
 
 class ModelEditor : public Editor {
 public:
@@ -21,30 +21,15 @@ public:
     void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
     void load(const std::string& path) override;
-    void unload(const std::string& path) override;
     void save(const std::string& path) override;
 
 private:
-    void drawGizmoControls();
-    void drawCameraControls();
-    void drawFreeFlightParameters();
-    void drawPerspectiveParameters();
-    void drawOrthographicParameters();
-
-    void switchToOrbitCamera();
-    void switchToFreeFlightCamera();
-    void updateGizmo();
-    ofCamera* getActiveCamera();
-
     ofLight light;
     ofMaterial material;
 
-    ofEasyCam orbitCam;
-    FreeFlightCamera freeFlightCam;
-    bool isFreeFlightMode;
-    bool shouldEnableMouseInput;
-
     SceneGraph sceneGraph;
-    ofxGizmo gizmo;
-    ofxGizmo::ofxGizmoType gizmoType;
+    CameraManager cameraManager;
+    GizmoManager gizmoManager;
+
+    bool shouldEnableMouseInput;
 };

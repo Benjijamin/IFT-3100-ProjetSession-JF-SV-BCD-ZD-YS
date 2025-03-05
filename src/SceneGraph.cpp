@@ -29,9 +29,16 @@ void SceneGraph::drawGui() {
     ImGui::SetCursorPosY(ImGui::GetWindowHeight() - footerHeight);
 
     ImGui::Separator();
+    ImGui::Spacing();
+
+    float sharedWidth = ImGui::GetContentRegionAvail().x;
 
     static char nodeName[128] = "";
-    ImGui::InputText("Node Name", nodeName, IM_ARRAYSIZE(nodeName));
+    ImGui::PushItemWidth(sharedWidth);
+    ImGui::InputTextWithHint("##NodeName", "Enter Node Name...", nodeName, IM_ARRAYSIZE(nodeName));
+    ImGui::PopItemWidth();
+
+    ImGui::Spacing();
 
     if (ImGui::Button("Add Empty Node") && strlen(nodeName) > 0) {
         addEmptyNode(nodeName);

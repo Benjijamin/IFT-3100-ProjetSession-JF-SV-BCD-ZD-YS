@@ -1,7 +1,7 @@
 #include "SceneNode.h"
 
 SceneNode::SceneNode(const std::string& name)
-    : name(name) {}
+    : name(name), primitiveType(PrimitiveType::None) {}
 
 void SceneNode::setModel(std::shared_ptr<ofxAssimpModelLoader> model) {
     this->model = model;
@@ -25,13 +25,11 @@ std::string SceneNode::getName() const {
     return name;
 }
 
-void SceneNode::setName(std::string& newName)
-{
+void SceneNode::setName(std::string& newName) {
     name = newName;
 }
 
-void SceneNode::setPrimitive(PrimitiveType newPrimitiveType) 
-{
+void SceneNode::setPrimitive(PrimitiveType newPrimitiveType) {
     primitiveType = newPrimitiveType;
 }
 
@@ -43,9 +41,8 @@ void SceneNode::customDraw() {
     if (model) {
         model->drawFaces();
     }
-    else if(primitiveType != PrimitiveType::None){
-        switch (primitiveType)
-        {
+    else {
+        switch (primitiveType) {
         case PrimitiveType::Sphere:
             ofDrawSphere(glm::vec3(0), 1);
             break;
@@ -68,13 +65,15 @@ void SceneNode::draw() {
     ofPushMatrix();
     ofMultMatrix(getLocalTransformMatrix());
     customDraw();
+
     for (auto& child : children) {
         child->draw();
     }
+
     ofPopMatrix();
 }
 
-bool SceneNode::operator ==(const SceneNode& other) const 
+bool SceneNode::operator==(const SceneNode& other) const 
 {
     return (name == other.name);
 }

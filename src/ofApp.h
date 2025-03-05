@@ -32,7 +32,7 @@ public:
     void gotMessage(ofMessage msg);
 
 private:
-    void switchEditor();
+    void handleNewDrawing();
     void handleAssetAddition();
     void handleAssetRemoval();
     void handleAssetSelection();

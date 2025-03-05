@@ -16,7 +16,12 @@ void ImageEditor::update() {
 void ImageEditor::draw() {
     if (isImageAllocated()) {
         ofVec2f panOffset = viewer.getPanOffset();
-        currentImage->draw(panOffset.x, panOffset.y, currentImage->getWidth() * viewer.getZoomFactor(), currentImage->getHeight() * viewer.getZoomFactor());
+        ofVec2f imageDimensions = ofVec2f(currentImage->getWidth(), currentImage->getHeight()) * viewer.getZoomFactor();
+
+        if (currentImage) {
+            currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
+        }
+
     }
 
     if (currentTool == Tool::CopyRegion && viewer.isDraggingMouse() && !isGuiHovered()) {
@@ -30,6 +35,7 @@ void ImageEditor::draw() {
 void ImageEditor::drawGui() {
     ImVec2 windowSize = ImGui::GetIO().DisplaySize;
     float toolbarHeight = windowSize.y * 0.25f;
+
     ImGui::SetNextWindowSize(ImVec2(150, toolbarHeight));
     ImGui::SetNextWindowPos(ImVec2(0, (windowSize.y - toolbarHeight) / 2), ImGuiCond_FirstUseEver);
     ImGui::Begin("Toolbar", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
@@ -120,10 +126,6 @@ void ImageEditor::load(const std::string& path) {
     }
 
     viewer.adjustZoomAndPan(currentImage->getWidth(), currentImage->getHeight());
-}
-
-void ImageEditor::unload(const std::string& path) {
-
 }
 
 void ImageEditor::save(const std::string& path) {

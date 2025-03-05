@@ -5,6 +5,7 @@
 
 #include "ofMain.h"
 #include "ofxImGui.h"
+#include "Editor.h"
 
 struct Shape {
     ImVec2 initPos;
@@ -19,68 +20,21 @@ struct Shape {
 * \class DessinVectoriel
 * \brief Gère le dessin vectoriel
 */
-class DessinVectoriel {
+class DessinVectoriel : public Editor {
 public:
-    /**
-    * \brief Override la méthode setup
-    */
-    void setup();
+    void setup() override;
+    void draw() override;
+    void drawGui() override;
+    void exit() override;
 
-    /**
-    * \brief Override la méthode draw
-    */
-    void draw();
-
-    /**
-    * \brief Override la méthode drawGui
-    */
-    void drawGui();
-
-    /**
-    * \brief (Explications)
-    *
-    * \param int x position
-    * \param int y position
-    * \param int boutton
-    */
-    void mousePressed(int x, int y, int button);
-
-    /**
-    * \brief This function gets called when the mouse is moving and the button 
-    * is down. The button (left 0, center 1, right 2) variable can be used to 
-    * test against left or right button drags. You also receive the x and y 
-    * coordinates of the mouse.
-    *
-    * Called on the active window when the mouse is dragged, i.e. moved with a 
-    * button pressed
-    * \param int x position
-    * \param int y position
-    * \param int boutton
-    *
-    *
-    * P.S. Override pour s'assurer que l'on prend cette méthode et non celle 
-    * d'openframworks 'ofBaseApp::mouseDragged(ofMouseEventArgs &mouse)'
-    */
-    void mouseDragged(int x, int y, int button);
-
-    /**
-    * \brief (Explications)
-    *
-    * \param int x position
-    * \param int y position
-    * \param int boutton
-    */
-    void mouseReleased(int x, int y, int button);
+    void mouseDragged(int x, int y, int button) override;
+    void mousePressed(int x, int y, int button) override;
+    void mouseReleased(int x, int y, int button) override;
 
     // Initialisation
     void begin();
-    bool isActive() const;
     void undo();
-    void exit();
-
-    // Affichage des fenêtres
-    void drawInit();
-    void drawToolbar();
+    void drawWindow();
 
     // Fonctions liées aux dimensions des formes
     ImVec2 rectangleDims(const ImVec2& init, const ImVec2& pos);
@@ -88,17 +42,23 @@ public:
     ImVec4 triangleDims(const ImVec2& init, const ImVec2& pos);
 
     // Construction des formes vectorielles
-    Shape initShape(const bool& cover) const;
+    bool checkHover() const;
+    Shape initShape() const;
     void drawShape(const Shape& s);
     void buildShape(const Shape& s, const bool& fill);
 
+    // Méthodes inutilisées
+    void update() override;
+    void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
+    void load(const std::string& path) override;
+    void save(const std::string& path) override;
+
 private:
 
-    // Taille et emplacement des fenêtres
+    // Taille et emplacement de la fenêtre
     float windowGap;
     ImVec2 windowPos;
-    ImVec2 initSize;
-    ImVec2 toolbarSize;
+    ImVec2 windowSize;
 
     // Attributs des outils de dessin
     vector<Shape> shapes;

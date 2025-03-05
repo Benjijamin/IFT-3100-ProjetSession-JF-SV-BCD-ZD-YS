@@ -104,16 +104,17 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\CameraManager.cpp" />
     <ClCompile Include="src\ColorPicker.cpp" />
     <ClCompile Include="src\CustomSlider.cpp" />
     <ClCompile Include="src\DessinVectoriel.cpp" />
     <ClCompile Include="src\FreeFlightCamera.cpp" />
+    <ClCompile Include="src\GizmoManager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MenuBar.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\AssetBrowser.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
-    <ClCompile Include="src\ModelEditor.cpp" />
     <ClCompile Include="src\Primitives.cpp" />
     <ClCompile Include="src\SceneEditor.cpp" />
     <ClCompile Include="src\SceneGraph.cpp" />
@@ -145,16 +146,17 @@
     <ClCompile Include="src\Viewer2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CameraManager.h" />
     <ClInclude Include="src\ColorPicker.h" />
     <ClInclude Include="src\CustomSlider.h" />
     <ClInclude Include="src\DessinVectoriel.h" />
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\FreeFlightCamera.h" />
+    <ClInclude Include="src\GizmoManager.h" />
     <ClInclude Include="src\MenuBar.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\AssetBrowser.h" />
     <ClInclude Include="src\ImageEditor.h" />
-    <ClInclude Include="src\ModelEditor.h" />
     <ClInclude Include="src\Primitives.h" />
     <ClInclude Include="src\SceneEditor.h" />
     <ClInclude Include="src\SceneGraph.h" />

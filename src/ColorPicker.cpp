@@ -46,7 +46,7 @@ void ColorPicker::draw()
 
 ofColor ColorPicker::getColor() const
 {
-	ofColor color(selectedColor[0], selectedColor[1], selectedColor[2], selectedColor[3]);
+	ofColor color(selectedColor[0] * 255, selectedColor[1] * 255, selectedColor[2] * 255, selectedColor[3] * 255);
 	return color;
 }
 

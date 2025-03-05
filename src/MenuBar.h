@@ -11,6 +11,8 @@ public:
     void drawGui();
     void exit();
 
+    std::function<void()> onNewDrawing;
+
 private:
     void drawFileMenu();
     void drawSettingsMenu();

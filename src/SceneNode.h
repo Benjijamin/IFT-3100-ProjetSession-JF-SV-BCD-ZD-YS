@@ -15,6 +15,7 @@ public:
 
     void setModel(std::shared_ptr<ofxAssimpModelLoader> model);
     void draw();
+    void drawVisibleNodes(const ofCamera& camera);
 
     void addChild(std::shared_ptr<SceneNode> child);
     void removeChild(std::shared_ptr<SceneNode> child);
@@ -25,9 +26,20 @@ public:
     void setPrimitive(PrimitiveType newPrimitiveType);
     bool containsModel() const;
 
-    bool operator ==(const SceneNode& other) const;
+    bool operator==(const SceneNode& other) const;
 
 private:
+    void customDraw() override;
+
+    void initAABBToInfinity();
+    void computeAABB(std::shared_ptr<ofxAssimpModelLoader> model);
+    bool isAABBVisible(const ofCamera& camera);
+    std::vector<glm::vec4> extractFrustumPlanes(const ofCamera& camera);
+    std::vector<glm::vec3> getAABBVertices();
+    std::vector<glm::vec3> SceneNode::getTransformedAABBVertices(const glm::mat4& transform);
+    bool isAABBInsideFrustum(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec4>& frustumPlanes);
+    void drawAABBBox();
+
     std::string name;
     std::shared_ptr<ofxAssimpModelLoader> model;
     std::vector<std::shared_ptr<SceneNode>> children;
@@ -35,5 +47,5 @@ private:
     PrimitiveType primitiveType;
     std::shared_ptr<ofMesh> primitiveModel;
 
-    void customDraw() override;
+    ofBoxPrimitive aabb;
 };

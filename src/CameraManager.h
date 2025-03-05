@@ -21,7 +21,8 @@ public:
     void enableSelectedMouseInput();
     void disableAllMouseInput();
 
-    void drawFrustums();
+    ofCamera* getFrustumCamera();
+    bool isFrustumCullingEnabled() const;
 
 private:
     void drawFreeFlightParameters();
@@ -41,4 +42,5 @@ private:
     std::vector<CameraData> cameras;
     int selectedCameraIndex = -1;
     int frustumCameraIndex = -1;
+    bool frustumCullingEnabled = false;
 };

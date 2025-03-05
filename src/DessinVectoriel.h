@@ -55,8 +55,6 @@ public:
     void drawShape(const Shape& s);
     void buildShape(const Shape& s, const bool& fill);
 
-    std::function<void()> onNewDrawing;
-
 private:
 
     // Taille et emplacement des fenêtres

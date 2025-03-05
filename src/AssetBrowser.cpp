@@ -5,7 +5,7 @@
 namespace fs = std::filesystem;
 
 void AssetBrowser::setup() {
-    assetBrowserHeight = 300.0f;
+    assetBrowserHeight = 210.0f;
     resizing = false;
     showFullPaths = false;
     filterIndex = 0;
@@ -23,6 +23,10 @@ void AssetBrowser::drawGui() {
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 windowSize = io.DisplaySize;
 
+    float controlsHeight = calculateControlsHeight();
+
+    assetBrowserHeight = std::max(assetBrowserHeight, controlsHeight);
+
     ImGui::SetNextWindowPos(ImVec2(0, windowSize.y - assetBrowserHeight));
     ImGui::SetNextWindowSize(ImVec2(windowSize.x, assetBrowserHeight));
 
@@ -38,7 +42,7 @@ void AssetBrowser::drawGui() {
         if (resizing && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
             float mouseDelta = io.MouseDelta.y;
             assetBrowserHeight -= mouseDelta;
-            assetBrowserHeight = std::clamp(assetBrowserHeight, 175.0f, windowSize.y - 100.0f);
+            assetBrowserHeight = std::clamp(assetBrowserHeight, controlsHeight, windowSize.y / 2.0f);
         }
         else if (resizing && !ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
             resizing = false;
@@ -96,9 +100,8 @@ void AssetBrowser::drawAssetList() {
                 selectAsset(asset);
             }
 
-            if (ImGui::BeginDragDropSource()) 
-            {
-                ImGui::SetDragDropPayload("ASSET", asset.c_str(), asset.size()+1);
+            if (ImGui::BeginDragDropSource()) {
+                ImGui::SetDragDropPayload("ASSET", asset.c_str(), asset.size() + 1);
                 ImGui::Text(asset.c_str());
                 ImGui::EndDragDropSource();
             }
@@ -151,6 +154,16 @@ void AssetBrowser::drawControls() {
     ImGui::Checkbox("Show Full Paths", &showFullPaths);
 
     ImGui::EndChild();
+}
+
+float AssetBrowser::calculateControlsHeight() {
+    ImVec2 framePadding = ImVec2(10, 10);
+    float elementHeight = ImGui::GetFrameHeight() + framePadding.y * 2;
+
+    int elementCount = !selectedAsset.empty() ? 5 : 4;
+    int offset = !selectedAsset.empty() ? 21 : 23;
+
+    return elementCount * elementHeight + offset;
 }
 
 void AssetBrowser::exit() {

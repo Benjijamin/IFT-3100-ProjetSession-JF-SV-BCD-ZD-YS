@@ -205,7 +205,8 @@ void ImageEditor::drawCopyRegion() {
     int height = std::abs(corner2.y - corner1.y);
 
     ofPushStyle();
-    ofSetColor(0, 122, 204, 128);
+    ofSetColor(0, 122, 204, 255);
+    ofSetLineWidth(5);
     ofNoFill();
     ofDrawRectangle(x, y, width, height);
     ofPopStyle();

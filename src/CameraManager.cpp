@@ -9,7 +9,7 @@ void CameraManager::update() {
 }
 
 void CameraManager::draw() {
-    drawFrustums();
+
 }
 
 void CameraManager::drawGui() {
@@ -17,89 +17,83 @@ void CameraManager::drawGui() {
 
     if (ImGui::BeginTabBar("Camera Manager Tabs")) {
         if (ImGui::BeginTabItem("Camera List")) {
-            ImGui::BeginChild("Camera List", ImVec2(0, 150), true, ImGuiWindowFlags_AlwaysUseWindowPadding);
-            for (int i = 0; i < cameras.size(); i++) {
-                if (ImGui::Selectable(cameras[i].name.c_str(), i == selectedCameraIndex)) {
-                    setSelectedCamera(i);
+            if (ImGui::BeginChild("Camera List Container", ImVec2(0, 0), false)) {
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered()) {
+                    ImGui::OpenPopup("CameraContextMenu");
+                }
+
+                for (int i = 0; i < cameras.size(); i++) {
+                    if (ImGui::Selectable(cameras[i].name.c_str(), i == selectedCameraIndex)) {
+                        setSelectedCamera(i);
+                    }
+                }
+
+                if (ImGui::BeginPopup("CameraContextMenu")) {
+                    static char cameraName[128] = "";
+                    ImGui::InputText("Camera Name", cameraName, IM_ARRAYSIZE(cameraName));
+
+                    if (ImGui::Button("Add Orbit Camera") && strlen(cameraName) > 0) {
+                        std::string uniqueName = generateUniqueName(cameraName);
+                        addOrbitCamera(uniqueName, glm::vec3(0, 0, 500), glm::vec3(0, 0, 0));
+                        cameraName[0] = '\0';
+                        ImGui::CloseCurrentPopup();
+                    }
+
+                    if (ImGui::Button("Add Free Flight Camera") && strlen(cameraName) > 0) {
+                        std::string uniqueName = generateUniqueName(cameraName);
+                        addFreeFlightCamera(uniqueName, glm::vec3(0, 500, 500));
+                        cameraName[0] = '\0';
+                        ImGui::CloseCurrentPopup();
+                    }
+
+                    if (ImGui::Button("Delete Selected Camera") && cameras.size() > 1) {
+                        delete cameras[selectedCameraIndex].camera;
+                        cameras.erase(cameras.begin() + selectedCameraIndex);
+
+                        if (selectedCameraIndex > 0) {
+                            setSelectedCamera(selectedCameraIndex - 1);
+                        }
+                        else {
+                            setSelectedCamera(0);
+                        }
+                    }
+
+                    ImGui::EndPopup();
                 }
             }
+
             ImGui::EndChild();
-
-            ImGui::Spacing();
-
-            float sharedWidth = ImGui::GetContentRegionAvail().x;
-
-            static char cameraName[128] = "";
-            ImGui::PushItemWidth(sharedWidth);
-            ImGui::InputTextWithHint("##CameraName", "Enter Camera Name...", cameraName, IM_ARRAYSIZE(cameraName));
-            ImGui::PopItemWidth();
-
-            ImGui::Spacing();
-
-            if (ImGui::Button("Add Orbit Camera") && strlen(cameraName) > 0) {
-                std::string uniqueName = generateUniqueName(cameraName);
-                addOrbitCamera(uniqueName, glm::vec3(0, 0, 500), glm::vec3(0, 0, 0));
-                cameraName[0] = '\0';
-            }
-
-            ImGui::Spacing();
-
-            if (ImGui::Button("Add Free Flight Camera") && strlen(cameraName) > 0) {
-                std::string uniqueName = generateUniqueName(cameraName);
-                addFreeFlightCamera(uniqueName, glm::vec3(0, 500, 500));
-                cameraName[0] = '\0';
-            }
-
-            ImGui::Spacing();
-
-            if (ImGui::Button("Delete Selected Camera")) {
-                if (cameras.size() > 1) {
-                    delete cameras[selectedCameraIndex].camera;
-                    cameras.erase(cameras.begin() + selectedCameraIndex);
-
-                    if (selectedCameraIndex > 0) {
-                        setSelectedCamera(selectedCameraIndex - 1);
-                    }
-                    else {
-                        setSelectedCamera(0);
-                    }
-                }
-            }
-
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Projection Mode")) {
+        if (ImGui::BeginTabItem("Camera Settings")) {
             ofCamera* activeCam = getSelectedCamera();
             static bool isPerspective = !activeCam->getOrtho();
+            static bool isFreeFlight = cameras[selectedCameraIndex].isFreeFlight;
 
-            if (ImGui::RadioButton("Perspective", isPerspective)) {
-                isPerspective = true;
-                activeCam->disableOrtho();
+            if (ImGui::CollapsingHeader("Projection Parameters")) {
+                if (ImGui::RadioButton("Perspective", isPerspective)) {
+                    isPerspective = true;
+                    activeCam->disableOrtho();
+                }
+
+                ImGui::SameLine();
+
+                if (ImGui::RadioButton("Orthographic", !isPerspective)) {
+                    isPerspective = false;
+                    activeCam->enableOrtho();
+                }
+
+                if (isPerspective) {
+                    drawPerspectiveParameters();
+                }
+                else {
+                    drawOrthographicParameters();
+                }
             }
 
-            ImGui::SameLine();
-
-            if (ImGui::RadioButton("Orthographic", !isPerspective)) {
-                isPerspective = false;
-                activeCam->enableOrtho();
-            }
-
-            if (isPerspective) {
-                drawPerspectiveParameters();
-            }
-            else {
-                drawOrthographicParameters();
-            }
-
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Settings")) {
-            if (selectedCameraIndex >= 0 && selectedCameraIndex < cameras.size()) {
-                bool isFreeFlight = cameras[selectedCameraIndex].isFreeFlight;
-
-                ImGui::Text("Mode: %s", isFreeFlight ? "Free Flight Camera" : "Orbit Camera");
+            if (ImGui::CollapsingHeader("Camera Type Settings")) {
+                ImGui::Text("Type: %s", isFreeFlight ? "Free Flight Camera" : "Orbit Camera");
 
                 if (isFreeFlight) {
                     drawFreeFlightParameters();
@@ -112,25 +106,31 @@ void CameraManager::drawGui() {
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Frustum")) {
-            if (ImGui::BeginCombo("Select Camera", frustumCameraIndex >= 0 ? cameras[frustumCameraIndex].name.c_str() : "None")) {
-                if (ImGui::Selectable("None", frustumCameraIndex == -1)) {
-                    frustumCameraIndex = -1;
+        if (ImGui::BeginTabItem("Frustum Culling")) {
+            if (ImGui::Checkbox("Enable Frustum Culling", &frustumCullingEnabled)) {
+;
+            }
+
+            if (frustumCullingEnabled) {
+                if (frustumCameraIndex < 0 || frustumCameraIndex >= cameras.size()) {
+                    frustumCameraIndex = 0;
                 }
 
-                for (int i = 0; i < cameras.size(); i++) {
-                    bool isSelected = (i == frustumCameraIndex);
+                if (ImGui::BeginCombo("Select Camera", cameras[frustumCameraIndex].name.c_str())) {
+                    for (int i = 0; i < cameras.size(); i++) {
+                        bool isSelected = (i == frustumCameraIndex);
 
-                    if (ImGui::Selectable(cameras[i].name.c_str(), isSelected)) {
-                        frustumCameraIndex = i;
+                        if (ImGui::Selectable(cameras[i].name.c_str(), isSelected)) {
+                            frustumCameraIndex = i;
+                        }
+
+                        if (isSelected) {
+                            ImGui::SetItemDefaultFocus();
+                        }
                     }
 
-                    if (isSelected) {
-                        ImGui::SetItemDefaultFocus();
-                    }
+                    ImGui::EndCombo();
                 }
-
-                ImGui::EndCombo();
             }
 
             ImGui::EndTabItem();
@@ -323,14 +323,13 @@ void CameraManager::disableAllMouseInput() {
     }
 }
 
-void CameraManager::drawFrustums() {
-    ofPushStyle();
-    ofNoFill();
-    for (int i = 0; i < cameras.size(); i++) {
-        if (i == frustumCameraIndex) {
-            ofSetColor(ofColor::yellow);
-            cameras[i].camera->drawFrustum();
-        }
+ofCamera* CameraManager::getFrustumCamera() {
+    if (frustumCameraIndex >= 0 && frustumCameraIndex < cameras.size()) {
+        return cameras[frustumCameraIndex].camera;
     }
-    ofPopStyle();
+    return nullptr;
+}
+
+bool CameraManager::isFrustumCullingEnabled() const {
+    return frustumCullingEnabled;
 }

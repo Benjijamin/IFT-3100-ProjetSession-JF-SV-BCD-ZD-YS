@@ -127,8 +127,6 @@ void DessinVectoriel::begin()
 {
     prevBg = ofGetBackgroundColor();
     active = true;
-
-    if (onNewDrawing) onNewDrawing();
 }
 
 bool DessinVectoriel::isActive() const

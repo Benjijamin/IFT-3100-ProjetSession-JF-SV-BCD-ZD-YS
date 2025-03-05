@@ -8,7 +8,7 @@ class GizmoManager {
 public:
     void setup();
     void update();
-    void draw(ofCamera& activeCamera);
+    void draw(ofCamera& camera);
     void drawGui();
     void exit();
 

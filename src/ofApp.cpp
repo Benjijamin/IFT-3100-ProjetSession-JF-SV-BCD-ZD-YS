@@ -9,7 +9,6 @@ void ofApp::setup() {
     ofSetBackgroundColor(ofColor(60, 60, 60));
 
     imageEditor.setup();
-    modelEditor.setup();
     sceneEditor.setup();
     assetBrowser.setup();
     menuBar.setup();
@@ -17,7 +16,7 @@ void ofApp::setup() {
 
     currentEditor = nullptr;
 
-    dessinVectoriel.onNewDrawing = std::bind(&ofApp::handleNewDrawing, this);
+    menuBar.onNewDrawing = std::bind(&ofApp::handleNewDrawing, this);
 
     assetBrowser.onAssetAddition = std::bind(&ofApp::handleAssetAddition, this);
     assetBrowser.onAssetRemoval = std::bind(&ofApp::handleAssetRemoval, this);
@@ -41,10 +40,6 @@ void ofApp::draw() {
         currentEditor->drawGui();
     }
 
-    if (!dessinVectoriel.isActive()) {
-        dessinVectoriel.drawInit();
-    }
-
     assetBrowser.drawGui();
     menuBar.drawGui();
 
@@ -55,7 +50,9 @@ void ofApp::exit() {
     if (currentEditor) {
         currentEditor->exit();
     }
+
     assetBrowser.exit();
+    menuBar.exit();
 }
 
 void ofApp::keyPressed(int key) {
@@ -64,17 +61,6 @@ void ofApp::keyPressed(int key) {
 
 void ofApp::keyReleased(int key) {
 
-    //TODO Mettre dans la barre d'onglets
-    if (key == 'o')
-    {
-        if (currentEditor) {
-            currentEditor->exit();
-        }
-
-        currentEditor = &sceneEditor;
-
-        currentEditor->setup();
-    }
 }
 
 void ofApp::mouseMoved(int x, int y) {
@@ -126,6 +112,8 @@ void ofApp::gotMessage(ofMessage msg) {
 }
 
 void ofApp::handleNewDrawing() {
+    dessinVectoriel.begin();
+
     currentEditor = &dessinVectoriel;
 }
 
@@ -133,7 +121,7 @@ void ofApp::handleAssetAddition() {
     std::string lastAsset = assetBrowser.getLastAssetPath();
 
     if (assetBrowser.isModelAsset(lastAsset)) {
-        modelEditor.load(lastAsset);
+        sceneEditor.load(lastAsset);
     }
 }
 
@@ -154,7 +142,7 @@ void ofApp::handleAssetSelection() {
             currentEditor->load(selectedAsset);
         }
         else if (assetBrowser.isModelAsset(selectedAsset)) {
-            currentEditor = &modelEditor;
+            currentEditor = &sceneEditor;
         }
     }
 }

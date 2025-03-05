@@ -31,6 +31,11 @@ void MenuBar::drawFileMenu() {
         if (ImGui::MenuItem("Capture Screenshot")) {
             screenCapture.captureScreenshot();
         }
+
+        if (ImGui::MenuItem("Dessin Vectoriel")) {
+            if (onNewDrawing) onNewDrawing();
+        }
+
         if (ImGui::MenuItem("Exit")) {
             ofExit();
         }

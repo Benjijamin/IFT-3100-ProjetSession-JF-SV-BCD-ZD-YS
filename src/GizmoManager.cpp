@@ -11,8 +11,8 @@ void GizmoManager::update() {
     }
 }
 
-void GizmoManager::draw(ofCamera& activeCamera) {
-    gizmo.draw(activeCamera);
+void GizmoManager::draw(ofCamera& camera) {
+    gizmo.draw(camera);
 }
 
 void GizmoManager::drawGui() {

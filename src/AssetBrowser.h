@@ -25,6 +25,7 @@ private:
     void drawSearchBar();
     void drawAssetList();
     void drawControls();
+    float calculateControlsHeight();
 
     void addAsset(const std::string& assetPath);
     void removeAsset(const std::string& asset);

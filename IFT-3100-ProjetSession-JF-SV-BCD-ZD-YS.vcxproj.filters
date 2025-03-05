@@ -85,9 +85,6 @@
     <ClCompile Include="src\ImageEditor.cpp">
       <Filter>src\editors</Filter>
     </ClCompile>
-    <ClCompile Include="src\ModelEditor.cpp">
-      <Filter>src\editors</Filter>
-    </ClCompile>
     <ClCompile Include="src\ScreenCapture.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
@@ -552,9 +549,6 @@
       <Filter>addons\ofxImGui\libs\imgui\src</Filter>
     </ClInclude>
     <ClInclude Include="src\ImageEditor.h">
-      <Filter>src\editors</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ModelEditor.h">
       <Filter>src\editors</Filter>
     </ClInclude>
     <ClInclude Include="src\ScreenCapture.h">

@@ -4,12 +4,10 @@
 #include "ofxImGui.h"
 #include "Editor.h"
 #include "ImageEditor.h"
-#include "ModelEditor.h"
 #include "SceneEditor.h"
 #include "DessinVectoriel.h"
 #include "AssetBrowser.h"
 #include "MenuBar.h"
-#include "DessinVectoriel.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -32,7 +30,7 @@ public:
     void gotMessage(ofMessage msg);
 
 private:
-    void switchEditor();
+    void handleNewDrawing();
     void handleAssetAddition();
     void handleAssetRemoval();
     void handleAssetSelection();
@@ -40,11 +38,10 @@ private:
     ofxImGui::Gui gui;
 
     ImageEditor imageEditor;
-    ModelEditor modelEditor;
     SceneEditor sceneEditor;
+    DessinVectoriel dessinVectoriel;
     AssetBrowser assetBrowser;
     MenuBar menuBar;
-    DessinVectoriel dessinVectoriel;
 
     Editor* currentEditor;
 };

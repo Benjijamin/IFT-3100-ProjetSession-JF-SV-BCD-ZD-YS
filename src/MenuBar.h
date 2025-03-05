@@ -25,6 +25,8 @@ public:
 	ScreenCapture screenCapture;
 	ImageEditor imageEditor;
 
+    std::function<void()> onNewDrawing;
+
 private:
 	void drawFileMenu();
 	void drawEditMenu();

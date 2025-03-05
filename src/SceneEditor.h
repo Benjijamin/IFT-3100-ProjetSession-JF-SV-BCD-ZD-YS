@@ -4,9 +4,10 @@
 #include "ofxImGui.h"
 #include "Editor.h"
 #include "SceneGraph.h"
+#include "GizmoManager.h"
+#include "CameraManager.h"
 
-class SceneEditor : public Editor
-{
+class SceneEditor : public Editor {
 public:
     void setup() override;
     void update() override;
@@ -20,12 +21,15 @@ public:
     void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
     void load(const std::string& path) override;
-    void unload(const std::string& path);
     void save(const std::string& path) override;
+
 private:
     char* sceneName;
     SceneGraph sceneGraph;
+    GizmoManager gizmoManager;
+    CameraManager cameraManager;
 
+    bool shouldEnableMouseInput;
     bool justAddedNode;
 
     ofEasyCam camera;
@@ -38,7 +42,6 @@ private:
     void newObjectMenu(std::shared_ptr<SceneNode> node);
     void nodeDragDropBehaviour(std::shared_ptr<SceneNode> node);
 
-    void newEmptyObject(std::shared_ptr<SceneNode> parent);
+    void newEmptyObject(const std::string& name, std::shared_ptr<SceneNode> parent);
     void newPrimitiveObject(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent);
-    void newCameraObject(std::shared_ptr<SceneNode> parent);
 };

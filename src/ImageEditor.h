@@ -20,7 +20,6 @@ public:
     void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
     void load(const std::string& path) override;
-    void unload(const std::string& path) override;
     void save(const std::string& path) override;
 
 private:

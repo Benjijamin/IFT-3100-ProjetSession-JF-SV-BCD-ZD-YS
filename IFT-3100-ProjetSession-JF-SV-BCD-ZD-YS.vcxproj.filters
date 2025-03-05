@@ -85,9 +85,6 @@
     <ClCompile Include="src\ImageEditor.cpp">
       <Filter>src\editors</Filter>
     </ClCompile>
-    <ClCompile Include="src\ModelEditor.cpp">
-      <Filter>src\editors</Filter>
-    </ClCompile>
     <ClCompile Include="src\ScreenCapture.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
@@ -119,6 +116,12 @@
       <Filter>src\editors</Filter>
     </ClCompile>
     <ClCompile Include="src\CustomSlider.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GizmoManager.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CameraManager.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -548,9 +551,6 @@
     <ClInclude Include="src\ImageEditor.h">
       <Filter>src\editors</Filter>
     </ClInclude>
-    <ClInclude Include="src\ModelEditor.h">
-      <Filter>src\editors</Filter>
-    </ClInclude>
     <ClInclude Include="src\ScreenCapture.h">
       <Filter>src\components</Filter>
     </ClInclude>
@@ -585,6 +585,12 @@
       <Filter>src\editors</Filter>
     </ClInclude>
     <ClInclude Include="src\CustomSlider.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GizmoManager.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CameraManager.h">
       <Filter>src\components</Filter>
     </ClInclude>
   </ItemGroup>

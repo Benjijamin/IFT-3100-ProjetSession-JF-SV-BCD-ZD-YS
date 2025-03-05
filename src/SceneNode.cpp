@@ -1,4 +1,5 @@
 #include "SceneNode.h"
+#include "Primitives.h"
 
 SceneNode::SceneNode(const std::string& name)
     : name(name) {}
@@ -32,7 +33,25 @@ void SceneNode::setName(std::string& newName)
 
 void SceneNode::setPrimitive(PrimitiveType newPrimitiveType) 
 {
-    primitiveType = newPrimitiveType;
+    primitiveType = newPrimitiveType; 
+
+    switch (primitiveType)
+    {
+    case PrimitiveType::Sphere:
+        break;
+    case PrimitiveType::Tetrahedron:
+        primitiveModel = Primitives::getTetrahedronPrimitive(1);
+        break;
+    case PrimitiveType::Cube:
+        primitiveModel = Primitives::getCubePrimitive(1);
+        break;
+    case PrimitiveType::Cylinder:
+        break;
+    case PrimitiveType::Cone:
+        break;
+    default:
+        break;
+    }
 }
 
 bool SceneNode::containsModel() const {
@@ -49,8 +68,11 @@ void SceneNode::customDraw() {
         case PrimitiveType::Sphere:
             ofDrawSphere(glm::vec3(0), 1);
             break;
+        case PrimitiveType::Tetrahedron:
+            primitiveModel->drawFaces();
+            break;
         case PrimitiveType::Cube:
-            ofDrawBox(glm::vec3(0), 1);
+            primitiveModel->drawFaces();
             break;
         case PrimitiveType::Cylinder:
             ofDrawCylinder(glm::vec3(0), 1, 2);

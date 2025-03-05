@@ -121,6 +121,9 @@
     <ClCompile Include="src\CustomSlider.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
+    <ClCompile Include="src\Primitives.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -585,6 +588,9 @@
       <Filter>src\editors</Filter>
     </ClInclude>
     <ClInclude Include="src\CustomSlider.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Primitives.h">
       <Filter>src\components</Filter>
     </ClInclude>
   </ItemGroup>

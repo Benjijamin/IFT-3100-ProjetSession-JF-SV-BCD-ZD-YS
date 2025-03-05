@@ -207,6 +207,8 @@ void SceneEditor::newObjectMenu(std::shared_ptr<SceneNode> node)
 
     if (ImGui::Selectable("New Sphere")) newPrimitiveObject(PrimitiveType::Sphere, "Sphere", node);
 
+    if (ImGui::Selectable("New Pyramid")) newPrimitiveObject(PrimitiveType::Tetrahedron, "Pyramid", node);
+
     if (ImGui::Selectable("New Cube")) newPrimitiveObject(PrimitiveType::Cube, "Cube", node);
 
     if (ImGui::Selectable("New Cylinder")) newPrimitiveObject(PrimitiveType::Cylinder, "Cylinder", node);

@@ -23,7 +23,6 @@ struct Shape {
 class DessinVectoriel : public Editor {
 public:
     void setup() override;
-    void update() override;
     void draw() override;
     void drawGui() override;
     void exit() override;
@@ -31,19 +30,11 @@ public:
     void mouseDragged(int x, int y, int button) override;
     void mousePressed(int x, int y, int button) override;
     void mouseReleased(int x, int y, int button) override;
-    void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
-
-    void load(const std::string& path) override;
-    void save(const std::string& path) override;
 
     // Initialisation
     void begin();
-    bool isActive() const;
     void undo();
-
-    // Affichage des fenêtres
-    void drawInit();
-    void drawToolbar();
+    void drawWindow();
 
     // Fonctions liées aux dimensions des formes
     ImVec2 rectangleDims(const ImVec2& init, const ImVec2& pos);
@@ -51,17 +42,23 @@ public:
     ImVec4 triangleDims(const ImVec2& init, const ImVec2& pos);
 
     // Construction des formes vectorielles
-    Shape initShape(const bool& cover) const;
+    bool checkHover() const;
+    Shape initShape() const;
     void drawShape(const Shape& s);
     void buildShape(const Shape& s, const bool& fill);
 
+    // Méthodes inutilisées
+    void update() override;
+    void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
+    void load(const std::string& path) override;
+    void save(const std::string& path) override;
+
 private:
 
-    // Taille et emplacement des fenêtres
+    // Taille et emplacement de la fenêtre
     float windowGap;
     ImVec2 windowPos;
-    ImVec2 initSize;
-    ImVec2 toolbarSize;
+    ImVec2 windowSize;
 
     // Attributs des outils de dessin
     vector<Shape> shapes;

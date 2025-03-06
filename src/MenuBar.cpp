@@ -13,11 +13,17 @@ void MenuBar::drawGui() {
 		drawEditMenu();
 		drawRenderMenu();
 		drawWindowMenu();
+		drawSceneMenu();
 
 		drawHelpMenu();
 
 		ImGui::EndMainMenuBar();
 	}
+
+	drawToolBar();
+
+	dessinVectoriel.drawGui();
+	//sceneEditor.drawGui();
 	screenCapture.drawGui();
 }
 
@@ -137,6 +143,12 @@ void MenuBar::drawRenderMenu() {
 	}
 }
 
+void MenuBar::drawSceneMenu() {
+//	if (ImGui::BeginMenu("Scene")) {
+//		if (ImGui::MenuItem("Scene Editor")) { sceneEditor.draw(); }
+//	}
+}
+
 /*
 * ONGLET DE FENÊTRE
 *
@@ -183,3 +195,20 @@ void MenuBar::openProject(const std::string& filePath) {
 		return;
 	}
 }
+
+/*
+* BARRE VERTICALE D'OUTILS
+* >Dessin vectoriel (primitives
+*/
+void MenuBar::drawToolBar() {
+	ImGui::SetNextWindowPos(ImVec2(ofGetWidth() - 150, 20));
+	ImGui::SetNextWindowSize(ImVec2(50, 500));
+
+	ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+	
+	if (ImGui::Button("Dessin Vectoriel", ImVec2(100, 40))) { dessinVectoriel.begin(); }
+
+	ImGui::End();
+}
+
+void MenuBar::exit() {}

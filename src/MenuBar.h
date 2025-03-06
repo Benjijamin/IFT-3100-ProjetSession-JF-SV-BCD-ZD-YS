@@ -3,6 +3,7 @@
 #include "ofxImGui.h"
 #include "ScreenCapture.h"
 
+
 class MenuBar {
 public:
     void setup();
@@ -19,4 +20,5 @@ private:
     void drawHelpMenu();
 
     ScreenCapture screenCapture;
+
 };

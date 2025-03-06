@@ -127,6 +127,9 @@
     <ClCompile Include="src\CameraManager.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
+    <ClCompile Include="src\DynamicCursor.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -597,6 +600,9 @@
       <Filter>src\components</Filter>
     </ClInclude>
     <ClInclude Include="src\Primitives.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DynamicCursor.h">
       <Filter>src\components</Filter>
     </ClInclude>
   </ItemGroup>

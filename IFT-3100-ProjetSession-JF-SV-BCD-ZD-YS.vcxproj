@@ -108,6 +108,7 @@
     <ClCompile Include="src\ColorPicker.cpp" />
     <ClCompile Include="src\CustomSlider.cpp" />
     <ClCompile Include="src\DessinVectoriel.cpp" />
+    <ClCompile Include="src\DynamicCursor.cpp" />
     <ClCompile Include="src\FreeFlightCamera.cpp" />
     <ClCompile Include="src\GizmoManager.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="src\ColorPicker.h" />
     <ClInclude Include="src\CustomSlider.h" />
     <ClInclude Include="src\DessinVectoriel.h" />
+    <ClInclude Include="src\DynamicCursor.h" />
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\FreeFlightCamera.h" />
     <ClInclude Include="src\GizmoManager.h" />

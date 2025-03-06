@@ -94,3 +94,7 @@ void ScreenCapture::deleteScreenshotTexture() {
         screenshotTexture = 0;
     }
 }
+
+void ScreenCapture::mouseDragged(int x, int y, int button) {
+
+}

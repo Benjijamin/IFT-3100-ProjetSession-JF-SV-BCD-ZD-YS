@@ -2,6 +2,8 @@
 
 #include "ofMain.h"
 #include "ofxImGui.h"
+#include <windows.h>
+#include "DynamicCursor.h"
 
 class ScreenCapture {
 public:
@@ -13,6 +15,8 @@ public:
 
     void captureScreenshot();
     void saveScreenshot();
+
+    void mouseDragged(int x, int y, int button);
 
 private:
     void createScreenshotTexture();

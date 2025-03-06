@@ -41,10 +41,11 @@ private:
     AssetBrowser assetBrowser;
     ScreenCapture screenCapture;
 
-    DynamicCursor dynamicCursor;
-    ofRectangle carre;
 
     MenuBar menuBar;
 
     std::unique_ptr<Editor> currentEditor;
+
+    DynamicCursor dynamicCursor;  // Instance de DynamicCursor
+
 };

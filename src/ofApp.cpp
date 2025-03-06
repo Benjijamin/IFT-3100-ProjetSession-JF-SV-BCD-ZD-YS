@@ -10,14 +10,15 @@ void ofApp::setup() {
 
     assetBrowser.setup();
     screenCapture.setup();
-    dynamicCursor.setup();
 
     currentEditor = nullptr;
 
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
     assetBrowser.onAssetDeletion = std::bind(&ofApp::handleAssetDeletion, this);
 
-    carre.set(300, 200, 100, 100);
+    dynamicCursor.setup();  // Initialiser DynamicCursor
+    menuBar.setup();  // Initialiser MenuBar
+
 }
 
 void ofApp::update() {
@@ -32,10 +33,6 @@ void ofApp::draw() {
     }
 
     screenCapture.draw();
-
-    // Dessiner le carré
-    ofSetColor(255, 0, 0); // Rouge
-    ofDrawRectangle(carre);
 
     gui.begin();
 
@@ -71,25 +68,39 @@ void ofApp::keyReleased(int key) {
 }
 
 void ofApp::mouseMoved(int x, int y) {
-    dynamicCursor.update(x, y, carre);
+    // Détecter si la souris est sur la barre de menus
+    bool isOnMenuBar = menuBar.isMouseOverMenuBar();
+
+    // Mettre à jour le curseur en fonction de la position de la souris
+    dynamicCursor.update(x, y,isOnMenuBar);
 }
 
 void ofApp::mouseDragged(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseDragged(x, y, button);
     }
+
+    // Exemple : Si l'utilisateur est en train de redimensionner, changer le curseur en RESIZE
+    dynamicCursor.setCursorType(DynamicCursor::RESIZE);
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mousePressed(x, y, button);
     }
+
+    // Exemple : Si l'utilisateur clique sur un élément interactif, changer le curseur en CROSSHAIR
+    dynamicCursor.setCursorType(DynamicCursor::CROSSHAIR);
 }
 
 void ofApp::mouseReleased(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseReleased(x, y, button);
+
     }
+
+    // Revenir au curseur par défaut après avoir relâché la souris
+    dynamicCursor.resetCursor();
 }
 
 void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {

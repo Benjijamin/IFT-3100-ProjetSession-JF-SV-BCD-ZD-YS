@@ -18,7 +18,7 @@ void MenuBar::drawGui() {
 		ImGui::EndMainMenuBar();
 	}
 
-	drawToolBar();
+	//drawToolBar();
 
 	dessinVectoriel.drawGui();
 	screenCapture.drawGui();
@@ -187,6 +187,7 @@ void MenuBar::drawHelpMenu() {
 
 // MÉTHODES POUR BARRE D'OUTILS VERTICALE
 void MenuBar::drawToolBar() {
+	/*
 	ImGui::SetNextWindowPos(ImVec2(ofGetWidth() - 150, 20));
 	ImGui::SetNextWindowSize(ImVec2(50, 500));
 
@@ -195,4 +196,5 @@ void MenuBar::drawToolBar() {
 	if (ImGui::Button("Dessin Vectoriel", ImVec2(100, 40))) { dessinVectoriel.begin(); }
 
 	ImGui::End();
+	*/
 }

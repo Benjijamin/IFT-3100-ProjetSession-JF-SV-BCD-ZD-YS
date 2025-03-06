@@ -1,7 +1,11 @@
 .idea/
 .vs/
 *.user
-bin/
 icon.rc
 obj/
 *.ini
+/bin/IFT-3100-ProjetSession-JF-SV-BCD-ZD-YS_debug.pdb
+/bin/IFT-3100-ProjetSession-JF-SV-BCD-ZD-YS_debug.exe
+/bin/FreeImage.dll
+/bin/fmodL.dll
+/bin/fmod.dll

@@ -4,8 +4,9 @@
 #include "ofxImGui.h"
 #include "ofxAssimpModelLoader.h"
 
-enum class PrimitiveType {
-    None, Sphere, Cube, Cylinder, Cone 
+enum class PrimitiveType 
+{
+    None, Sphere, Tetrahedron, Cube, Cylinder, Cone 
 };
 
 class SceneNode : public ofNode, public std::enable_shared_from_this<SceneNode> {
@@ -40,9 +41,11 @@ private:
     void drawAABBBox();
 
     std::string name;
-    PrimitiveType primitiveType;
     std::shared_ptr<ofxAssimpModelLoader> model;
     std::vector<std::shared_ptr<SceneNode>> children;
+
+    PrimitiveType primitiveType;
+    std::shared_ptr<ofMesh> primitiveModel;
 
     ofBoxPrimitive aabb;
 };

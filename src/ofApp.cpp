@@ -13,6 +13,7 @@ void ofApp::setup() {
     assetBrowser.setup();
     menuBar.setup();
     dessinVectoriel.setup();
+    dynamicCursor.setup();
 
     currentEditor = nullptr;
 
@@ -65,12 +66,16 @@ void ofApp::keyReleased(int key) {
 
 void ofApp::mouseMoved(int x, int y) {
 
+    dynamicCursor.update(x, y);
 }
+
+
 
 void ofApp::mouseDragged(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseDragged(x, y, button);
     }
+    dynamicCursor.setCursorType(DynamicCursor::RESIZE);
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
@@ -83,6 +88,7 @@ void ofApp::mouseReleased(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mouseReleased(x, y, button);
     }
+    dynamicCursor.resetCursor();
 }
 
 void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
@@ -126,8 +132,10 @@ void ofApp::handleAssetAddition() {
 }
 
 void ofApp::handleAssetRemoval() {
-
+    currentEditor = nullptr;
 }
+
+
 
 void ofApp::handleAssetSelection() {
     std::string selectedAsset = assetBrowser.getSelectedAssetPath();

@@ -8,6 +8,9 @@
 #include "DessinVectoriel.h"
 #include "AssetBrowser.h"
 #include "MenuBar.h"
+#include "DynamicCursor.h"
+
+
 
 class ofApp : public ofBaseApp {
 public:
@@ -42,6 +45,7 @@ private:
     DessinVectoriel dessinVectoriel;
     AssetBrowser assetBrowser;
     MenuBar menuBar;
+    DynamicCursor dynamicCursor;
 
     Editor* currentEditor;
 };

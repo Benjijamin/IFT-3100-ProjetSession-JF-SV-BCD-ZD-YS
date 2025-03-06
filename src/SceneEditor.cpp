@@ -165,25 +165,17 @@ void SceneEditor::newObjectMenu(std::shared_ptr<SceneNode> node) {
         }
     }
 
-    if (ImGui::Selectable("New Empty")) {
-        newEmptyObject("Empty", node);
-    }
+    if (ImGui::Selectable("New Empty")) newEmptyObject("Empty", node);
 
-    if (ImGui::Selectable("New Sphere")) {
-        newPrimitiveObject(PrimitiveType::Sphere, "Sphere", node);
-    }
+    if (ImGui::Selectable("New Sphere")) newPrimitiveObject(PrimitiveType::Sphere, "Sphere", node);
 
-    if (ImGui::Selectable("New Cube")) {
-        newPrimitiveObject(PrimitiveType::Cube, "Cube", node);
-    }
+    if (ImGui::Selectable("New Pyramid")) newPrimitiveObject(PrimitiveType::Tetrahedron, "Pyramid", node);
 
-    if (ImGui::Selectable("New Cylinder")) {
-        newPrimitiveObject(PrimitiveType::Cylinder, "Cylinder", node);
-    }
+    if (ImGui::Selectable("New Cube")) newPrimitiveObject(PrimitiveType::Cube, "Cube", node);
 
-    if (ImGui::Selectable("New Cone")) {
-        newPrimitiveObject(PrimitiveType::Cone, "Cone", node);
-    }
+    if (ImGui::Selectable("New Cylinder")) newPrimitiveObject(PrimitiveType::Cylinder, "Cylinder", node);
+
+    if (ImGui::Selectable("New Cone")) newPrimitiveObject(PrimitiveType::Cone, "Cone", node);
 }
 
 void SceneEditor::nodeDragDropBehaviour(std::shared_ptr<SceneNode> node) {

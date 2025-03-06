@@ -118,10 +118,19 @@
     <ClCompile Include="src\CustomSlider.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
+    <ClCompile Include="src\Primitives.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
     <ClCompile Include="src\GizmoManager.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
     <ClCompile Include="src\CameraManager.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DynamicCursor.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImageExporter.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -591,6 +600,15 @@
       <Filter>src\components</Filter>
     </ClInclude>
     <ClInclude Include="src\CameraManager.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Primitives.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DynamicCursor.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ImageExporter.h">
       <Filter>src\components</Filter>
     </ClInclude>
   </ItemGroup>

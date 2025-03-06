@@ -128,11 +128,18 @@ void AssetBrowser::drawControls() {
     ImVec2 buttonSize = ImVec2(-1, 0);
 
     if (!selectedAsset.empty()) {
+        if (ImGui::Button("Save", buttonSize)) {
+            imageExporter.image_export("myImage", "png", imageEditor);
+        }
+    }
+
+    if (!selectedAsset.empty()) {
         if (ImGui::Button("Delete", buttonSize)) {
             removeAsset(selectedAsset);
             selectedAsset.clear();
         }
     }
+
 
     if (ImGui::Button("Load New Asset", buttonSize)) {
         ofFileDialogResult result = ofSystemLoadDialog("Select an asset");

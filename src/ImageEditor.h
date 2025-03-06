@@ -22,6 +22,8 @@ public:
     void load(const std::string& path) override;
     void save(const std::string& path) override;
 
+    ofImage* getImage();
+
 private:
     void drawBrush(int startX, int startY, int endX, int endY);
     void copyRegion(int startX, int startY, int endX, int endY);
@@ -40,6 +42,10 @@ private:
     ofVec2f previousMousePos;
     int drawRadius;
 
-    enum class Tool { PanZoom, CopyRegion, PasteRegion, Brush };
+    ofShader shader;
+    void applyTint(int x, int y);
+
+
+    enum class Tool { PanZoom, CopyRegion, PasteRegion, Brush, Tint };
     Tool currentTool;
 };

@@ -132,8 +132,10 @@ void ofApp::handleAssetAddition() {
 }
 
 void ofApp::handleAssetRemoval() {
-
+    currentEditor = nullptr;
 }
+
+
 
 void ofApp::handleAssetSelection() {
     std::string selectedAsset = assetBrowser.getSelectedAssetPath();

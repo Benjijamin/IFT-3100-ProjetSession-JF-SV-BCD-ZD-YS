@@ -2,6 +2,8 @@
 
 #include "ofMain.h"
 #include "ofxImGui.h"
+#include "ImageExporter.h"
+#include "ImageEditor.h"
 
 class AssetBrowser {
 public:
@@ -42,4 +44,7 @@ private:
     bool resizing;
     bool showFullPaths;
     int filterIndex;
+
+    ImageExporter imageExporter;
+    ImageEditor imageEditor;
 };

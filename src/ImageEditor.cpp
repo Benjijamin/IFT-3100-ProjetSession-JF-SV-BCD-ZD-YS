@@ -15,9 +15,6 @@ void ImageEditor::setup() {
 void ImageEditor::update() {
 
 }
-ofImage* ImageEditor::getImage() {
-    return currentImage;
-}
 
 void ImageEditor::draw() {
     if (isImageAllocated()) {
@@ -154,6 +151,7 @@ void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
     ofVec2f end = viewer.screenToPixelCoords(ofVec2f(endX, endY));
 
     int numSteps = std::max(abs(end.x - start.x), abs(end.y - start.y));
+
     for (int step = 0; step <= numSteps; ++step) {
         float t = static_cast<float>(step) / static_cast<float>(numSteps);
         int x = static_cast<int>(ofLerp(start.x, end.x, t));
@@ -164,6 +162,7 @@ void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
                 if (i * i + j * j <= drawRadius * drawRadius) {
                     int drawX = x + i;
                     int drawY = y + j;
+
                     if (isWithinBounds(drawX, drawY)) {
                         currentImage->setColor(drawX, drawY, drawColor);
                     }
@@ -171,6 +170,7 @@ void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
             }
         }
     }
+
     currentImage->update();
 }
 
@@ -178,15 +178,14 @@ void ImageEditor::applyTint(int x, int y) {
     ofVec2f panOffset = viewer.getPanOffset();
     ofVec2f imageDimensions = ofVec2f(currentImage->getWidth(), currentImage->getHeight()) * viewer.getZoomFactor();
 
-        shader.begin();
-        shader.setUniformTexture("image", currentImage->getTexture(), 1);
+    shader.begin();
+    shader.setUniformTexture("image", currentImage->getTexture(), 1);
 
-        ofColor tintColor = colorPicker.getColor();
-        shader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
+    ofColor tintColor = colorPicker.getColor();
+    shader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
 
-        currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
-        shader.end();
-    
+    currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
+    shader.end();
 }
 
 void ImageEditor::copyRegion(int startX, int startY, int endX, int endY) {
@@ -202,11 +201,13 @@ void ImageEditor::copyRegion(int startX, int startY, int endX, int endY) {
     int height = endY - startY;
 
     copiedRegion.allocate(width, height, OF_IMAGE_COLOR);
+
     for (int x = 0; x < width; ++x) {
         for (int y = 0; y < height; ++y) {
             copiedRegion.setColor(x, y, currentImage->getColor(startX + x, startY + y));
         }
     }
+
     copiedRegion.update();
 }
 

@@ -33,12 +33,10 @@ void SceneNode::setName(std::string& newName) {
     name = newName;
 }
 
-void SceneNode::setPrimitive(PrimitiveType newPrimitiveType) 
-{
+void SceneNode::setPrimitive(PrimitiveType newPrimitiveType) {
     primitiveType = newPrimitiveType; 
 
-    switch (primitiveType)
-    {
+    switch (primitiveType) {
     case PrimitiveType::Sphere:
         break;
     case PrimitiveType::Tetrahedron:
@@ -67,7 +65,7 @@ void SceneNode::customDraw() {
     else {
         switch (primitiveType) {
         case PrimitiveType::Sphere:
-            ofDrawSphere(glm::vec3(0), 1);
+            ofDrawSphere(glm::vec3(0.0f), 100.0f);
             break;
         case PrimitiveType::Tetrahedron:
             primitiveModel->drawFaces();
@@ -76,10 +74,10 @@ void SceneNode::customDraw() {
             primitiveModel->drawFaces();
             break;
         case PrimitiveType::Cylinder:
-            ofDrawCylinder(glm::vec3(0), 1, 2);
+            ofDrawCylinder(glm::vec3(0.0f), 100.0f, 200.0f);
             break;
         case PrimitiveType::Cone:
-            ofDrawCone(glm::vec3(0), 1, 2);
+            ofDrawCone(glm::vec3(0.0f), 100.0f, 200.0f);
             break;
         default:
             break;
@@ -122,8 +120,8 @@ void SceneNode::drawVisibleNodes(const ofCamera& camera) {
     ofPopMatrix();
 }
 
-bool SceneNode::operator==(const SceneNode& other) const {
-    return (name == other.name);
+ofBoxPrimitive SceneNode::getAABB() const {
+    return aabb;
 }
 
 void SceneNode::initAABBToInfinity() {
@@ -253,4 +251,8 @@ void SceneNode::drawAABBBox() {
     ofDrawLine(vertices[1], vertices[5]);
     ofDrawLine(vertices[2], vertices[6]);
     ofDrawLine(vertices[3], vertices[7]);
+}
+
+bool SceneNode::operator==(const SceneNode& other) const {
+    return (name == other.name);
 }

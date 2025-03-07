@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "ofxImGui.h"
-#include "ImageExporter.h"
 #include "ImageEditor.h"
 
 class AssetBrowser {
@@ -22,12 +21,12 @@ public:
     std::function<void()> onAssetAddition;
     std::function<void()> onAssetRemoval;
     std::function<void()> onAssetSelection;
+    std::function<void(const std::string&)> onAssetSave;
 
 private:
     void drawSearchBar();
     void drawAssetList();
     void drawControls();
-    float calculateControlsHeight();
 
     void addAsset(const std::string& assetPath);
     void removeAsset(const std::string& asset);
@@ -45,6 +44,5 @@ private:
     bool showFullPaths;
     int filterIndex;
 
-    ImageExporter imageExporter;
     ImageEditor imageEditor;
 };

@@ -24,10 +24,6 @@ public:
 private:
 	// Objets issus d'autres classes pour liaison avec boutons de l'interface
 	ScreenCapture screenCapture;
-	ImageEditor imageEditor;
-	DessinVectoriel dessinVectoriel;
-
-
 
 	// ONGLET DES FICHIERS
 	//----------------------//

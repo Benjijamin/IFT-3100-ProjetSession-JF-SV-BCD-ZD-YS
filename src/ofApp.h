@@ -37,6 +37,7 @@ private:
     void handleAssetAddition();
     void handleAssetRemoval();
     void handleAssetSelection();
+    void handleAssetSave(const std::string& path);
 
     ofxImGui::Gui gui;
 

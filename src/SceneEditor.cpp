@@ -63,7 +63,7 @@ void SceneEditor::draw() {
 
     gizmoManager.draw(*selectedCam);
 
-    if (frustumCam) {
+    if (frustumCam && frustumCam != selectedCam) {
         ofPushStyle();
         ofSetColor(ofColor::yellow);
 
@@ -89,6 +89,39 @@ void SceneEditor::drawGui() {
     cameraManager.drawGui();
 
     drawInfo(sceneGraph.getSelectedNode());
+}
+
+void SceneEditor::exit() {
+    cameraManager.disableAllMouseInput();
+    shouldEnableMouseInput = true;
+
+    sceneGraph.exit();
+    gizmoManager.exit();
+    cameraManager.exit();
+}
+
+void SceneEditor::mouseDragged(int x, int y, int button) {
+
+}
+
+void SceneEditor::mousePressed(int x, int y, int button) {
+
+}
+
+void SceneEditor::mouseReleased(int x, int y, int button) {
+
+}
+
+void SceneEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
+
+}
+
+void SceneEditor::load(const std::string& path) {
+    sceneGraph.addModelNode(path, sceneGraph.getRootNode());
+}
+
+void SceneEditor::save(const std::string& path) {
+
 }
 
 void SceneEditor::drawInfo(std::shared_ptr<SceneNode> node) {
@@ -166,15 +199,10 @@ void SceneEditor::newObjectMenu(std::shared_ptr<SceneNode> node) {
     }
 
     if (ImGui::Selectable("New Empty")) newEmptyObject("Empty", node);
-
     if (ImGui::Selectable("New Sphere")) newPrimitiveObject(PrimitiveType::Sphere, "Sphere", node);
-
     if (ImGui::Selectable("New Pyramid")) newPrimitiveObject(PrimitiveType::Tetrahedron, "Pyramid", node);
-
     if (ImGui::Selectable("New Cube")) newPrimitiveObject(PrimitiveType::Cube, "Cube", node);
-
     if (ImGui::Selectable("New Cylinder")) newPrimitiveObject(PrimitiveType::Cylinder, "Cylinder", node);
-
     if (ImGui::Selectable("New Cone")) newPrimitiveObject(PrimitiveType::Cone, "Cone", node);
 }
 
@@ -209,37 +237,4 @@ void SceneEditor::newEmptyObject(const std::string& name, std::shared_ptr<SceneN
 void SceneEditor::newPrimitiveObject(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent) {
     sceneGraph.addPrimitiveNode(primitiveType, name, parent);
     justAddedNode = true;
-}
-
-void SceneEditor::exit() {
-    cameraManager.disableAllMouseInput();
-    shouldEnableMouseInput = true;
-
-    sceneGraph.exit();
-    gizmoManager.exit();
-    cameraManager.exit();
-}
-
-void SceneEditor::mouseDragged(int x, int y, int button) {
-
-}
-
-void SceneEditor::mousePressed(int x, int y, int button) {
-
-}
-
-void SceneEditor::mouseReleased(int x, int y, int button) {
-
-}
-
-void SceneEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
-
-}
-
-void SceneEditor::load(const std::string& path) {
-    sceneGraph.addModelNode(path, sceneGraph.getRootNode());
-}
-
-void SceneEditor::save(const std::string& path) {
-
 }

@@ -50,6 +50,7 @@ void GizmoManager::exit() {
 
 void GizmoManager::setSelectedNode(std::shared_ptr<SceneNode> node) {
     selectedNode = node;
+
     if (selectedNode) {
         gizmo.setNode(*selectedNode);
     }

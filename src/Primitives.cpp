@@ -60,8 +60,6 @@ std::shared_ptr<ofMesh> Primitives::getTetrahedronPrimitive(float size)
 	return primitive;
 }
 
-
-
 std::vector<glm::vec3> Primitives::calculateNormals(std::shared_ptr<ofMesh> mesh)
 {
 	std::vector<glm::vec3> normals;

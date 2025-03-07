@@ -23,14 +23,14 @@ void AssetBrowser::drawGui() {
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 windowSize = io.DisplaySize;
 
-    float controlsHeight = calculateControlsHeight();
+    float controlsHeight = selectedAsset.empty() ? 175 : 250;
 
     assetBrowserHeight = std::max(assetBrowserHeight, controlsHeight);
 
     ImGui::SetNextWindowPos(ImVec2(0, windowSize.y - assetBrowserHeight));
     ImGui::SetNextWindowSize(ImVec2(windowSize.x, assetBrowserHeight));
 
-    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
 
     if (ImGui::Begin("Asset Browser", nullptr, windowFlags)) {
         if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) {
@@ -59,7 +59,7 @@ void AssetBrowser::drawGui() {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 
         ImGui::Columns(2, nullptr, false);
-        ImGui::SetColumnWidth(0, windowSize.x * 0.75f);
+        ImGui::SetColumnWidth(0, windowSize.x * 0.70f);
 
         drawSearchBar();
         drawAssetList();
@@ -128,12 +128,13 @@ void AssetBrowser::drawControls() {
     ImVec2 buttonSize = ImVec2(-1, 0);
 
     if (!selectedAsset.empty()) {
-        if (ImGui::Button("Duplicate asset", buttonSize)) {
-            addAsset(selectedAsset);
-        }
-
         if (ImGui::Button("Save", buttonSize)) {
-            imageExporter.image_export("myImage", "png", imageEditor);
+            std::string filename = fs::path(selectedAsset).filename().string();
+
+            ofFileDialogResult result = ofSystemSaveDialog(filename, "Save your asset");
+            if (result.bSuccess) {
+                if (onAssetSave) onAssetSave(result.getPath());
+            }
         }
 
         if (ImGui::Button("Delete", buttonSize)) {
@@ -141,7 +142,6 @@ void AssetBrowser::drawControls() {
             selectedAsset.clear();
         }
     }
-
 
     if (ImGui::Button("Load New Asset", buttonSize)) {
         ofFileDialogResult result = ofSystemLoadDialog("Select an asset");
@@ -163,16 +163,6 @@ void AssetBrowser::drawControls() {
     ImGui::Checkbox("Show Full Paths", &showFullPaths);
 
     ImGui::EndChild();
-}
-
-float AssetBrowser::calculateControlsHeight() {
-    ImVec2 framePadding = ImVec2(10, 10);
-    float elementHeight = ImGui::GetFrameHeight() + framePadding.y * 2;
-
-    int elementCount = !selectedAsset.empty() ? 5 : 4;
-    int offset = !selectedAsset.empty() ? 21 : 23;
-
-    return elementCount * elementHeight + offset;
 }
 
 void AssetBrowser::exit() {

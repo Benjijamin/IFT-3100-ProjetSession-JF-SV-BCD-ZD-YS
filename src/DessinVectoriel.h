@@ -27,14 +27,13 @@ public:
     void drawGui() override;
     void exit() override;
 
+    void begin();
+
     void mouseDragged(int x, int y, int button) override;
     void mousePressed(int x, int y, int button) override;
     void mouseReleased(int x, int y, int button) override;
 
-    // Initialisation
-    void begin();
     void undo();
-    void drawWindow();
 
     // Fonctions liées aux dimensions des formes
     ImVec2 rectangleDims(const ImVec2& init, const ImVec2& pos);

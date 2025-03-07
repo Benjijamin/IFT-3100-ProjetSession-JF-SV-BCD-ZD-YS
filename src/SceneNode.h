@@ -23,8 +23,11 @@ public:
 
     std::string getName() const;
     void setName(std::string& newName);
+
     void setPrimitive(PrimitiveType newPrimitiveType);
     bool containsModel() const;
+
+    ofBoxPrimitive getAABB() const;
 
     bool operator==(const SceneNode& other) const;
 

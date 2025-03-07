@@ -22,6 +22,7 @@ void ofApp::setup() {
     assetBrowser.onAssetAddition = std::bind(&ofApp::handleAssetAddition, this);
     assetBrowser.onAssetRemoval = std::bind(&ofApp::handleAssetRemoval, this);
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
+    assetBrowser.onAssetSave = std::bind(&ofApp::handleAssetSave, this, std::placeholders::_1);
 }
 
 void ofApp::update() {
@@ -135,8 +136,6 @@ void ofApp::handleAssetRemoval() {
     currentEditor = nullptr;
 }
 
-
-
 void ofApp::handleAssetSelection() {
     std::string selectedAsset = assetBrowser.getSelectedAssetPath();
 
@@ -153,4 +152,8 @@ void ofApp::handleAssetSelection() {
             currentEditor = &sceneEditor;
         }
     }
+}
+
+void ofApp::handleAssetSave(const std::string& path) {
+    currentEditor->save(path);
 }

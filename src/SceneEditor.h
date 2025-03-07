@@ -24,6 +24,15 @@ public:
     void save(const std::string& path) override;
 
 private:
+    void drawSceneGraph();
+    void drawSceneGraphNode(std::shared_ptr<SceneNode> node);
+    void drawInfo(std::shared_ptr<SceneNode> node);
+    void newObjectMenu(std::shared_ptr<SceneNode> node);
+    void nodeDragDropBehaviour(std::shared_ptr<SceneNode> node);
+
+    void newEmptyObject(const std::string& name, std::shared_ptr<SceneNode> parent);
+    void newPrimitiveObject(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent);
+
     char* sceneName;
     SceneGraph sceneGraph;
     GizmoManager gizmoManager;
@@ -36,12 +45,5 @@ private:
     ofLight light;
     ofMaterial material;
 
-    void drawSceneGraph();
-    void drawSceneGraphNode(std::shared_ptr<SceneNode> node);
-    void drawInfo(std::shared_ptr<SceneNode> node);
-    void newObjectMenu(std::shared_ptr<SceneNode> node);
-    void nodeDragDropBehaviour(std::shared_ptr<SceneNode> node);
-
-    void newEmptyObject(const std::string& name, std::shared_ptr<SceneNode> parent);
-    void newPrimitiveObject(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent);
+    
 };

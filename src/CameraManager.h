@@ -14,6 +14,8 @@ public:
     void addOrbitCamera(const std::string& name, const glm::vec3& position, const glm::vec3& target = glm::vec3(0.0f));
     void addFreeFlightCamera(const std::string& name, const glm::vec3& position);
 
+    void adjustCameraToFitAABB(const ofBoxPrimitive& aabb);
+
     void setSelectedCamera(int index);
     ofCamera* getSelectedCamera();
 

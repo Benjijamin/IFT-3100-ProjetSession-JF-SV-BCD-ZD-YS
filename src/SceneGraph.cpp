@@ -49,6 +49,7 @@ void SceneGraph::addModelNode(const std::string& path, std::shared_ptr<SceneNode
     auto model = std::make_shared<ofxAssimpModelLoader>();
     model->load(path);
     model->setPosition(0, 0, 0);
+    model->setRotation(0, 180, 1, 0, 0);
 
     std::string baseName = std::filesystem::path(path).stem().string();
     std::string uniqueName = generateUniqueName(baseName);

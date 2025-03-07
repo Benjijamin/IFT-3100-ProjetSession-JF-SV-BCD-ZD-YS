@@ -8,11 +8,11 @@ void DessinVectoriel::setup()
     // Taille et espacement des fenêtres
     windowGap = 12.0f;
     windowPos = ImVec2(windowGap / 3, windowGap * 2);
-    windowSize = ImVec2(368.0f, 128.0f);
+    windowSize = ImVec2(400.0f, 175.0f);
 
     // Attributs des outils de dessin
     shapes = {};
-    types = {"Dot", "Line", "Rectangle", "Ellipse", "Triangle", "Dot trail"};
+    types = { "Dot", "Line", "Rectangle", "Ellipse", "Triangle", "Dot trail" };
     typeIndex = 0;
     dotSize = 16;
     zoneColor = ofColor(255.0f);
@@ -26,7 +26,7 @@ void DessinVectoriel::setup()
     circRes = 128;
 
     // Variables d'état
-    active = false;
+    active = false; // Renamed variable
     hovering = false;
 
     // Contrôle de la souris
@@ -38,13 +38,19 @@ void DessinVectoriel::setup()
 
 void DessinVectoriel::draw()
 {
+    if (!active) return;
+
     // Paramètres globaux
     ofSetBackgroundColor(bgColor);
     ofSetCircleResolution(circRes);
 
+    ofPushStyle();
+
     // Tracer toutes les formes stockées en mémoire
-    for (auto it = shapes.begin(); it != shapes.end(); ++it)
-        buildShape(*it, true);
+    for (const auto& shape : shapes)
+    {
+        buildShape(shape, true);
+    }
 
     // Tracer la zone de sélection
     if (mouseHeld && !hovering)
@@ -52,19 +58,67 @@ void DessinVectoriel::draw()
         Shape s = initShape();
         s.strokeColor = zoneColor;
         buildShape(s, false);
-    };
+    }
+
+    ofPopStyle();
 }
 
 void DessinVectoriel::drawGui()
 {
-    if (active) drawWindow();
+    if (!active) return;
+
+    // Drapeaux de la fenêtre
+    ImGuiWindowFlags flags = 0;
+    flags |= ImGuiWindowFlags_NoCollapse;
+    flags |= ImGuiWindowFlags_NoMove;
+    flags |= ImGuiWindowFlags_NoResize;
+    flags |= ImGuiWindowFlags_NoTitleBar;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(12, 12));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 4));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 4));
+
+    // Paramètres de la fenêtre
+    ImGui::SetNextWindowPos(windowPos);
+    ImGui::SetNextWindowSize(windowSize);
+
+    // Initialisation
+    ImGui::Begin("Drawing tools", nullptr, flags);
+
+    // Paramètres des outils de dessin
+    ofxImGui::VectorCombo("Primitive type", &typeIndex, types);
+    ImGui::SliderInt("Dot size", &dotSize, minWidth, maxWidth);
+    ImGui::ColorEdit3("Stroke color", (float*)&strokeColor);
+    ImGui::ColorEdit3("Fill color", (float*)&fillColor);
+    ImGui::ColorEdit3("Background color", (float*)&bgColor);
+
+    // Boutons d'action
+    if (ImGui::Button("Undo")) undo();
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Quit")) exit();
+
+    ImGui::PopStyleVar(3);
+
+    // Fin
+    ImGui::End();
 }
 
 void DessinVectoriel::exit()
 {
-    shapes.clear();
     bgColor = prevBg;
+    ofSetBackgroundColor(bgColor);
+
     active = false;
+    shapes.clear();
+}
+
+void DessinVectoriel::begin()
+{
+    prevBg = ofGetBackgroundColor();
+    active = true;
+    shapes.clear();
 }
 
 void DessinVectoriel::mousePressed(int x, int y, int button)
@@ -78,90 +132,37 @@ void DessinVectoriel::mousePressed(int x, int y, int button)
 void DessinVectoriel::mouseDragged(int x, int y, int button)
 {
     // Restreindre la sélection à la fenêtre
-    mousePos.x = min(max(mouseGap, x), ofGetWidth() - mouseGap);
-    mousePos.y = min(max(mouseGap, y), ofGetHeight() - mouseGap);
+    mousePos.x = std::clamp(x, mouseGap, ofGetWidth() - mouseGap);
+    mousePos.y = std::clamp(y, mouseGap, ofGetHeight() - mouseGap);
 
     // Tracer la courbe si le mode Suite de points est sélectionné
-    if (typeIndex == 5 && !hovering) shapes.push_back(initShape());
+    if (typeIndex == 5 && !hovering)
+    {
+        shapes.push_back(initShape());
+    }
 }
 
 void DessinVectoriel::mouseReleased(int x, int y, int button)
 {
     mouseHeld = false;
-    if (!hovering) shapes.push_back(initShape());
-}
 
-void DessinVectoriel::begin()
-{
-    prevBg = ofGetBackgroundColor();
-    active = true;
+    if (!hovering)
+    {
+        shapes.push_back(initShape());
+    }
 }
 
 void DessinVectoriel::undo()
 {
-    shapes.pop_back();
+    if (shapes.empty()) return;
+
     bool isCurve = true;
     while (isCurve && shapes.size() > 1)
     {
         size_t i = shapes.size() - 1;
-        isCurve = shapes[i].shapeType == 5;
+        isCurve = shapes[i].shapeType == 5; // Dot trail
         shapes.pop_back();
     }
-}
-
-void DessinVectoriel::drawWindow()
-{
-    // Drapeaux de la fenêtre
-    ImGuiWindowFlags flags = 0;
-    flags |= ImGuiWindowFlags_NoCollapse;
-    flags |= ImGuiWindowFlags_NoMove;
-    flags |= ImGuiWindowFlags_NoResize;
-    flags |= ImGuiWindowFlags_NoTitleBar;
-
-    // Paramètres de la fenêtre
-    ImGui::SetNextWindowPos(windowPos);
-    ImGui::SetNextWindowSize(windowSize);
-
-    // Initialisation
-    ImGui::Begin("Drawing tools", &active, flags);
-
-    // Paramètres des outils de dessin
-    ofxImGui::VectorCombo("Primitive type", &typeIndex, types);
-    ImGui::SliderInt("Dot size", &dotSize, minWidth, maxWidth);
-    ImGui::ColorEdit3("Stroke color", (float*) &strokeColor);
-    ImGui::ColorEdit3("Fill color", (float*) &fillColor);
-    ImGui::ColorEdit3("Background color", (float*) &bgColor);
-
-    // Boutons d'action
-    if (ImGui::Button("Undo")) undo();
-    ImGui::SameLine();
-    if (ImGui::Button("Quit")) exit();
-
-    // Fin
-    ImGui::End();
-}
-
-ImVec2 DessinVectoriel::rectangleDims(const ImVec2& init, const ImVec2& pos)
-{
-    return ImVec2(pos.x - init.x, pos.y - init.y);
-}
-
-ImVec2 DessinVectoriel::ellipseDims(const ImVec2& init, const ImVec2& pos)
-{
-    return ImVec2((init.x + pos.x) / 2.0f, (init.y + pos.y) / 2.0f);
-}
-
-ImVec4 DessinVectoriel::triangleDims(const ImVec2& init, const ImVec2& pos)
-{
-    return ImVec4((init.x + pos.x) / 2.0f, pos.y, pos.x, init.y);
-}
-
-bool DessinVectoriel::checkHover() const
-{
-    ImVec2 windowArea = windowPos + windowSize;
-    bool lowerBound = mousePos.x >= windowPos.x && mousePos.y >= windowPos.y;
-    bool upperBound = mousePos.x <= windowArea.x && mousePos.y <= windowArea.y;
-    return lowerBound && upperBound;
 }
 
 Shape DessinVectoriel::initShape() const
@@ -176,6 +177,22 @@ Shape DessinVectoriel::initShape() const
     return s;
 }
 
+void DessinVectoriel::buildShape(const Shape& s, const bool& fill)
+{
+    if (s.shapeType != 1 && fill)
+    {
+        ofFill();
+        ofSetColor(s.fillColor);
+    }
+    else
+    {
+        ofNoFill();
+        ofSetColor(s.strokeColor);
+    }
+
+    drawShape(s);
+}
+
 void DessinVectoriel::drawShape(const Shape& s)
 {
     ImVec2 d1 = rectangleDims(s.initPos, s.currPos);
@@ -184,7 +201,7 @@ void DessinVectoriel::drawShape(const Shape& s)
 
     switch (s.shapeType)
     {
-    case 1: // Ligne
+    case 1: // Line
         ofDrawLine(s.initPos.x, s.initPos.y, s.currPos.x, s.currPos.y);
         break;
     case 2: // Rectangle
@@ -202,21 +219,29 @@ void DessinVectoriel::drawShape(const Shape& s)
     }
 }
 
-void DessinVectoriel::buildShape(const Shape& s, const bool& fill)
+bool DessinVectoriel::checkHover() const
 {
-    // Si la forme possède une surface (pas une ligne ni une zone de 
-    // sélection), remplir cette surface
-    if (s.shapeType != 1 && fill)
-    {
-        ofFill();
-        ofSetColor(s.fillColor);
-        drawShape(s);
-    }
+    ImVec2 windowArea = windowPos + windowSize;
+    bool withinBoundsX = mousePos.x >= windowPos.x && mousePos.x <= windowArea.x;
+    bool withinBoundsY = mousePos.y >= windowPos.y && mousePos.y <= windowArea.y;
+    return withinBoundsX && withinBoundsY;
+}
 
-    // Tracer le contour de la forme
-    ofNoFill();
-    ofSetColor(s.strokeColor);
-    drawShape(s);
+// Helper Functions
+
+ImVec2 DessinVectoriel::rectangleDims(const ImVec2& init, const ImVec2& pos)
+{
+    return ImVec2(pos.x - init.x, pos.y - init.y);
+}
+
+ImVec2 DessinVectoriel::ellipseDims(const ImVec2& init, const ImVec2& pos)
+{
+    return ImVec2((init.x + pos.x) / 2.0f, (init.y + pos.y) / 2.0f);
+}
+
+ImVec4 DessinVectoriel::triangleDims(const ImVec2& init, const ImVec2& pos)
+{
+    return ImVec4((init.x + pos.x) / 2.0f, pos.y, pos.x, init.y);
 }
 
 // Méthodes inutilisées

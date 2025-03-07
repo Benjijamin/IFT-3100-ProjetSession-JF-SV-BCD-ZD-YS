@@ -111,7 +111,6 @@
     <ClCompile Include="src\DynamicCursor.cpp" />
     <ClCompile Include="src\FreeFlightCamera.cpp" />
     <ClCompile Include="src\GizmoManager.cpp" />
-    <ClCompile Include="src\ImageExporter.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MenuBar.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
@@ -156,7 +155,6 @@
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\FreeFlightCamera.h" />
     <ClInclude Include="src\GizmoManager.h" />
-    <ClInclude Include="src\ImageExporter.h" />
     <ClInclude Include="src\MenuBar.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\AssetBrowser.h" />

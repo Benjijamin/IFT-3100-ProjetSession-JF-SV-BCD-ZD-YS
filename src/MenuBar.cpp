@@ -7,12 +7,10 @@ void MenuBar::exit() {}
 
 void MenuBar::drawGui() {
 	if (ImGui::BeginMainMenuBar()) {
-
 		drawFileMenu();
 		drawEditMenu();
 		drawRenderMenu();
 		drawWindowMenu();
-
 		drawHelpMenu();
 
 		ImGui::EndMainMenuBar();
@@ -20,16 +18,11 @@ void MenuBar::drawGui() {
 
 	//drawToolBar();
 
-	dessinVectoriel.drawGui();
 	screenCapture.drawGui();
 }
 
 void MenuBar::drawFileMenu() {
-	if (ImGui::BeginMenu("File")) {
-		drawProjectMenu();
-
-		ImGui::Separator();
-
+    if (ImGui::BeginMenu("File")) {
 		drawDrawingMenu();
 
 		ImGui::Separator();
@@ -49,10 +42,12 @@ void MenuBar::drawFileMenu() {
 void MenuBar::drawProjectMenu() {
 	if (ImGui::BeginMenu("Project")) {
 		if (ImGui::MenuItem("New Project")) {}
+
 		if (ImGui::MenuItem("Open Project")) {
 			ofFileDialogResult result = ofSystemLoadDialog("Choisissez un fichier de projet ...");
 			if (result.bSuccess) { openProject(result.getPath()); }
 		}
+
 		if (ImGui::MenuItem("Save Project")) {
 			ofFileDialogResult result = ofSystemSaveDialog("monProjet.json", "Enregistrer sous ...");
 			if (result.bSuccess) { saveProject((result.getPath())); }
@@ -64,15 +59,16 @@ void MenuBar::drawProjectMenu() {
 
 void MenuBar::drawDrawingMenu() {
 	if (ImGui::BeginMenu("Drawing")) {
-		if (ImGui::MenuItem("New Drawing..")) {
+		if (ImGui::MenuItem("New Drawing")) {
 			if (onNewDrawing) onNewDrawing();
 		}
+
 		if (ImGui::MenuItem("Export Drawing")) {
-			ofFileDialogResult result = ofSystemSaveDialog("monImage.png", "Enregistrer sous ...");
-			if (result.bSuccess) { imageEditor.save(result.getPath()); }
+			
 		}
+
 		if (ImGui::MenuItem("Import Drawing")) {
-			ofFileDialogResult result = ofSystemLoadDialog("Choisissez un fichier image a importer ...");
+			
 		}
 
 		ImGui::EndMenu();

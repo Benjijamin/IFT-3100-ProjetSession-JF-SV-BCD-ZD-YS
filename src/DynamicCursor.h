@@ -10,7 +10,11 @@ public:
         HAND,       // Curseur en forme de main
         CROSSHAIR,  // Curseur en forme de croix
         RESIZE,     // Curseur de redimensionnement
-        WAIT        // Curseur d'attente
+        FRONT,      // Curseur touche w
+        LEFT,       // Curseur touche a
+        RIGHT,      // Curseur touche d
+        BACK,       // Curseur touche s
+        SCROLL      // Curseur de scroll (zoom)
     };
 
     void setup();

@@ -46,8 +46,16 @@ HCURSOR DynamicCursor::getSystemCursor(CursorType type) {
         return LoadCursor(NULL, IDC_CROSS);
     case RESIZE:
         return LoadCursor(NULL, IDC_SIZEALL);
-    case WAIT:
-        return LoadCursor(NULL, IDC_WAIT);
+    case FRONT:
+        return LoadCursor(NULL, MAKEINTRESOURCE(32655));
+    case LEFT:
+        return LoadCursor(NULL, MAKEINTRESOURCE(32657));
+    case RIGHT:
+        return LoadCursor(NULL, MAKEINTRESOURCE(32658));
+    case BACK:
+        return LoadCursor(NULL, MAKEINTRESOURCE(32656));
+    case SCROLL:
+        return LoadCursor(NULL, IDC_SIZENS);
     default:
         return LoadCursor(NULL, IDC_ARROW);
     }

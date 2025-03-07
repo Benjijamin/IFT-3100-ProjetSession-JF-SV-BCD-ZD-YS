@@ -58,11 +58,26 @@ void ofApp::exit() {
 }
 
 void ofApp::keyPressed(int key) {
+    if (key == 'w' || key == 'W') {
+        dynamicCursor.setCursorType(DynamicCursor::FRONT);
+    }
 
+    if (key == 'a' || key == 'A') {
+        dynamicCursor.setCursorType(DynamicCursor::LEFT);
+    }
+
+    if (key == 'd' || key == 'd') {
+        dynamicCursor.setCursorType(DynamicCursor::RIGHT);
+    }
+
+    if (key == 's' || key == 's') {
+        dynamicCursor.setCursorType(DynamicCursor::BACK);
+    }
 }
 
 void ofApp::keyReleased(int key) {
-
+dynamicCursor.resetCursor();
+    
 }
 
 void ofApp::mouseMoved(int x, int y) {
@@ -83,6 +98,7 @@ void ofApp::mousePressed(int x, int y, int button) {
     if (currentEditor) {
         currentEditor->mousePressed(x, y, button);
     }
+    dynamicCursor.setCursorType(DynamicCursor::CROSSHAIR);
 }
 
 void ofApp::mouseReleased(int x, int y, int button) {
@@ -96,6 +112,7 @@ void ofApp::mouseScrolled(int x, int y, float scrollX, float scrollY) {
     if (currentEditor) {
         currentEditor->mouseScrolled(x, y, scrollX, scrollY);
     }
+    dynamicCursor.setCursorType(DynamicCursor::SCROLL);
 }
 
 void ofApp::mouseEntered(int x, int y) {

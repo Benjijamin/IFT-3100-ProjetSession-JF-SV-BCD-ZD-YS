@@ -42,7 +42,10 @@ private:
 
     ofShader shader;
     void applyTint(int x, int y);
+    void bakeTint();
+    ofImage* originalImage = nullptr;
 
     enum class Tool { PanZoom, CopyRegion, PasteRegion, Brush, Tint };
     Tool currentTool;
+
 };

@@ -48,22 +48,38 @@ void ImageEditor::drawGui() {
     ImVec2 buttonSize = ImVec2(-1, 40);
 
     if (ImGui::Button("Pan/Zoom", buttonSize)) {
+        if (currentTool == Tool::Tint) {
+            bakeTint();
+        }
         currentTool = Tool::PanZoom;
+
     }
 
     if (ImGui::Button("Copy Region", buttonSize)) {
+        if (currentTool == Tool::Tint) {
+            bakeTint();
+        }
         currentTool = Tool::CopyRegion;
     }
 
     if (ImGui::Button("Paste Region", buttonSize)) {
+        if (currentTool == Tool::Tint) {
+            bakeTint();
+        }
         currentTool = Tool::PasteRegion;
     }
 
     if (ImGui::Button("Brush", buttonSize)) {
+        if (currentTool == Tool::Tint) {
+            bakeTint();
+        }
         currentTool = Tool::Brush;
     }
 
     if (currentTool == Tool::Brush) {
+        if (currentTool == Tool::Tint) {
+            bakeTint();
+        }
         ImGui::SliderInt("Brush Size", &drawRadius, 1, 50);
     }
 
@@ -172,9 +188,17 @@ void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
     }
 
     currentImage->update();
+    originalImage = new ofImage();
+    *originalImage = *currentImage;
+
 }
 
 void ImageEditor::applyTint(int x, int y) {
+    if (originalImage) {
+        *currentImage = *originalImage;
+        currentImage->update();
+    }
+
     ofVec2f panOffset = viewer.getPanOffset();
     ofVec2f imageDimensions = ofVec2f(currentImage->getWidth(), currentImage->getHeight()) * viewer.getZoomFactor();
 
@@ -186,6 +210,36 @@ void ImageEditor::applyTint(int x, int y) {
 
     currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
     shader.end();
+}
+
+void ImageEditor::bakeTint() {
+    if (!isImageAllocated()) return;
+
+    if (!originalImage) {
+        originalImage = new ofImage();
+        *originalImage = *currentImage;
+    }
+
+    ofFbo fbo;
+    fbo.allocate(currentImage->getWidth(), currentImage->getHeight());
+    fbo.begin();
+    ofClear(0, 0, 0, 0);
+
+    shader.begin();
+    shader.setUniformTexture("image", currentImage->getTexture(), 1);
+
+    ofColor tintColor = colorPicker.getColor();
+    shader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
+
+    currentImage->draw(0, 0);
+    shader.end();
+
+    fbo.end();
+
+    ofPixels pixels;
+    fbo.readToPixels(pixels);
+    currentImage->setFromPixels(pixels);
+    currentImage->update();
 }
 
 void ImageEditor::copyRegion(int startX, int startY, int endX, int endY) {
@@ -224,6 +278,10 @@ void ImageEditor::pasteRegion(int x, int y) {
         }
     }
     currentImage->update();
+    originalImage = new ofImage();
+    *originalImage = *currentImage;
+
+
 }
 
 void ImageEditor::drawCopyRegion() {

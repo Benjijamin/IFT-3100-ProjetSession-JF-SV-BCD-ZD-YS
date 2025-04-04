@@ -151,6 +151,15 @@ void SceneEditor::drawInfo(std::shared_ptr<SceneNode> node) {
         gizmoManager.setSelectedNode(node);
     }
 
+    if (ImGui::Button("Set texture"))
+    {
+        ofFileDialogResult result = ofSystemLoadDialog("Select a texture");
+        if (result.bSuccess) 
+        {
+            node->setTexture(result.getPath());
+        }
+    }
+
     ImGui::End();
 }
 

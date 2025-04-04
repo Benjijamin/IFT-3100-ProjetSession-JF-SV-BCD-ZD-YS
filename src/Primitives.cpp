@@ -4,29 +4,68 @@ std::shared_ptr<ofMesh> Primitives::getCubePrimitive(float size)
 {
 	std::vector<glm::vec3> verts =
 	{
-		{ -size, -size, -size },
-		{  size, -size, -size },
-		{  size,  size, -size },
-		{ -size,  size, -size },
-		{ -size, -size,  size },
-		{  size, -size,  size },
-		{  size,  size,  size },
-		{ -size,  size,  size }
+		//back
+		{  size,  size, -size }, //rtb
+		{ -size,  size, -size }, //ltb
+		{  size, -size, -size }, //rbb
+		{ -size, -size, -size }, //lbb
+
+		//left
+		{ -size,  size, -size }, //ltb
+		{ -size,  size,  size }, //ltf
+		{ -size, -size, -size }, //lbb
+		{ -size, -size,  size }, //lbf
+
+		//front
+		{ -size,  size,  size }, //ltf
+		{  size,  size,  size }, //rtf
+		{ -size, -size,  size }, //lbf
+		{  size, -size,  size }, //rbf
+
+		//right
+		{  size,  size,  size }, //rtf
+		{  size,  size, -size }, //rtb
+		{  size, -size,  size }, //rbf
+		{  size, -size, -size }, //rbb
+
+		//top
+		{ -size,  size, -size }, //ltb
+		{  size,  size, -size }, //rtb
+		{ -size,  size,  size }, //ltf
+		{  size,  size,  size }, //rtf
+
+		//bottom
+		{ -size, -size,  size }, //lbf
+		{  size, -size,  size }, //rbf
+		{ -size, -size, -size }, //lbb
+		{  size, -size, -size }, //rbb
 	};
 
 	std::vector<unsigned int> indices =
 	{
-		1, 2, 0, 2, 3, 0, 
-		6, 5, 4, 7, 6, 4, 
-		5, 1, 0, 4, 5, 0, 
-		7, 3, 2, 6, 7, 2, 
-		7, 4, 0, 3, 7, 0, 
-		6, 2, 1, 5, 6, 1  
+		0, 1, 3, 3, 2, 0, //back
+		4, 5, 7, 7, 6, 4, //left
+		8, 9, 11, 11, 10, 8, //front
+		12, 13, 15, 15, 14, 12, //right
+		16, 17, 19, 19, 18, 16, //top
+		20, 21, 23, 23, 22, 20 //bottom
+	};
+
+	//cubemap ex:de6.jpg
+	std::vector<glm::vec2> texCoords =
+	{
+		glm::vec2(0, 0.333), glm::vec2(0.25, 0.333), glm::vec2(0, 0.666), glm::vec2(0.25, 0.666), //back
+		glm::vec2(0.25, 0.333), glm::vec2(0.5, 0.333), glm::vec2(0.25, 0.666), glm::vec2(0.5, 0.666), //left
+		glm::vec2(0.5, 0.333), glm::vec2(0.75, 0.333), glm::vec2(0.5, 0.666), glm::vec2(0.75, 0.666), //front
+		glm::vec2(0.75, 0.333), glm::vec2(1, 0.333), glm::vec2(0.75, 0.666), glm::vec2(1, 0.666), //right
+		glm::vec2(0.5, 0), glm::vec2(0.75, 0), glm::vec2(0.5, 0.333), glm::vec2(0.75, 0.333), //top
+		glm::vec2(0.5, 0.666), glm::vec2(0.75, 0.666), glm::vec2(0.5, 1), glm::vec2(0.75, 1) //bottom
 	};
 
 	auto primitive = make_shared<ofMesh>();
 	primitive->addVertices(verts);
 	primitive->addIndices(indices);
+	primitive->addTexCoords(texCoords);
 	primitive->addNormals(calculateNormals(primitive));
 	primitive->flatNormals();
 

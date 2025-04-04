@@ -14,6 +14,8 @@ public:
     SceneNode(const std::string& name);
 
     void setModel(std::shared_ptr<ofxAssimpModelLoader> model);
+    void setTexture(const std::string& path);
+
     void draw();
     void drawVisibleNodes(const ofCamera& camera);
 
@@ -49,6 +51,9 @@ private:
 
     PrimitiveType primitiveType;
     std::shared_ptr<ofMesh> primitiveModel;
+
+    ofImage textureImage;
+    ofTexture texture;
 
     ofBoxPrimitive aabb;
 };

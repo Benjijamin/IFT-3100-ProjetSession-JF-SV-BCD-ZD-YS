@@ -11,6 +11,12 @@ void SceneNode::setModel(std::shared_ptr<ofxAssimpModelLoader> model) {
     computeAABB(model);
 }
 
+void SceneNode::setTexture(const std::string& path) 
+{
+    textureImage.load(path);
+    texture = textureImage.getTextureReference();
+}
+
 void SceneNode::addChild(std::shared_ptr<SceneNode> child) {
     children.push_back(child);
     child->setParent(*this);
@@ -59,6 +65,11 @@ bool SceneNode::containsModel() const {
 }
 
 void SceneNode::customDraw() {
+    if (texture.isAllocated()) 
+    {
+        texture.bind();
+    }
+
     if (model) {
         model->drawFaces();
     }
@@ -83,6 +94,8 @@ void SceneNode::customDraw() {
             break;
         }
     }
+
+    texture.unbind();
 }
 
 void SceneNode::draw() {

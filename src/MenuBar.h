@@ -1,7 +1,6 @@
 #pragma once
-
-#include "ofxImGui.h"
 #include "ofMain.h"
+#include "ofxImGui.h"
 
 #include "imageEditor.h"
 #include "ScreenCapture.h"

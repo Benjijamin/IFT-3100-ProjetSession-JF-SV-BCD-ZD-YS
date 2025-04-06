@@ -130,6 +130,15 @@
     <ClCompile Include="src\DynamicCursor.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
+    <ClCompile Include="src\renderer.cpp">
+      <Filter>src\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirLight.cpp">
+      <Filter>src\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shaders.cpp">
+      <Filter>src\rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -200,6 +209,15 @@
     </Filter>
     <Filter Include="src\camera">
       <UniqueIdentifier>{a2ded317-f4b7-446d-8787-374079313d3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{4a431895-0f35-45ff-b659-f0fff09cd72d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="materials">
+      <UniqueIdentifier>{92e1f3f6-2181-45c1-99d0-68a468ee35b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\rendering">
+      <UniqueIdentifier>{c71471d9-23ed-4e3c-bf9d-835911c6f34f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -605,5 +623,52 @@
     <ClInclude Include="src\DynamicCursor.h">
       <Filter>src\components</Filter>
     </ClInclude>
+    <ClInclude Include="src\renderer.h">
+      <Filter>src\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DirLight.h">
+      <Filter>src\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shaders.h">
+      <Filter>src\rendering</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\data\shaders\blinn_phong.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\blinn_phong.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\colorFill.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\colorFill.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\gouraud.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\gouraud.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\lambert.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\lambert.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\phong.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\phong.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\toon.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\shaders\toon.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

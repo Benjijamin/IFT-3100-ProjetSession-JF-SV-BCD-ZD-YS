@@ -1,17 +1,18 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxImGui.h"
-#include "Editor.h"
-#include "ImageEditor.h"
-#include "SceneEditor.h"
-#include "DessinVectoriel.h"
-#include "AssetBrowser.h"
-#include "MenuBar.h"
-#include "DynamicCursor.h"
+//#include "ofxImGui.h"
+//#include "Editor.h"
+//#include "ImageEditor.h"
+//#include "SceneEditor.h"
+//#include "DessinVectoriel.h"
+//#include "AssetBrowser.h"
+//#include "MenuBar.h"
+//#include "DynamicCursor.h"
+#include "renderer.h"
 
-
-
+// code original, a remettre en place avant merge
+/*
 class ofApp : public ofBaseApp {
 public:
     void setup();
@@ -49,4 +50,46 @@ private:
     DynamicCursor dynamicCursor;
 
     Editor* currentEditor;
+};
+*/
+
+class ofApp : public ofBaseApp {
+public:
+
+    Renderer renderer;
+
+    float time_current;
+    float time_last;
+    float time_elapsed;
+
+    bool is_key_press_up;
+    bool is_key_press_down;
+    bool is_key_press_left;
+    bool is_key_press_right;
+
+    void setup();
+    void update();
+    void draw();
+    void exit();
+
+    void keyPressed(int key);
+    void keyReleased(int key);
+    void mouseReleased(int x, int y, int button);
+    void windowResized(int w, int h);
+
+    /*
+    ofLight dirLight;           // Lumière directionnelle
+
+    // Shaders
+    ofShader lambertShader;
+    ofShader phongShader;
+
+    ofSpherePrimitive sphere;   // Objet à illuminer
+
+    // Material
+    ofMaterial material;        // Matériau appliqué
+
+    // Direction lumiere
+    ofVec3f lightDirection;     // Direction de la lumière
+    */
 };

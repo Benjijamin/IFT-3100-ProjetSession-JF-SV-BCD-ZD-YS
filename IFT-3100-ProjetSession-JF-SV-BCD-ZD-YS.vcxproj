@@ -104,6 +104,9 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\renderer.cpp" />
+    <ClCompile Include="src\DirLight.cpp" />
+    <ClCompile Include="src\Shaders.cpp" />
     <ClCompile Include="src\CameraManager.cpp" />
     <ClCompile Include="src\ColorPicker.cpp" />
     <ClCompile Include="src\CustomSlider.cpp" />
@@ -147,6 +150,9 @@
     <ClCompile Include="src\Viewer2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\renderer.h" />
+    <ClInclude Include="src\DirLight.h" />
+    <ClInclude Include="src\Shaders.h" />
     <ClInclude Include="src\CameraManager.h" />
     <ClInclude Include="src\ColorPicker.h" />
     <ClInclude Include="src\CustomSlider.h" />
@@ -285,6 +291,20 @@
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
       <Project>{5837595d-aca9-485c-8e76-729040ce4b0b}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\data\shaders\blinn_phong.frag" />
+    <None Include="bin\data\shaders\blinn_phong.vert" />
+    <None Include="bin\data\shaders\colorFill.frag" />
+    <None Include="bin\data\shaders\colorFill.vert" />
+    <None Include="bin\data\shaders\gouraud.frag" />
+    <None Include="bin\data\shaders\gouraud.vert" />
+    <None Include="bin\data\shaders\lambert.frag" />
+    <None Include="bin\data\shaders\lambert.vert" />
+    <None Include="bin\data\shaders\phong.frag" />
+    <None Include="bin\data\shaders\phong.vert" />
+    <None Include="bin\data\shaders\toon.frag" />
+    <None Include="bin\data\shaders\toon.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

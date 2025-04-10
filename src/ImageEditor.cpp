@@ -8,7 +8,13 @@ void ImageEditor::setup() {
     colorPicker.setup();
     drawColor = colorPicker.getColor();
 
-    shader.load("image_tint_330_vs.glsl", "image_tint_330_fs.glsl");
+    tintShader.load("image_tint_330_vs.glsl", "image_tint_330_fs.glsl");
+    vibranceShader.load("image_vibrance_330_vs.glsl", "image_vibrance_330_fs.glsl");
+
+    saturationValue = 1.0f;
+    brightnessValue = 0.0f;
+    contrastValue = 1.0f;
+
     ofDisableArbTex();
 }
 
@@ -21,11 +27,17 @@ void ImageEditor::draw() {
         ofVec2f panOffset = viewer.getPanOffset();
         ofVec2f imageDimensions = ofVec2f(currentImage->getWidth(), currentImage->getHeight()) * viewer.getZoomFactor();
 
-        if (currentTool == Tool::Tint) {
-            applyTint(imageDimensions.x, imageDimensions.y);
-        }
-        else {
+        switch (currentTool)
+        {
+        case ImageEditor::Tool::Tint:
+            applyTint(panOffset, imageDimensions);
+            break;
+        case ImageEditor::Tool::Vibrance:
+            applyVibrance(panOffset, imageDimensions);
+            break;
+        default:
             currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
+            break;
         }
     }
 
@@ -35,56 +47,67 @@ void ImageEditor::draw() {
     else if (currentTool == Tool::PasteRegion && copiedRegion.isAllocated() && !isGuiHovered()) {
         drawPasteRegion();
     }
+
 }
 
 void ImageEditor::drawGui() {
     ImVec2 windowSize = ImGui::GetIO().DisplaySize;
-    float toolbarHeight = windowSize.y * 0.25f;
+    float toolbarWidth = 150.0f;
+    float padding = 15.0f;
 
-    ImGui::SetNextWindowSize(ImVec2(150, toolbarHeight));
-    ImGui::SetNextWindowPos(ImVec2(0, (windowSize.y - toolbarHeight) / 2), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Toolbar", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(toolbarWidth, 0), ImVec2(toolbarWidth, windowSize.y));
+    ImGui::Begin("Toolbar", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
     ImVec2 buttonSize = ImVec2(-1, 40);
 
-    if (ImGui::Button("Pan/Zoom", buttonSize)) {
-        if (currentTool == Tool::Tint) {
-            bakeTint();
-        }
-        currentTool = Tool::PanZoom;
-
+    if (ImGui::Button("Pan/Zoom", buttonSize))
+    {
+        switchTool(Tool::PanZoom);
     }
 
-    if (ImGui::Button("Copy Region", buttonSize)) {
-        if (currentTool == Tool::Tint) {
-            bakeTint();
-        }
-        currentTool = Tool::CopyRegion;
+    if (ImGui::Button("Copy Region", buttonSize))
+    {
+        switchTool(Tool::CopyRegion);
     }
 
-    if (ImGui::Button("Paste Region", buttonSize)) {
-        if (currentTool == Tool::Tint) {
-            bakeTint();
-        }
-        currentTool = Tool::PasteRegion;
+    if (ImGui::Button("Paste Region", buttonSize))
+    {
+        switchTool(Tool::PasteRegion);
     }
 
-    if (ImGui::Button("Brush", buttonSize)) {
-        if (currentTool == Tool::Tint) {
-            bakeTint();
-        }
-        currentTool = Tool::Brush;
+    if (ImGui::Button("Brush", buttonSize)) 
+    {
+        switchTool(Tool::Brush);
     }
 
-    if (currentTool == Tool::Brush) {
-        if (currentTool == Tool::Tint) {
-            bakeTint();
-        }
-        ImGui::SliderInt("Brush Size", &drawRadius, 1, 50);
+    if (currentTool == Tool::Brush) 
+    {
+        ImGui::Text("Brush Size");
+        ImGui::SetNextItemWidth(toolbarWidth - padding);
+        ImGui::SliderInt("##Brush Size", &drawRadius, 1, 50);
     }
 
-    if (ImGui::Button("Tint", buttonSize)) {
-        currentTool = Tool::Tint;
+    if (ImGui::Button("Tint", buttonSize)) 
+    {
+        switchTool(Tool::Tint);
+    }
+
+    if (ImGui::Button("Vibrance", buttonSize)) 
+    {
+        switchTool(Tool::Vibrance);
+    }
+
+    if (currentTool == Tool::Vibrance) 
+    {
+        ImGui::Text("Saturation Value");
+        ImGui::SetNextItemWidth(toolbarWidth - padding);
+        ImGui::SliderFloat("##Saturation Value", &saturationValue, 0.0f, 2.0f);
+        ImGui::Text("Brightness Value");
+        ImGui::SetNextItemWidth(toolbarWidth - padding);
+        ImGui::SliderFloat("##Brightness Value", &brightnessValue, -1.0f, 1.0f);
+        ImGui::Text("Contrast Value");
+        ImGui::SetNextItemWidth(toolbarWidth - padding);
+        ImGui::SliderFloat("##Contrast Value", &contrastValue, 0.0f, 2.0f);
     }
 
     ImGui::End();
@@ -112,7 +135,6 @@ void ImageEditor::mouseDragged(int x, int y, int button) {
             break;
         }
     }
-    
 }
 
 void ImageEditor::mousePressed(int x, int y, int button) {
@@ -124,7 +146,6 @@ void ImageEditor::mousePressed(int x, int y, int button) {
         ofVec2f p = viewer.screenToPixelCoords(ofVec2f(x, y));
         pasteRegion(p.x, p.y);
     }
-
 }
 
 void ImageEditor::mouseReleased(int x, int y, int button) {
@@ -135,7 +156,6 @@ void ImageEditor::mouseReleased(int x, int y, int button) {
         ofVec2f end = viewer.screenToPixelCoords(viewer.getDragEndPos());
         copyRegion(start.x, start.y, end.x, end.y);
     }
-
 }
 
 void ImageEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
@@ -160,6 +180,16 @@ void ImageEditor::save(const std::string& path) {
     if (isImageAllocated()) {
         currentImage->save(path);
     }
+}
+
+void ImageEditor::switchTool(Tool tool) 
+{
+    if (currentTool == Tool::Tint) 
+    {
+        bakeTint();
+    }
+
+    currentTool = tool;
 }
 
 void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
@@ -190,26 +220,45 @@ void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
     currentImage->update();
     originalImage = new ofImage();
     *originalImage = *currentImage;
-
 }
 
-void ImageEditor::applyTint(int x, int y) {
+void ImageEditor::applyTint(ofVec2f panOffset, ofVec2f imageDimensions) 
+{
     if (originalImage) {
         *currentImage = *originalImage;
         currentImage->update();
     }
 
-    ofVec2f panOffset = viewer.getPanOffset();
-    ofVec2f imageDimensions = ofVec2f(currentImage->getWidth(), currentImage->getHeight()) * viewer.getZoomFactor();
+    tintShader.begin();
 
-    shader.begin();
-    shader.setUniformTexture("image", currentImage->getTexture(), 1);
+    tintShader.setUniformTexture("image", currentImage->getTexture(), 1);
 
     ofColor tintColor = colorPicker.getColor();
-    shader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
+    tintShader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
 
     currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
-    shader.end();
+
+    tintShader.end();
+}
+
+void ImageEditor::applyVibrance(ofVec2f panOffset, ofVec2f imageDimensions) 
+{
+    if (originalImage) {
+        *currentImage = *originalImage;
+        currentImage->update();
+    }
+
+    vibranceShader.begin();
+
+    vibranceShader.setUniformTexture("image", currentImage->getTexture(), 1);
+
+    vibranceShader.setUniform1f("saturationValue", saturationValue);
+    vibranceShader.setUniform1f("brightnessValue", brightnessValue);
+    vibranceShader.setUniform1f("contrastValue", contrastValue);
+
+    currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
+
+    vibranceShader.end();
 }
 
 void ImageEditor::bakeTint() {
@@ -225,14 +274,14 @@ void ImageEditor::bakeTint() {
     fbo.begin();
     ofClear(0, 0, 0, 0);
 
-    shader.begin();
-    shader.setUniformTexture("image", currentImage->getTexture(), 1);
+    tintShader.begin();
+    tintShader.setUniformTexture("image", currentImage->getTexture(), 1);
 
     ofColor tintColor = colorPicker.getColor();
-    shader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
+    tintShader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
 
     currentImage->draw(0, 0);
-    shader.end();
+    tintShader.end();
 
     fbo.end();
 

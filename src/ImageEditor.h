@@ -23,6 +23,8 @@ public:
     void save(const std::string& path) override;
 
 private:
+    enum class Tool { PanZoom, CopyRegion, PasteRegion, Brush, Tint, Vibrance};
+
     void drawBrush(int startX, int startY, int endX, int endY);
     void copyRegion(int startX, int startY, int endX, int endY);
     void pasteRegion(int x, int y);
@@ -40,12 +42,18 @@ private:
     ofVec2f previousMousePos;
     int drawRadius;
 
-    ofShader shader;
-    void applyTint(int x, int y);
+    ofShader tintShader;
+    ofShader vibranceShader;
+
+    float saturationValue;
+    float brightnessValue;
+    float contrastValue;
+
+    void applyTint(ofVec2f panOffset, ofVec2f imageDimensions);
+    void applyVibrance(ofVec2f panOffset, ofVec2f imageDimensions);
     void bakeTint();
     ofImage* originalImage = nullptr;
 
-    enum class Tool { PanZoom, CopyRegion, PasteRegion, Brush, Tint };
+    void switchTool(Tool tool);
     Tool currentTool;
-
 };

@@ -188,6 +188,10 @@ void ImageEditor::switchTool(Tool tool)
     {
         bakeTint();
     }
+    else if (currentTool == Tool::Vibrance) 
+    {
+        bakeVibrance();
+    }
 
     currentTool = tool;
 }
@@ -280,6 +284,37 @@ void ImageEditor::bakeTint() {
     ofColor tintColor = colorPicker.getColor();
     tintShader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
 
+    currentImage->draw(0, 0);
+    tintShader.end();
+
+    fbo.end();
+
+    ofPixels pixels;
+    fbo.readToPixels(pixels);
+    currentImage->setFromPixels(pixels);
+    currentImage->update();
+}
+
+void ImageEditor::bakeVibrance() {
+    if (!isImageAllocated()) return;
+
+    if (!originalImage) {
+        originalImage = new ofImage();
+        *originalImage = *currentImage;
+    }
+
+    ofFbo fbo;
+    fbo.allocate(currentImage->getWidth(), currentImage->getHeight());
+    fbo.begin();
+    ofClear(0, 0, 0, 0);
+
+    vibranceShader.begin();
+    vibranceShader.setUniformTexture("image", currentImage->getTexture(), 1);
+
+    vibranceShader.setUniform1f("saturationValue", saturationValue);
+    vibranceShader.setUniform1f("brightnessValue", brightnessValue);
+    vibranceShader.setUniform1f("contrastValue", contrastValue);
+        
     currentImage->draw(0, 0);
     tintShader.end();
 

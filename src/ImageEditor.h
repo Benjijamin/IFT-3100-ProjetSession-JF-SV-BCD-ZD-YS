@@ -52,6 +52,7 @@ private:
     void applyTint(ofVec2f panOffset, ofVec2f imageDimensions);
     void applyVibrance(ofVec2f panOffset, ofVec2f imageDimensions);
     void bakeTint();
+    void bakeVibrance();
     ofImage* originalImage = nullptr;
 
     void switchTool(Tool tool);

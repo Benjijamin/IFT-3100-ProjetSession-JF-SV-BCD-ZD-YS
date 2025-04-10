@@ -6,7 +6,6 @@ uniform float saturationValue;
 uniform float brightnessValue;
 uniform float contrastValue;
 
-
 // attribut en entrée
 in vec2 surface_texcoord;
 
@@ -20,7 +19,6 @@ mat4 saturationMat()
 
   float sat = 1.0 - saturationValue;
 
-  //???
   vec3 red = vec3(lum.x * sat);
   red += vec3(saturationValue, 0, 0);
   vec3 green = vec3(lum.y * sat);

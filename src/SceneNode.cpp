@@ -118,7 +118,8 @@ void SceneNode::setTexture(const std::string& path)
 }
 
 void SceneNode::customDraw() {
-    if (texture.isAllocated()) {
+    if (texture.isAllocated())
+    {
         texture.bind();
     }
 
@@ -130,57 +131,6 @@ void SceneNode::customDraw() {
     }
     else {
         drawPrimitive();
-    }
-}
-
-void SceneNode::drawLight() {
-    ofPushMatrix();
-
-    if (light->getIsPointLight()) {
-        ofDrawSphere(glm::vec3(0, 0, 0), 10.0f);
-        ofDrawAxis(20);
-    }
-    else if (light->getIsSpotlight()) {
-        float coneHeight = (sin(ofDegToRad(light->getSpotlightCutOff())) * 30.0f) + 1.0f;
-        float coneRadius = (cos(ofDegToRad(light->getSpotlightCutOff())) * 30.0f) + 8.0f;
-        ofRotateDeg(270, 1, 0, 0);
-        ofDrawCone(0, -(coneHeight * 0.5f), 0, coneRadius, coneHeight);
-    }
-    else if (light->getIsDirectional()) {
-        ofDrawBox(glm::vec3(0, 0, 0), 10.0f);
-        ofDrawArrow(glm::vec3(0, 0, 0), glm::vec3(0, 0, -40), 10.0f);
-    }
-    else if (light->getIsAreaLight()) {
-        ofDrawPlane(glm::vec3(0, 0, 0), 30.0f, 30.0f);
-        ofDrawArrow(glm::vec3(0, 0, 0), glm::vec3(0, 0, -30), 10.0f);
-    }
-    else {
-        ofDrawBox(glm::vec3(0, 0, 0), 10.0f);
-        ofDrawAxis(20);
-    }
-
-    ofPopMatrix();
-}
-
-void SceneNode::drawPrimitive() {
-    switch (primitiveType) {
-    case PrimitiveType::Sphere:
-        ofDrawSphere(glm::vec3(0.0f), 100.0f);
-        break;
-    case PrimitiveType::Tetrahedron:
-    case PrimitiveType::Cube:
-        if (primitiveModel) {
-            primitiveModel->drawFaces();
-        }
-        break;
-    case PrimitiveType::Cylinder:
-        ofDrawCylinder(glm::vec3(0.0f), 100.0f, 200.0f);
-        break;
-    case PrimitiveType::Cone:
-        ofDrawCone(glm::vec3(0.0f), 100.0f, 200.0f);
-        break;
-    default:
-        break;
     }
 }
 

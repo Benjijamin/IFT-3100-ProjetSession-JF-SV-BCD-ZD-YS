@@ -12,9 +12,7 @@ void ImageEditor::setup() {
     ofDisableArbTex();
 }
 
-void ImageEditor::update() {
-
-}
+void ImageEditor::update() {}
 
 void ImageEditor::draw() {
     if (isImageAllocated()) {
@@ -124,7 +122,6 @@ void ImageEditor::mousePressed(int x, int y, int button) {
         ofVec2f p = viewer.screenToPixelCoords(ofVec2f(x, y));
         pasteRegion(p.x, p.y);
     }
-
 }
 
 void ImageEditor::mouseReleased(int x, int y, int button) {
@@ -135,7 +132,6 @@ void ImageEditor::mouseReleased(int x, int y, int button) {
         ofVec2f end = viewer.screenToPixelCoords(viewer.getDragEndPos());
         copyRegion(start.x, start.y, end.x, end.y);
     }
-
 }
 
 void ImageEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
@@ -190,7 +186,6 @@ void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
     currentImage->update();
     originalImage = new ofImage();
     *originalImage = *currentImage;
-
 }
 
 void ImageEditor::applyTint(int x, int y) {
@@ -280,8 +275,6 @@ void ImageEditor::pasteRegion(int x, int y) {
     currentImage->update();
     originalImage = new ofImage();
     *originalImage = *currentImage;
-
-
 }
 
 void ImageEditor::drawCopyRegion() {

@@ -24,9 +24,8 @@ public:
     std::function<void(const std::string&)> onAssetSave;
 
 private:
-    void drawSearchBar();
+    void drawNavigationBar();
     void drawAssetList();
-    void drawControls();
 
     void addAsset(const std::string& assetPath);
     void removeAsset(const std::string& asset);

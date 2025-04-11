@@ -72,9 +72,9 @@ std::shared_ptr<ofMesh> Primitives::getCubePrimitive(float size)
 	return primitive;
 }
 
-std::shared_ptr<ofMesh> Primitives::getTetrahedronPrimitive(float size) 
+std::shared_ptr<ofMesh> Primitives::getTetrahedronPrimitive(float size)
 {
-	std::vector<glm::vec3> verts =
+	std::vector<glm::vec3> verts = 
 	{
 		{  size,  size,  size },
 		{  size, -size, -size },
@@ -82,7 +82,7 @@ std::shared_ptr<ofMesh> Primitives::getTetrahedronPrimitive(float size)
 		{ -size, -size,  size }
 	};
 
-	std::vector<unsigned int> indices =
+	std::vector<unsigned int> indices = 
 	{
 		2, 1, 0,
 		3, 2, 0,
@@ -105,7 +105,8 @@ std::vector<glm::vec3> Primitives::calculateNormals(std::shared_ptr<ofMesh> mesh
 
 	normals.resize(mesh->getVertices().size(), glm::vec3(0));
 
-	for (int i = 0; i < mesh->getIndices().size(); i += 3) {
+	for (int i = 0; i < mesh->getIndices().size(); i += 3)
+	{
 		unsigned int index1 = mesh->getIndices()[i];
 		unsigned int index2 = mesh->getIndices()[i + 1];
 		unsigned int index3 = mesh->getIndices()[i + 2];
@@ -122,7 +123,8 @@ std::vector<glm::vec3> Primitives::calculateNormals(std::shared_ptr<ofMesh> mesh
 		normals[index3] += normal;
 	}
 
-	for (size_t i = 0; i < normals.size(); ++i) {
+	for (size_t i = 0; i < normals.size(); ++i)
+	{
 		glm::normalize(normals[i]);
 	}
 

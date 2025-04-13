@@ -1,221 +1,264 @@
-﻿#include "Shaders.h"
+﻿/**
+ * \file shaders.cpp
+ * \brief Implémentation des cinq types de shaders
+ * \author Yohan
+ * \version 0.1
+ * \date Avril 2025
+ *
+ *  IFT-3100 Equipe 2 TP2
+ *
+ */
+
+#include "shaders.h"
+
+ofMaterial& Shaders::getActiveMaterial() {
+    // Pour l'instant, toujours utiliser la sphère
+    return light->getSphereMaterial();
+}
+
+// Méthode qui applique tous les attributs sur un shader
+void Shaders::sendMaterialUniforms(ofShader* shader, ofMaterial& mat) {
+    shader->setUniform3f("color_ambient", mat.getAmbientColor().r, mat.getAmbientColor().g, mat.getAmbientColor().b);
+    shader->setUniform3f("color_diffuse", mat.getDiffuseColor().r, mat.getDiffuseColor().g, mat.getDiffuseColor().b);
+    shader->setUniform3f("color_specular", mat.getSpecularColor().r, mat.getSpecularColor().g, mat.getSpecularColor().b);
+    shader->setUniform1f("shininess", mat.getShininess());
+}
 
 void Shaders::setup() {
-    listShaderFiles();
+    // Settings de la lumiere
+    //light = std::make_unique<Light>();
+    //light->setup(LightType::Directional); // par defaut
+    //light->setup(LightType::Point);
+    //light->setup(LightType::Spot);
+    //light->setup(LightType::Ambient);
 
-    // Paramètres dans le code du prof:
+    //light->setPosition(ofVec3f(0, 300, 600));
+    //light->setDirection(ofVec3f(0, 0, 0));
+
     ofSetFrameRate(60);
     ofSetSphereResolution(32);
     ofSetBackgroundColor(0);
     ofEnableDepthTest();
     ofSetLogLevel(OF_LOG_VERBOSE);
 
+    // paramètres
+    oscillation_amplitude = 32.0f;
+    oscillation_frequency = 7500.0f;
+    speed_motion = 150.0f;
+    initial_x = 0.0f;
+    initial_z = -100.0f;
+    scale_cube = 100.0f;
+    scale_sphere = 80.0f;
+    scale_teapot = 0.618f;
 
-    ofEnableDepthTest();
-    ofSetSmoothLighting(true);
+    // initialisation des variables
+    offset_x = initial_x;
+    offset_z = initial_z;
 
-    // Configurer la lumiere directionnelle
-    dirLight.setup();
-    dirLight.setDirectional();
-    dirLight.setDiffuseColor(ofFloatColor(1.0, 1.0, 1.0));
-    dirLight.setSpecularColor(ofFloatColor(0.1, 0.1, 0.1));
-    material.setShininess(128);
-    lightDirection = ofVec3f(1.0, -1.0, -1.0); // direction vers la scène
-    dirLight.setOrientation(lightDirection);
+    delta_x = speed_motion;
+    delta_z = speed_motion;
 
     // chargement d'un modèle 3D
-    teapot.loadModel("geometry/teapot.obj");
+    //teapot.loadModel("geometry/teapot.obj");
 
     // désactiver le matériau par défaut du modèle
-    teapot.disableMaterials();
+    //teapot.disableMaterials();
 
-    // Materials
-    material.setDiffuseColor(ofColor(180, 100, 100));
-    //material.setShininess(32);
+    // charger, compiler et linker les sources des shaders
+    shader_color_fill.load("shaders/colorFill");
+    shader_lambert.load("shaders/lambert");
+    shader_gouraud.load("shaders/gouraud");
+    shader_phong.load("shaders/phong");
+    shader_blinn_phong.load("shaders/blinn_phong");
+    shader_toon.load("shaders/toon");
 
-    // Preparer un objet sphere pour les tests
-    sphere.setRadius(200);
-    sphere.setPosition(0, 0, 0);
+    // shader actif au lancement de la scène
+    shader_active = ShaderType::blinn_phong;
 
-    // Chargerement des shaders
-    lambertShader.load("shaders/lambert");
-    phongShader.load("shaders/phong");
-    gouraudShader.load("shaders/gouraud");
-    blinn_phongShader.load("shaders/blinn_phong");
-    toonShader.load("shaders/toon");
-
-    logShaderStatus();
-
-    activeShader = ShaderType::SHADER_LAMBERT;
-
+    // initialisation de la scène
     reset();
 }
 
 void Shaders::reset() {
+    // centre du framebuffer
+    center_x = ofGetWidth() / 2.0f;
+    center_y = ofGetHeight() / 2.0f;
 
+    // caméra à sa position initiale
+    offset_x = initial_x;
+    offset_z = initial_z;
+
+    // déterminer la position des géométries
+    position_cube.set(-ofGetWidth() * (1.0f / 4.0f), 0.0f, 0.0f);
+    position_sphere.set(0.0f, 0.0f, 0.0f);
+    position_teapot.set(ofGetWidth() * (1.0f / 4.0f), 50.0f, 0.0f);
+
+    ofLog() << "<reset>";
 }
 
 void Shaders::update() {
-    dirLight.setOrientation(lightDirection);
-    dirLight.rotate(2, ofVec3f(0, 1, 0));
+     //transformer la lumière
+    //light->setGlobalPosition(
+     //   ofMap(ofGetMouseX() / (float)ofGetWidth(), 0.0f, 1.0f, -ofGetWidth() / 2.0f, ofGetWidth() / 2.0f),
+      //  ofMap(ofGetMouseY() / (float)ofGetHeight(), 0.0f, 1.0f, -ofGetHeight() / 2.0f, ofGetHeight() / 2.0f),
+       //-offset_z * 1.5f);
+
+    // mise à jour d'une valeur numérique animée par un oscillateur
+    float oscillation = oscillate(ofGetElapsedTimeMillis(), oscillation_frequency, oscillation_amplitude) + oscillation_amplitude;
+
+    // passer les attributs uniformes au shader de sommets
+    switch (shader_active) {
+    case ShaderType::color_fill:
+        shader_name = "Color Fill";
+        shader = &shader_color_fill;
+        shader->begin();
+        shader->setUniform3f("color", 1.0f, 1.0f, 0.0f);
+        shader->end();
+        break;
+
+    case ShaderType::lambert:
+        shader_name = "Lambert";
+        shader = &shader_lambert;
+
+        shader->begin();
+        sendMaterialUniforms(shader, getActiveMaterial());
+        shader->setUniform3f("light_position", light->getLightPosition(LightType::Point));
+        shader->end();
+
+        break;
+
+    case ShaderType::gouraud:
+        shader_name = "Gouraud";
+        shader = &shader_gouraud;
+
+        shader->begin();
+        sendMaterialUniforms(shader, getActiveMaterial());
+        shader->setUniform3f("light_position", light->getLightPosition(LightType::Point)); // Placeholder, utiliser l'terface pour changer LightType
+        shader->setUniform1f("brightness", oscillation);
+        shader->end();
+
+        break;
+
+    case ShaderType::phong:
+        shader_name = "Phong";
+        shader = &shader_phong;
+        
+        shader->begin();
+        sendMaterialUniforms(shader, getActiveMaterial());
+        shader->setUniform3f("light_position", light->getLightPosition(LightType::Point)); // Placeholder
+        shader->setUniform1f("brightness", oscillation);
+        shader->end();
+
+        break;
+
+    case ShaderType::blinn_phong:
+        shader_name = "Blinn-Phong";
+        shader = &shader_blinn_phong;
+        
+        shader->begin();
+        sendMaterialUniforms(shader, getActiveMaterial());
+        shader->setUniform3f("light_position", light->getLightPosition(LightType::Point)); // Placeholder
+        shader->setUniform1f("brightness", oscillation);
+        shader->end();
+
+        break;
+
+    case ShaderType::toon:
+        shader_name = "Toon (Cel Shading)";
+        shader = &shader_toon;
+        
+        shader->begin();
+        sendMaterialUniforms(shader, getActiveMaterial());
+        shader->setUniform3f("light_position", light->getLightPosition(LightType::Point)); // Placeholder
+        shader->setUniform1f("brightness", oscillation);
+        shader->end();
+
+        break;
+
+    default:
+        break;
+    }
 }
 
 void Shaders::draw() {
-    switch (activeShader) {
-    case SHADER_LAMBERT:
-        drawLambertShader();
-        //ofLog() << "drawLambertShader() appellee";
-        break;
-    case SHADER_PHONG:
-        drawPhongShader();
-        break;
-    case SHADER_GOURAUD:
-        drawGouraudShader();
-        break;
-    case SHADER_BLINN_PHONG:
-        drawBlinn_phongShader();
-        break;
-    case SHADER_TOON:
-        drawToonShader();
-        break;
-    }
+    // activer l'éclairage dynamique
+    ofEnableLighting();
+
+    // activer la lumière dynamique
+    //light.enable();
+    light->draw();
+
+    ofPushMatrix();
+
+    // transformer l'origine de la scène au milieu de la fenêtre d'affichage
+    ofTranslate(center_x + offset_x, center_y, offset_z);
+
+    ofPushMatrix();
+
+    // positionnner le cube
+    ofTranslate(
+        position_cube.x,
+        position_cube.y,
+        position_cube.z);
+
+    // rotation locale
+    ofRotateDeg(45.0f, 1.0f, 0.0f, 0.0f);
+
+    // activer le shader
+    shader->begin();
+
+    // dessiner un cube
+    ofDrawBox(0.0f, 0.0f, 0.0f, scale_cube);
+
+    ofPopMatrix();
+
+    ofPushMatrix();
+
+    // positionner la sphère
+    ofTranslate(
+        position_sphere.x,
+        position_sphere.y,
+        position_sphere.z);
+
+    // dessiner une sphère
+    ofDrawSphere(0.0f, 0.0f, 0.0f, scale_sphere);
+
+    ofPopMatrix();
+
+    /*
+    ofPushMatrix();
+
+    // positionner le teapot
+    teapot.setPosition(
+        position_teapot.x,
+        position_teapot.y + 15.0f,
+        position_teapot.z);
+
+    // dimension du teapot
+    teapot.setScale(
+        scale_teapot,
+        scale_teapot,
+        scale_teapot);
+
+    // dessiner un teapot
+    teapot.draw(OF_MESH_FILL);
+
+    ofPopMatrix();
+    */
+
+    ofPopMatrix();
+
+    // désactiver le shader
+    shader->end();
+
+    // désactiver la lumière
+    //light.disable();
+
+    // désactiver l'éclairage dynamique
+    ofDisableLighting();
 }
 
-
-void Shaders::drawShadersMenu() {
-    ImGui::Text("Selection du shader");
-
-    int shaderIndex = static_cast<int>(activeShader);
-    if (ImGui::RadioButton("Lambert", shaderIndex == SHADER_LAMBERT)) shaderIndex = SHADER_LAMBERT;
-    if (ImGui::RadioButton("Phong", shaderIndex == SHADER_PHONG)) shaderIndex = SHADER_PHONG;
-    if (ImGui::RadioButton("Gouraud", shaderIndex == SHADER_GOURAUD)) shaderIndex = SHADER_GOURAUD;
-    if (ImGui::RadioButton("Blinn-Phong", shaderIndex == SHADER_BLINN_PHONG)) shaderIndex = SHADER_BLINN_PHONG;
-    if (ImGui::RadioButton("Cel Shading (Toon)", shaderIndex == SHADER_TOON)) shaderIndex = SHADER_TOON;
-
-    activeShader = static_cast<ShaderType>(shaderIndex);
-}
-
-void Shaders::drawLambertShader() {
-    dirLight.enable();
-    lambertShader.begin();
-
-    ofFloatColor diffuse = material.getDiffuseColor();
-    lambertShader.setUniform3f("ambientColor", 0.05f, 0.05f, 0.05f);
-    lambertShader.setUniform3f("diffuseColor", diffuse.r, diffuse.g, diffuse.b);
-    lambertShader.setUniform3f("lightDir", -lightDirection.getNormalized());
-
-    drawSphere();
-
-    lambertShader.end();
-    dirLight.disable();
-}
-
-void Shaders::drawPhongShader() {
-    dirLight.enable();
-    phongShader.begin();
-
-    ofFloatColor diff = material.getDiffuseColor();
-    ofFloatColor spec = material.getSpecularColor();
-    ofFloatColor ambient = material.getAmbientColor();
-
-    phongShader.setUniform3f("lightDir", -lightDirection.getNormalized());
-    phongShader.setUniform3f("diffuseColor", diff.r, diff.g, diff.b);
-    phongShader.setUniform3f("specularColor", spec.r, spec.g, spec.b);
-    phongShader.setUniform3f("ambientColor", ambient.r, ambient.g, ambient.b);
-    phongShader.setUniform1f("shininess", material.getShininess());
-
-    drawSphere();
-
-    phongShader.end();
-    dirLight.disable();
-}
-
-void Shaders::drawGouraudShader() {
-    dirLight.enable();
-    gouraudShader.begin();
-
-    ofFloatColor diff = material.getDiffuseColor();
-    ofFloatColor spec = material.getSpecularColor();
-    ofFloatColor ambient = material.getAmbientColor();
-
-    gouraudShader.setUniform3f("lightDir", -lightDirection.getNormalized());
-    gouraudShader.setUniform3f("diffuseColor", diff.r, diff.g, diff.b);
-    gouraudShader.setUniform3f("specularColor", spec.r, spec.g, spec.b);
-    gouraudShader.setUniform3f("ambientColor", ambient.r, ambient.g, ambient.b);
-    gouraudShader.setUniform1f("shininess", material.getShininess());
-
-    drawSphere();
-
-    gouraudShader.end();
-    dirLight.disable();
-}
-
-void Shaders::drawBlinn_phongShader() {
-    dirLight.enable();
-    blinn_phongShader.begin();
-
-    ofFloatColor diff = material.getDiffuseColor();
-    ofFloatColor spec = material.getSpecularColor();
-    ofFloatColor ambient = material.getAmbientColor();
-
-    blinn_phongShader.setUniform3f("lightDir", -lightDirection.getNormalized());
-    blinn_phongShader.setUniform3f("diffuseColor", diff.r, diff.g, diff.b);
-    blinn_phongShader.setUniform3f("specularColor", spec.r, spec.g, spec.b);
-    blinn_phongShader.setUniform3f("ambientColor", ambient.r, ambient.g, ambient.b);
-    blinn_phongShader.setUniform1f("shininess", material.getShininess());
-
-    drawSphere();
-
-    blinn_phongShader.end();
-    dirLight.disable();
-}
-
-void Shaders::drawToonShader() {
-    dirLight.enable();
-    toonShader.begin();
-
-    ofFloatColor color = material.getDiffuseColor();
-
-    toonShader.setUniform3f("lightDir", -lightDirection.getNormalized());
-    toonShader.setUniform3f("baseColor", color.r, color.g, color.b);
-
-    drawSphere();
-
-    toonShader.end();
-    dirLight.disable();
-}
-
-void Shaders::listShaderFiles() {
-    ofDirectory dir("shaders");
-    dir.allowExt("vert");
-    dir.allowExt("frag");
-    dir.listDir();
-
-    ofLog() << "=== [FICHIERS .vert et .frag dans /shaders/] ===";
-    for (auto& file : dir.getFiles()) {
-        ofLogNotice() << "📄 " << file.getFileName();
-    }
-    ofLog() << "=== [Fin de la liste] ===";
-}
-
-void Shaders::logShaderStatus() {
-    ofLog() << "[SHADER STATUS]";
-
-    auto checkShader = [](const std::string& name, ofShader& shader) {
-        if (shader.isLoaded()) {
-            ofLogNotice() << "Shader " << name << " load successfully.";
-        } else {
-            ofLogError() << "Shader " << name << " failed to load.";
-        }
-    };
-
-    checkShader("Lambert", lambertShader);
-    checkShader("Phong", phongShader);
-    checkShader("Gouraud", gouraudShader);
-    checkShader("Blinn-Phong",blinn_phongShader);
-    checkShader("Toon", toonShader);
-}
-
-void Shaders::drawSphere() {
-    sphere.draw();
+// fonction d'oscillation
+float Shaders::oscillate(float time, float frequency, float amplitude) {
+    return sinf(time * 2.0f * PI / frequency) * amplitude;
 }

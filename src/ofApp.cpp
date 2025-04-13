@@ -181,8 +181,6 @@ void ofApp::handleAssetSave(const std::string& path) {
 // IFT3100H24_ShaderClassic/application.cpp
 // Classe principale de l'application.
 
-#include "ofApp.h"
-
 void ofApp::setup() {
     ofLog() << "<app::setup>";
 

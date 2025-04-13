@@ -4,6 +4,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "light.h"
 #include "ofxAssimpModelLoader.h"
 
 // énumération des types de shader
@@ -23,7 +24,7 @@ public:
 
 	ofShader* shader;
 
-	ofLight light;
+	Light* light; // objet de type Light
 
 	//ofxAssimpModelLoader teapot;
 
@@ -32,6 +33,7 @@ public:
 	ofVec3f position_teapot;
 
 	string shader_name;
+	string lightName;
 
 	float oscillation;
 
@@ -62,4 +64,7 @@ public:
 	void reset();
 
 	float oscillate(float time, float frequency, float amplitude);
+
+private:
+	std::unique_ptr<Light> light;
 };

@@ -104,9 +104,10 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\materials.cpp" />
     <ClCompile Include="src\renderer.cpp" />
-    <ClCompile Include="src\DirLight.cpp" />
-    <ClCompile Include="src\Shaders.cpp" />
+    <ClCompile Include="src\light.cpp" />
+    <ClCompile Include="src\shaders.cpp" />
     <ClCompile Include="src\CameraManager.cpp" />
     <ClCompile Include="src\ColorPicker.cpp" />
     <ClCompile Include="src\CustomSlider.cpp" />
@@ -150,9 +151,10 @@
     <ClCompile Include="src\Viewer2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\materials.h" />
     <ClInclude Include="src\renderer.h" />
-    <ClInclude Include="src\DirLight.h" />
-    <ClInclude Include="src\Shaders.h" />
+    <ClInclude Include="src\light.h" />
+    <ClInclude Include="src\shaders.h" />
     <ClInclude Include="src\CameraManager.h" />
     <ClInclude Include="src\ColorPicker.h" />
     <ClInclude Include="src\CustomSlider.h" />

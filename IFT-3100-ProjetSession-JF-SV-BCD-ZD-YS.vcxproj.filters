@@ -133,10 +133,13 @@
     <ClCompile Include="src\renderer.cpp">
       <Filter>src\rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\DirLight.cpp">
+    <ClCompile Include="src\light.cpp">
       <Filter>src\rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\Shaders.cpp">
+    <ClCompile Include="src\shaders.cpp">
+      <Filter>src\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\materials.cpp">
       <Filter>src\rendering</Filter>
     </ClCompile>
   </ItemGroup>
@@ -212,9 +215,6 @@
     </Filter>
     <Filter Include="shaders">
       <UniqueIdentifier>{4a431895-0f35-45ff-b659-f0fff09cd72d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="materials">
-      <UniqueIdentifier>{92e1f3f6-2181-45c1-99d0-68a468ee35b7}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\rendering">
       <UniqueIdentifier>{c71471d9-23ed-4e3c-bf9d-835911c6f34f}</UniqueIdentifier>
@@ -626,10 +626,13 @@
     <ClInclude Include="src\renderer.h">
       <Filter>src\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\DirLight.h">
+    <ClInclude Include="src\light.h">
       <Filter>src\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\Shaders.h">
+    <ClInclude Include="src\shaders.h">
+      <Filter>src\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\materials.h">
       <Filter>src\rendering</Filter>
     </ClInclude>
   </ItemGroup>

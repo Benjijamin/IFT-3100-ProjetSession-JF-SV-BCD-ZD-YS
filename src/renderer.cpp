@@ -4,6 +4,16 @@
 #include "renderer.h"
 
 void Renderer::setup() {
+    // Settings de la lumiere
+    light = std::make_unique<Light>();
+    //light->setup(LightType::Directional); // par defaut
+    light->setup(LightType::Point);
+    //light->setup(LightType::Spot);
+    //light->setup(LightType::Ambient);
+
+    light->setPosition(ofVec3f(0, 300, 600));
+    light->setDirection(ofVec3f(0,0,0));
+
     ofSetFrameRate(60);
     ofSetSphereResolution(32);
     ofSetBackgroundColor(0);
@@ -67,10 +77,10 @@ void Renderer::reset() {
 
 void Renderer::update() {
     // transformer la lumière
-    light.setGlobalPosition(
-        ofMap(ofGetMouseX() / (float)ofGetWidth(), 0.0f, 1.0f, -ofGetWidth() / 2.0f, ofGetWidth() / 2.0f),
-        ofMap(ofGetMouseY() / (float)ofGetHeight(), 0.0f, 1.0f, -ofGetHeight() / 2.0f, ofGetHeight() / 2.0f),
-        -offset_z * 1.5f);
+    //light->setGlobalPosition(
+    //    ofMap(ofGetMouseX() / (float)ofGetWidth(), 0.0f, 1.0f, -ofGetWidth() / 2.0f, ofGetWidth() / 2.0f),
+    //    ofMap(ofGetMouseY() / (float)ofGetHeight(), 0.0f, 1.0f, -ofGetHeight() / 2.0f, ofGetHeight() / 2.0f),
+    //   -offset_z * 1.5f);
 
     // mise à jour d'une valeur numérique animée par un oscillateur
     float oscillation = oscillate(ofGetElapsedTimeMillis(), oscillation_frequency, oscillation_amplitude) + oscillation_amplitude;
@@ -91,7 +101,7 @@ void Renderer::update() {
         shader->begin();
         shader->setUniform3f("color_ambient", 0.1f, 0.1f, 0.1f);
         shader->setUniform3f("color_diffuse", 0.6f, 0.6f, 0.6f);
-        shader->setUniform3f("light_position", light.getGlobalPosition());
+        shader->setUniform3f("light_position", light->getGlobalPosition());
         shader->end();
         break;
 
@@ -103,7 +113,7 @@ void Renderer::update() {
         shader->setUniform3f("color_diffuse", 0.6f, 0.6f, 0.0f);
         shader->setUniform3f("color_specular", 1.0f, 1.0f, 0.0f);
         shader->setUniform1f("brightness", oscillation);
-        shader->setUniform3f("light_position", light.getGlobalPosition());
+        shader->setUniform3f("light_position", light->getGlobalPosition());
         shader->end();
         break;
 
@@ -115,7 +125,7 @@ void Renderer::update() {
         shader->setUniform3f("color_diffuse", 0.6f, 0.0f, 0.6f);
         shader->setUniform3f("color_specular", 1.0f, 1.0f, 0.0f);
         shader->setUniform1f("brightness", oscillation);
-        shader->setUniform3f("light_position", light.getGlobalPosition());
+        shader->setUniform3f("light_position", light->getGlobalPosition());
         shader->end();
         break;
 
@@ -127,7 +137,7 @@ void Renderer::update() {
         shader->setUniform3f("color_diffuse", 0.0f, 0.6f, 0.6f);
         shader->setUniform3f("color_specular", 1.0f, 1.0f, 0.0f);
         shader->setUniform1f("brightness", oscillation);
-        shader->setUniform3f("light_position", light.getGlobalPosition());
+        shader->setUniform3f("light_position", light->getGlobalPosition());
         shader->end();
         break;
 
@@ -138,7 +148,7 @@ void Renderer::update() {
         shader->setUniform3f("color_ambient", 0.2f, 0.2f, 0.2f); // lumière de fond grise
         shader->setUniform3f("color_diffuse", 0.8f, 0.5f, 0.1f); // orange cartoon
         shader->setUniform1f("brightness", oscillation);
-        shader->setUniform3f("light_position", light.getGlobalPosition());
+        shader->setUniform3f("light_position", light->getGlobalPosition());
         shader->end();
         break;
 
@@ -152,7 +162,8 @@ void Renderer::draw() {
     ofEnableLighting();
 
     // activer la lumière dynamique
-    light.enable();
+    //light.enable();
+    light->draw();
 
     ofPushMatrix();
 
@@ -218,7 +229,7 @@ void Renderer::draw() {
     shader->end();
 
     // désactiver la lumière
-    light.disable();
+    //light.disable();
 
     // désactiver l'éclairage dynamique
     ofDisableLighting();

@@ -8,18 +8,24 @@ void ImageEditor::setup() {
     colorPicker.setup();
     drawColor = colorPicker.getColor();
 
-    tintShader.load("image_tint_330_vs.glsl", "image_tint_330_fs.glsl");
-    vibranceShader.load("image_vibrance_330_vs.glsl", "image_vibrance_330_fs.glsl");
+    filterShader.load("image_filter_330_vs.glsl", "image_filter_330_fs.glsl");
 
+    tintColor = ofColor(0);
     saturationValue = 1.0f;
     brightnessValue = 0.0f;
     contrastValue = 1.0f;
+    blurValue = 0.0f;
 
     ofDisableArbTex();
 }
 
 void ImageEditor::update() {
+    imageDimensions = ofVec2f(currentImage->getWidth(), currentImage->getHeight()) * viewer.getZoomFactor();
 
+    if (currentTool == Tool::Tint) 
+    {
+        tintColor = colorPicker.getColor();
+    }
 }
 
 void ImageEditor::draw() {
@@ -27,18 +33,7 @@ void ImageEditor::draw() {
         ofVec2f panOffset = viewer.getPanOffset();
         ofVec2f imageDimensions = ofVec2f(currentImage->getWidth(), currentImage->getHeight()) * viewer.getZoomFactor();
 
-        switch (currentTool)
-        {
-        case ImageEditor::Tool::Tint:
-            applyTint(panOffset, imageDimensions);
-            break;
-        case ImageEditor::Tool::Vibrance:
-            applyVibrance(panOffset, imageDimensions);
-            break;
-        default:
-            currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
-            break;
-        }
+        applyFilter(panOffset);
     }
 
     if (currentTool == Tool::CopyRegion && viewer.isDraggingMouse() && !isGuiHovered()) {
@@ -87,7 +82,7 @@ void ImageEditor::drawGui() {
         ImGui::SliderInt("##Brush Size", &drawRadius, 1, 50);
     }
 
-    if (ImGui::Button("Tint", buttonSize)) 
+    if (ImGui::Button("Tint", buttonSize))
     {
         switchTool(Tool::Tint);
     }
@@ -108,6 +103,18 @@ void ImageEditor::drawGui() {
         ImGui::Text("Contrast Value");
         ImGui::SetNextItemWidth(toolbarWidth - padding);
         ImGui::SliderFloat("##Contrast Value", &contrastValue, 0.0f, 2.0f);
+    }
+
+    if (ImGui::Button("Blur", buttonSize)) 
+    {
+        switchTool(Tool::Blur);
+    }
+
+    if (currentTool == Tool::Blur) 
+    {
+        ImGui::Text("Blur Value");
+        ImGui::SetNextItemWidth(toolbarWidth - padding);
+        ImGui::SliderFloat("##Blur Value", &blurValue, 0.0f, 10.0f);
     }
 
     ImGui::End();
@@ -178,21 +185,13 @@ void ImageEditor::load(const std::string& path) {
 
 void ImageEditor::save(const std::string& path) {
     if (isImageAllocated()) {
+        bakeFilter();
         currentImage->save(path);
     }
 }
 
 void ImageEditor::switchTool(Tool tool) 
 {
-    if (currentTool == Tool::Tint) 
-    {
-        bakeTint();
-    }
-    else if (currentTool == Tool::Vibrance) 
-    {
-        bakeVibrance();
-    }
-
     currentTool = tool;
 }
 
@@ -226,46 +225,38 @@ void ImageEditor::drawBrush(int startX, int startY, int endX, int endY) {
     *originalImage = *currentImage;
 }
 
-void ImageEditor::applyTint(ofVec2f panOffset, ofVec2f imageDimensions) 
+void ImageEditor::setFilterValues() 
+{
+    filterShader.setUniformTexture("image", currentImage->getTexture(), 1);
+
+    filterShader.setUniform2f("resolution", imageDimensions);
+
+    filterShader.setUniform4f("tint", tintColor.r, tintColor.g, tintColor.b, 1.0f);
+
+    filterShader.setUniform1f("saturationValue", saturationValue);
+    filterShader.setUniform1f("brightnessValue", brightnessValue);
+    filterShader.setUniform1f("contrastValue", contrastValue);
+
+    filterShader.setUniform1f("blurValue", blurValue);
+}
+
+void ImageEditor::applyFilter(ofVec2f panOffset) 
 {
     if (originalImage) {
         *currentImage = *originalImage;
         currentImage->update();
     }
 
-    tintShader.begin();
+    filterShader.begin();
 
-    tintShader.setUniformTexture("image", currentImage->getTexture(), 1);
-
-    ofColor tintColor = colorPicker.getColor();
-    tintShader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
+    setFilterValues();
 
     currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
 
-    tintShader.end();
+    filterShader.end();
 }
 
-void ImageEditor::applyVibrance(ofVec2f panOffset, ofVec2f imageDimensions) 
-{
-    if (originalImage) {
-        *currentImage = *originalImage;
-        currentImage->update();
-    }
-
-    vibranceShader.begin();
-
-    vibranceShader.setUniformTexture("image", currentImage->getTexture(), 1);
-
-    vibranceShader.setUniform1f("saturationValue", saturationValue);
-    vibranceShader.setUniform1f("brightnessValue", brightnessValue);
-    vibranceShader.setUniform1f("contrastValue", contrastValue);
-
-    currentImage->draw(panOffset.x, panOffset.y, imageDimensions.x, imageDimensions.y);
-
-    vibranceShader.end();
-}
-
-void ImageEditor::bakeTint() {
+void ImageEditor::bakeFilter() {
     if (!isImageAllocated()) return;
 
     if (!originalImage) {
@@ -278,14 +269,9 @@ void ImageEditor::bakeTint() {
     fbo.begin();
     ofClear(0, 0, 0, 0);
 
-    tintShader.begin();
-    tintShader.setUniformTexture("image", currentImage->getTexture(), 1);
+    filterShader.begin();
 
-    ofColor tintColor = colorPicker.getColor();
-    tintShader.setUniform4f("tint", tintColor.r / 255.0f, tintColor.g / 255.0f, tintColor.b / 255.0f, 1.0f);
-
-    currentImage->draw(0, 0);
-    tintShader.end();
+    setFilterValues();
 
     fbo.end();
 
@@ -293,37 +279,8 @@ void ImageEditor::bakeTint() {
     fbo.readToPixels(pixels);
     currentImage->setFromPixels(pixels);
     currentImage->update();
-}
 
-void ImageEditor::bakeVibrance() {
-    if (!isImageAllocated()) return;
-
-    if (!originalImage) {
-        originalImage = new ofImage();
-        *originalImage = *currentImage;
-    }
-
-    ofFbo fbo;
-    fbo.allocate(currentImage->getWidth(), currentImage->getHeight());
-    fbo.begin();
-    ofClear(0, 0, 0, 0);
-
-    vibranceShader.begin();
-    vibranceShader.setUniformTexture("image", currentImage->getTexture(), 1);
-
-    vibranceShader.setUniform1f("saturationValue", saturationValue);
-    vibranceShader.setUniform1f("brightnessValue", brightnessValue);
-    vibranceShader.setUniform1f("contrastValue", contrastValue);
-        
-    currentImage->draw(0, 0);
-    tintShader.end();
-
-    fbo.end();
-
-    ofPixels pixels;
-    fbo.readToPixels(pixels);
-    currentImage->setFromPixels(pixels);
-    currentImage->update();
+    filterShader.end();
 }
 
 void ImageEditor::copyRegion(int startX, int startY, int endX, int endY) {

@@ -2,9 +2,12 @@
 
 // attributs uniformes
 uniform sampler2D image;
+uniform vec2 resolution;
+uniform vec4 tint;
 uniform float saturationValue;
 uniform float brightnessValue;
 uniform float contrastValue;
+uniform float blurValue;
 
 // attribut en entrée
 in vec2 surface_texcoord;
@@ -53,9 +56,23 @@ mat4 contrastMat()
 
 void main()
 {
-  // échantillonner la texture
+  float TAU = 6.2831;
+
   vec4 texture_sample = texture(image, surface_texcoord);
 
-  // couleur finale du fragment
-  fragment_color = brightnessMat() * contrastMat() * saturationMat() * texture_sample;
+  vec4 filtered_color = mix(texture_sample, tint, 0.25);
+
+  vec2 radius = blurValue / resolution;
+
+  for(float d = 0.0; d < TAU; d += TAU/16.0)
+  {
+    for(float i = 0.0 ; i < 1; i += 0.25)
+    {
+      filtered_color += texture(image, surface_texcoord + vec2(cos(d), sin(d)) * radius * i);
+    }
+  }
+
+  filtered_color /= 49.0;
+
+  fragment_color = brightnessMat() * contrastMat() * saturationMat() * filtered_color;
 }

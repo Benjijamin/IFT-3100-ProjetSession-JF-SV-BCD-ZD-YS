@@ -1,20 +1,14 @@
 #include "SceneNode.h"
-#include "Primitives.h"
 
 SceneNode::SceneNode(const std::string& name)
     : name(name), primitiveType(PrimitiveType::None) {
-    initAABBToInfinity();
+    boundingBox.initToInfinity();
 }
 
-void SceneNode::setModel(std::shared_ptr<ofxAssimpModelLoader> model) {
-    this->model = model;
-    computeAABB(model);
-}
-
-void SceneNode::setTexture(const std::string& path) 
-{
-    textureImage.load(path);
-    texture = textureImage.getTextureReference();
+SceneNode::~SceneNode() {
+    if (light) {
+        light->disable();
+    }
 }
 
 void SceneNode::addChild(std::shared_ptr<SceneNode> child) {
@@ -35,12 +29,12 @@ std::string SceneNode::getName() const {
     return name;
 }
 
-void SceneNode::setName(std::string& newName) {
+void SceneNode::setName(const std::string& newName) {
     name = newName;
 }
 
 void SceneNode::setPrimitive(PrimitiveType newPrimitiveType) {
-    primitiveType = newPrimitiveType; 
+    primitiveType = newPrimitiveType;
 
     switch (primitiveType) {
     case PrimitiveType::Sphere:
@@ -58,41 +52,136 @@ void SceneNode::setPrimitive(PrimitiveType newPrimitiveType) {
     default:
         break;
     }
+
+    setDefaultMaterial();
 }
 
-bool SceneNode::containsModel() const {
+void SceneNode::setModel(std::shared_ptr<ofxAssimpModelLoader> newModel) {
+    model = newModel;
+    boundingBox.compute(model);
+
+    model->disableMaterials();
+
+    setDefaultMaterial();
+}
+
+bool SceneNode::hasModel() const {
     return model != nullptr;
 }
 
+void SceneNode::setDefaultMaterial() {
+    material = std::make_shared<ofMaterial>();
+
+    material->setDiffuseColor(ofFloatColor(0.4f, 0.4f, 0.4f, 1.0f));
+    material->setAmbientColor(ofFloatColor(0.3f, 0.3f, 0.3f, 1.0f));
+    material->setSpecularColor(ofFloatColor(0.6f, 0.6f, 0.6f, 1.0f));
+    material->setEmissiveColor(ofFloatColor(0.0f, 0.0f, 0.0f, 1.0f));
+    material->setShininess(32);
+}
+
+void SceneNode::setLightMaterial() {
+    material = std::make_shared<ofMaterial>();
+
+    material->setAmbientColor(ofFloatColor(0.2f, 0.2f, 0.2f, 1.0f));
+    material->setDiffuseColor(ofFloatColor(0.8f, 0.8f, 0.8f, 1.0f));
+    material->setSpecularColor(ofFloatColor(0.9f, 0.9f, 0.9f, 1.0f));
+    material->setEmissiveColor(ofFloatColor(1.0f, 1.0f, 1.0f, 1.0f));
+    material->setShininess(100);
+}
+
+bool SceneNode::hasMaterial() const {
+    return material != nullptr;
+}
+
+std::shared_ptr<ofMaterial> SceneNode::getMaterial() const {
+    return material;
+}
+
+void SceneNode::setLight(std::shared_ptr<ofLight> newLight) {
+    this->light = newLight;
+
+    setLightMaterial();
+}
+
+bool SceneNode::hasLight() const {
+    return light != nullptr;
+}
+
+std::shared_ptr<ofLight> SceneNode::getLight() const {
+    return light;
+}
+
+void SceneNode::setTexture(const std::string& path)
+{
+    textureImage.load(path);
+    texture = textureImage.getTextureReference();
+}
+
 void SceneNode::customDraw() {
-    if (texture.isAllocated()) 
+    if (texture.isAllocated())
     {
         texture.bind();
     }
 
-    if (model) {
+    if (light) {
+        drawLight();
+    }
+    else if (model) {
         model->drawFaces();
     }
     else {
-        switch (primitiveType) {
-        case PrimitiveType::Sphere:
-            ofDrawSphere(glm::vec3(0.0f), 100.0f);
-            break;
-        case PrimitiveType::Tetrahedron:
+        drawPrimitive();
+    }
+}
+
+void SceneNode::drawLight() {
+    ofPushMatrix();
+
+    if (light->getIsPointLight()) {
+        ofDrawSphere(glm::vec3(0, 0, 0), 10.0f);
+        ofDrawAxis(20);
+    }
+    else if (light->getIsSpotlight()) {
+        float coneHeight = (sin(ofDegToRad(light->getSpotlightCutOff())) * 30.0f) + 1.0f;
+        float coneRadius = (cos(ofDegToRad(light->getSpotlightCutOff())) * 30.0f) + 8.0f;
+        ofRotateDeg(270, 1, 0, 0);
+        ofDrawCone(0, -(coneHeight * 0.5f), 0, coneRadius, coneHeight);
+    }
+    else if (light->getIsDirectional()) {
+        ofDrawBox(glm::vec3(0, 0, 0), 10.0f);
+        ofDrawArrow(glm::vec3(0, 0, 0), glm::vec3(0, 0, -40), 10.0f);
+    }
+    else if (light->getIsAreaLight()) {
+        ofDrawPlane(glm::vec3(0, 0, 0), 30.0f, 30.0f);
+        ofDrawArrow(glm::vec3(0, 0, 0), glm::vec3(0, 0, -30), 10.0f);
+    }
+    else {
+        ofDrawBox(glm::vec3(0, 0, 0), 10.0f);
+        ofDrawAxis(20);
+    }
+
+    ofPopMatrix();
+}
+
+void SceneNode::drawPrimitive() {
+    switch (primitiveType) {
+    case PrimitiveType::Sphere:
+        ofDrawSphere(glm::vec3(0.0f), 100.0f);
+        break;
+    case PrimitiveType::Tetrahedron:
+    case PrimitiveType::Cube:
+        if (primitiveModel) {
             primitiveModel->drawFaces();
-            break;
-        case PrimitiveType::Cube:
-            primitiveModel->drawFaces();
-            break;
-        case PrimitiveType::Cylinder:
-            ofDrawCylinder(glm::vec3(0.0f), 100.0f, 200.0f);
-            break;
-        case PrimitiveType::Cone:
-            ofDrawCone(glm::vec3(0.0f), 100.0f, 200.0f);
-            break;
-        default:
-            break;
         }
+        break;
+    case PrimitiveType::Cylinder:
+        ofDrawCylinder(glm::vec3(0.0f), 100.0f, 200.0f);
+        break;
+    case PrimitiveType::Cone:
+        ofDrawCone(glm::vec3(0.0f), 100.0f, 200.0f);
+        break;
+    default:
+        break;
     }
 
     texture.unbind();
@@ -102,7 +191,25 @@ void SceneNode::draw() {
     ofPushMatrix();
     ofMultMatrix(getLocalTransformMatrix());
 
+    if (light) {
+        light->setPosition(getGlobalTransformMatrix() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+        glm::mat4 rotationMatrix = getGlobalTransformMatrix();
+        glm::quat orientationQuat = glm::quat_cast(rotationMatrix);
+        glm::vec3 eulerAngles = glm::eulerAngles(orientationQuat);
+
+        light->setOrientation(ofVec3f(ofRadToDeg(eulerAngles.x), ofRadToDeg(eulerAngles.y), ofRadToDeg(eulerAngles.z)));
+    }
+
+    if (material) {
+        material->begin();
+    }
+
     customDraw();
+
+    if (material) {
+        material->end();
+    }
 
     for (auto& child : children) {
         child->draw();
@@ -114,158 +221,27 @@ void SceneNode::draw() {
 void SceneNode::drawVisibleNodes(const ofCamera& camera) {
     ofPushMatrix();
     ofMultMatrix(getLocalTransformMatrix());
-    
-    customDraw();
 
-    if (isAABBVisible(camera)) {
+    if (boundingBox.isVisible(camera, getGlobalTransformMatrix())) {
         ofSetColor(ofColor::green);
     }
     else {
         ofSetColor(ofColor::red);
     }
 
-    drawAABBBox();
+    boundingBox.draw();
 
     for (auto& child : children) {
         child->drawVisibleNodes(camera);
     }
-    
+
     ofPopMatrix();
 }
 
-ofBoxPrimitive SceneNode::getAABB() const {
-    return aabb;
-}
-
-void SceneNode::initAABBToInfinity() {
-    ofVec3f minBounds(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-    ofVec3f maxBounds(FLT_MAX, FLT_MAX, FLT_MAX);
-
-    aabb.setPosition((minBounds + maxBounds) * 0.5f);
-    aabb.setWidth(maxBounds.x - minBounds.x);
-    aabb.setHeight(maxBounds.y - minBounds.y);
-    aabb.setDepth(maxBounds.z - minBounds.z);
-}
-
-void SceneNode::computeAABB(std::shared_ptr<ofxAssimpModelLoader> model) {
-    ofVec3f minBounds(FLT_MAX, FLT_MAX, FLT_MAX);
-    ofVec3f maxBounds(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-
-    for (int i = 0; i < model->getNumMeshes(); i++) {
-        ofMesh mesh = model->getMesh(i);
-
-        for (const auto& vertex : mesh.getVertices()) {
-            ofVec4f transformedVertex = model->getModelMatrix() * ofVec4f(vertex.x, vertex.y, vertex.z, 1.0f);
-
-            minBounds.x = std::min(minBounds.x, transformedVertex.x);
-            minBounds.y = std::min(minBounds.y, transformedVertex.y);
-            minBounds.z = std::min(minBounds.z, transformedVertex.z);
-
-            maxBounds.x = std::max(maxBounds.x, transformedVertex.x);
-            maxBounds.y = std::max(maxBounds.y, transformedVertex.y);
-            maxBounds.z = std::max(maxBounds.z, transformedVertex.z);
-        }
-    }
-
-    aabb.setPosition((minBounds + maxBounds) * 0.5f);
-    aabb.setWidth(maxBounds.x - minBounds.x);
-    aabb.setHeight(maxBounds.y - minBounds.y);
-    aabb.setDepth(maxBounds.z - minBounds.z);
-}
-
-bool SceneNode::isAABBVisible(const ofCamera& camera) {
-    glm::mat4 globalTransform = getGlobalTransformMatrix();
-    auto vertices = getTransformedAABBVertices(globalTransform);
-
-    auto frustumPlanes = extractFrustumPlanes(camera);
-
-    return isAABBInsideFrustum(vertices, frustumPlanes);
-}
-
-std::vector<glm::vec4> SceneNode::extractFrustumPlanes(const ofCamera& camera) {
-    glm::mat4 viewProj = camera.getModelViewProjectionMatrix();
-
-    std::vector<glm::vec4> planes(6);
-    planes[0] = glm::vec4(viewProj[0][3] + viewProj[0][0], viewProj[1][3] + viewProj[1][0], viewProj[2][3] + viewProj[2][0], viewProj[3][3] + viewProj[3][0]); // Left
-    planes[1] = glm::vec4(viewProj[0][3] - viewProj[0][0], viewProj[1][3] - viewProj[1][0], viewProj[2][3] - viewProj[2][0], viewProj[3][3] - viewProj[3][0]); // Right
-    planes[2] = glm::vec4(viewProj[0][3] + viewProj[0][1], viewProj[1][3] + viewProj[1][1], viewProj[2][3] + viewProj[2][1], viewProj[3][3] + viewProj[3][1]); // Bottom
-    planes[3] = glm::vec4(viewProj[0][3] - viewProj[0][1], viewProj[1][3] - viewProj[1][1], viewProj[2][3] - viewProj[2][1], viewProj[3][3] - viewProj[3][1]); // Top
-    planes[4] = glm::vec4(viewProj[0][3] + viewProj[0][2], viewProj[1][3] + viewProj[1][2], viewProj[2][3] + viewProj[2][2], viewProj[3][3] + viewProj[3][2]); // Near
-    planes[5] = glm::vec4(viewProj[0][3] - viewProj[0][2], viewProj[1][3] - viewProj[1][2], viewProj[2][3] - viewProj[2][2], viewProj[3][3] - viewProj[3][2]); // Far
-
-    return planes;
-}
-
-std::vector<glm::vec3> SceneNode::getAABBVertices() {
-    ofVec3f center = aabb.getPosition();
-    float halfWidth = aabb.getWidth() / 2.0f;
-    float halfHeight = aabb.getHeight() / 2.0f;
-    float halfDepth = aabb.getDepth() / 2.0f;
-
-    std::vector<glm::vec3> vertices(8);
-    vertices[0] = glm::vec3(center.x - halfWidth, center.y - halfHeight, center.z - halfDepth);
-    vertices[1] = glm::vec3(center.x + halfWidth, center.y - halfHeight, center.z - halfDepth);
-    vertices[2] = glm::vec3(center.x - halfWidth, center.y + halfHeight, center.z - halfDepth);
-    vertices[3] = glm::vec3(center.x + halfWidth, center.y + halfHeight, center.z - halfDepth);
-    vertices[4] = glm::vec3(center.x - halfWidth, center.y - halfHeight, center.z + halfDepth);
-    vertices[5] = glm::vec3(center.x + halfWidth, center.y - halfHeight, center.z + halfDepth);
-    vertices[6] = glm::vec3(center.x - halfWidth, center.y + halfHeight, center.z + halfDepth);
-    vertices[7] = glm::vec3(center.x + halfWidth, center.y + halfHeight, center.z + halfDepth);
-
-    return vertices;
-}
-
-std::vector<glm::vec3> SceneNode::getTransformedAABBVertices(const glm::mat4& transform) {
-    auto vertices = getAABBVertices();
-    std::vector<glm::vec3> transformedVertices;
-
-    for (const auto& vertex : vertices) {
-        glm::vec4 transformedVertex = transform * glm::vec4(vertex, 1.0f);
-        transformedVertices.push_back(glm::vec3(transformedVertex));
-    }
-
-    return transformedVertices;
-}
-
-bool SceneNode::isAABBInsideFrustum(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec4>& frustumPlanes) {
-    for (const auto& plane : frustumPlanes) {
-        bool allOutside = true;
-
-        for (const auto& vertex : vertices) {
-            float distance = plane.x * vertex.x + plane.y * vertex.y + plane.z * vertex.z + plane.w;
-            if (distance >= 0) {
-                allOutside = false;
-                break;
-            }
-        }
-
-        if (allOutside) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-void SceneNode::drawAABBBox() {
-    auto vertices = getAABBVertices();
-
-    ofDrawLine(vertices[0], vertices[1]);
-    ofDrawLine(vertices[1], vertices[3]);
-    ofDrawLine(vertices[3], vertices[2]);
-    ofDrawLine(vertices[2], vertices[0]);
-
-    ofDrawLine(vertices[4], vertices[5]);
-    ofDrawLine(vertices[5], vertices[7]);
-    ofDrawLine(vertices[7], vertices[6]);
-    ofDrawLine(vertices[6], vertices[4]);
-
-    ofDrawLine(vertices[0], vertices[4]);
-    ofDrawLine(vertices[1], vertices[5]);
-    ofDrawLine(vertices[2], vertices[6]);
-    ofDrawLine(vertices[3], vertices[7]);
+ofBoxPrimitive SceneNode::getBoundingBox() const {
+    return boundingBox.getBox();
 }
 
 bool SceneNode::operator==(const SceneNode& other) const {
-    return (name == other.name);
+    return name == other.name;
 }

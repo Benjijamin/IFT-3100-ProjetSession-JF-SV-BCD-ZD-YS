@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 
-//TODO cache & instanciation
 class Primitives 
 {
 public:

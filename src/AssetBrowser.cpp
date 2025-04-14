@@ -23,16 +23,16 @@ void AssetBrowser::drawGui() {
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 windowSize = io.DisplaySize;
 
-    float controlsHeight = selectedAsset.empty() ? 175 : 250;
-
-    assetBrowserHeight = std::max(assetBrowserHeight, controlsHeight);
-
+    assetBrowserHeight = std::max(assetBrowserHeight, 200.0f);
     ImGui::SetNextWindowPos(ImVec2(0, windowSize.y - assetBrowserHeight));
     ImGui::SetNextWindowSize(ImVec2(windowSize.x, assetBrowserHeight));
 
     ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
 
     if (ImGui::Begin("Asset Browser", nullptr, windowFlags)) {
+        drawNavigationBar();
+        drawAssetList();
+
         if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) {
             if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
                 resizing = true;
@@ -42,48 +42,80 @@ void AssetBrowser::drawGui() {
         if (resizing && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
             float mouseDelta = io.MouseDelta.y;
             assetBrowserHeight -= mouseDelta;
-            assetBrowserHeight = std::clamp(assetBrowserHeight, controlsHeight, windowSize.y / 2.0f);
+            assetBrowserHeight = std::clamp(assetBrowserHeight, 200.0f, windowSize.y / 2.0f);
         }
         else if (resizing && !ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
             resizing = false;
         }
-
-        ImU32 childBgColor = IM_COL32(30, 30, 30, 200);
-        if (ImGui::GetStyle().Colors[ImGuiCol_WindowBg].x > 0.5f) {
-            childBgColor = IM_COL32(255, 255, 255, 200);
-        }
-
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, childBgColor);
-
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-
-        ImGui::Columns(2, nullptr, false);
-        ImGui::SetColumnWidth(0, windowSize.x * 0.70f);
-
-        drawSearchBar();
-        drawAssetList();
-
-        ImGui::NextColumn();
-
-        ImGui::PopStyleColor();
-
-        drawControls();
-
-        ImGui::Columns(1);
-        ImGui::PopStyleVar(2);
     }
 
     ImGui::End();
 }
 
-void AssetBrowser::drawSearchBar() {
+void AssetBrowser::drawNavigationBar() {
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 5));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
+
+    ImGui::BeginChild("NavigationBar", ImVec2(0, 30), false, ImGuiWindowFlags_NoScrollbar);
+
+    if (ImGui::Button("Load New Asset")) {
+        ofFileDialogResult result = ofSystemLoadDialog("Select an asset");
+        if (result.bSuccess) {
+            addAsset(result.getPath());
+        }
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Load Assets from Folder")) {
+        ofFileDialogResult result = ofSystemLoadDialog("Select a folder", true);
+        if (result.bSuccess) {
+            loadAssetsFromFolder(result.getPath());
+        }
+    }
+
+    ImGui::SameLine();
+
+    if (!selectedAsset.empty()) {
+        if (ImGui::Button("Save")) {
+            std::string filename = fs::path(selectedAsset).filename().string();
+
+            ofFileDialogResult result = ofSystemSaveDialog(filename, "Save your asset");
+            if (result.bSuccess) {
+                if (onAssetSave) onAssetSave(result.getPath());
+            }
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Delete")) {
+            removeAsset(selectedAsset);
+            selectedAsset.clear();
+        }
+    }
+
+    ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 500.0f);
+
+    const char* filterOptions[] = { "All", "Images", "Models" };
+    ImGui::SetNextItemWidth(150);
+    ImGui::Combo("", &filterIndex, filterOptions, IM_ARRAYSIZE(filterOptions));
+    ImGui::SameLine();
+
     ImGui::SetNextItemWidth(-1);
-    ImGui::InputTextWithHint("##Search", "Search...", searchBuffer, IM_ARRAYSIZE(searchBuffer));
-    ImGui::Dummy(ImVec2(0.0f, 4.0f));
+    ImGui::InputTextWithHint("##SearchBar", "Search...", searchBuffer, IM_ARRAYSIZE(searchBuffer));
+
+    ImGui::EndChild();
+    ImGui::PopStyleVar(2);
 }
 
 void AssetBrowser::drawAssetList() {
+    ImU32 childBgColor = IM_COL32(30, 30, 30, 200);
+    if (ImGui::GetStyle().Colors[ImGuiCol_WindowBg].x > 0.5f) {
+        childBgColor = IM_COL32(255, 255, 255, 200);
+    }
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, childBgColor);
+
     ImGui::BeginChild("AssetList", ImVec2(0, 0), false);
 
     auto filteredAssets = getFilteredAssets();
@@ -120,49 +152,7 @@ void AssetBrowser::drawAssetList() {
     }
 
     ImGui::EndChild();
-}
-
-void AssetBrowser::drawControls() {
-    ImGui::BeginChild("Controls", ImVec2(0, 0), false);
-
-    ImVec2 buttonSize = ImVec2(-1, 0);
-
-    if (!selectedAsset.empty()) {
-        if (ImGui::Button("Save", buttonSize)) {
-            std::string filename = fs::path(selectedAsset).filename().string();
-
-            ofFileDialogResult result = ofSystemSaveDialog(filename, "Save your asset");
-            if (result.bSuccess) {
-                if (onAssetSave) onAssetSave(result.getPath());
-            }
-        }
-
-        if (ImGui::Button("Delete", buttonSize)) {
-            removeAsset(selectedAsset);
-            selectedAsset.clear();
-        }
-    }
-
-    if (ImGui::Button("Load New Asset", buttonSize)) {
-        ofFileDialogResult result = ofSystemLoadDialog("Select an asset");
-        if (result.bSuccess) {
-            addAsset(result.getPath());
-        }
-    }
-
-    if (ImGui::Button("Load Assets from Folder", buttonSize)) {
-        ofFileDialogResult result = ofSystemLoadDialog("Select a folder", true);
-        if (result.bSuccess) {
-            loadAssetsFromFolder(result.getPath());
-        }
-    }
-
-    const char* filterOptions[] = { "None", "Images", "Models" };
-    ImGui::Combo("Filter", &filterIndex, filterOptions, IM_ARRAYSIZE(filterOptions));
-
-    ImGui::Checkbox("Show Full Paths", &showFullPaths);
-
-    ImGui::EndChild();
+    ImGui::PopStyleColor();
 }
 
 void AssetBrowser::exit() {

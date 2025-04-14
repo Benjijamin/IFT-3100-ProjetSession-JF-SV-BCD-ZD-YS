@@ -321,8 +321,6 @@ void ImageEditor::pasteRegion(int x, int y) {
     currentImage->update();
     originalImage = new ofImage();
     *originalImage = *currentImage;
-
-
 }
 
 void ImageEditor::drawCopyRegion() {

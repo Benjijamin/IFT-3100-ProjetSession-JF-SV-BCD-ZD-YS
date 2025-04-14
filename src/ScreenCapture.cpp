@@ -52,13 +52,16 @@ void ScreenCapture::exit() {
 void ScreenCapture::captureScreenshot() {
     screenshotImg.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
     screenshotImg.update();
+
     createScreenshotTexture();
+
     screenshotTaken = true;
     showModal();
 }
 
 void ScreenCapture::saveScreenshot() {
     ofFileDialogResult result = ofSystemSaveDialog("screenshot.png", "Save your file");
+
     if (result.bSuccess) {
         screenshotImg.save(result.getPath());
     }

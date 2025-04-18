@@ -10,20 +10,18 @@ in vec4 normal;
 out vec3 surface_position;
 out vec3 surface_normal;
 
-// attributs uniformes
+// Uniformes matrices
 uniform mat4x4 modelViewMatrix;
 uniform mat4x4 projectionMatrix;
 
 void main() {
-    // calculer la matrice normale
+    // calcul de la matrice normale en eye space
     mat4x4 normalMatrix = transpose(inverse(modelViewMatrix));
+    surface_normal   = vec3(normalMatrix * normal);
 
-    // transformation de la normale du sommet dans l'espace de vue
-    surface_normal = vec3(normalMatrix * normal);
-
-    // transformation de la position du sommet dans l'espace de vue
+    // position en eye space
     surface_position = vec3(modelViewMatrix * position);
 
-    // transformation de la position du sommet par les matrices de modèle, vue et projection
+    // projection finale
     gl_Position = projectionMatrix * modelViewMatrix * position;
 }

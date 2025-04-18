@@ -193,7 +193,7 @@ void ofApp::setup() {
 }
 
 void ofApp::update() {
-    ofSetWindowTitle("modèle d'illumination : " + renderer.shader_name + " (1-6 ↑↓←→ r)");
+    ofSetWindowTitle("Renderer : " + renderer.shader_name + " (1-6 ↑↓←→ r)");
 
     time_current = ofGetElapsedTimef();
     time_elapsed = time_current - time_last;
@@ -272,6 +272,26 @@ void ofApp::keyReleased(int key) {
     case 54: // touche 6
         renderer.shader_active = ShaderType::toon;
         ofLog() << "<shader: toon>";
+        break;
+
+    case 55: // touche 7
+        renderer.is_active_light_ambient = !renderer.is_active_light_ambient;
+        ofLog() <<"<Light ambient: " << renderer.is_active_light_ambient << ">";
+        break;
+
+    case 56: // touche 8
+        renderer.is_active_light_directional = !renderer.is_active_light_directional;
+        ofLog() << "<light directional: " << renderer.is_active_light_directional << ">";
+        break;
+
+    case 57: // touche 9
+        renderer.is_active_light_point = !renderer.is_active_light_point;
+        ofLog() << "<light point: " << renderer.is_active_light_point << ">";
+        break;
+
+    case 48: // touche 0
+        renderer.is_active_light_spot = !renderer.is_active_light_spot;
+        ofLog() << "<light spot: " << renderer.is_active_light_spot << ">";
         break;
 
     case 114: // touche r

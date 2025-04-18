@@ -1,71 +1,108 @@
-// IFT3100H24 TP2 ~ gouraud.vert
-
 #version 330
 
 // attributs de sommet
 in vec4 position;
 in vec4 normal;
 
-// attributs en sortie
+// attribut en sortie pour le fragment
 out vec3 surface_color;
 
-// attributs uniformes
+// uniformes matrices
 uniform mat4x4 modelViewMatrix;
 uniform mat4x4 projectionMatrix;
 
-// couleurs de réflexion du matériau
+// matériau
 uniform vec3 color_ambient;
 uniform vec3 color_diffuse;
 uniform vec3 color_specular;
-
-// facteur de brillance spéculaire du matériau
 uniform float brightness;
 
-// position d'une source de lumière
-uniform vec3 light_position;
+// lumière ambiante
+uniform bool use_light_ambient;
+uniform vec3 light_ambient;
 
-void main()
-{
-  // calculer la matrice normale
-  mat4x4 normalMatrix = transpose(inverse(modelViewMatrix));
+// directionnelle
+uniform bool use_light_directional;
+uniform vec3 light_directional_direction;
+uniform vec3 light_directional_diffuse;
 
-  // transformation de la normale du sommet dans l'espace de vue
-  vec3 surface_normal = vec3(normalMatrix * normal);
+// ponctuelle
+uniform bool use_light_point;
+uniform vec3 light_point_position;
+uniform vec3 light_point_diffuse;
+uniform float light_point_constant;
+uniform float light_point_linear;
+uniform float light_point_quadratic;
 
-  // transformation de la position du sommet dans l'espace de vue
-  vec3 surface_position = vec3(modelViewMatrix * position);
+// spot
+uniform bool use_light_spot;
+uniform vec3 light_spot_position;
+uniform vec3 light_spot_direction;
+uniform vec3 light_spot_diffuse;
+uniform float light_spot_cutoff;
+uniform float light_spot_outerCutoff;
+uniform float light_spot_constant;
+uniform float light_spot_linear;
+uniform float light_spot_quadratic;
 
-  // re-normaliser la normale
-  vec3 n = normalize(surface_normal);
+void main() {
+    // calcul de la normale et de la position en espace vue
+    mat4x4 normalMatrix = transpose(inverse(modelViewMatrix));
+    vec3 n   = normalize(vec3(normalMatrix * normal));
+    vec3 pos = vec3(modelViewMatrix * position);
 
-  // calculer la direction de la surface vers la lumière (l)
-  vec3 l = normalize(light_position - surface_position);
+    vec3 V = normalize(-pos);
 
-  // calculer le niveau de réflexion diffuse (n • l)
-  float reflection_diffuse = max(dot(n, l), 0.0);
+    // accumulateur pour diffus + spéculaire
+    vec3 diffuse_accum  = vec3(0.0);
+    vec3 specular_accum = vec3(0.0);
+    vec3 ambient = vec3(0.0);
 
-  // réflexion spéculaire par défaut
-  float reflection_specular = 0.0;
 
-  // calculer la réflexion spéculaire seulement s'il y a réflexion diffuse
-  if (reflection_diffuse > 0.0)
-  {
-    // calculer la direction de la surface vers la caméra (v)
-    vec3 v = normalize(-surface_position);
+    // - Ambient -
+    if(use_light_ambient) {
+        ambient = color_ambient * light_ambient;
+    }
 
-    // calculer la direction de la réflection (v) du rayon incident (-l) en fonction de la normale (n)
-    vec3 r = reflect(-l, n);
+    // — Directionnelle —
+    if(use_light_directional) {
+        vec3 L = normalize(-light_directional_direction);
+        float NdotL = max(dot(n, L), 0.0);
+        diffuse_accum  += color_diffuse * light_directional_diffuse * NdotL;
+        vec3 R = reflect(-L, n);
+        specular_accum += color_specular * light_directional_diffuse * pow(max(dot(R, V), 0.0), brightness);
+    }
+    
+    // — Ponctuelle —
+    if(use_light_point) {
+        vec3 Lp = light_point_position - pos;
+        float d = length(Lp);
+        Lp = normalize(Lp);
+        float att = 1.0 / (light_point_constant + light_point_linear * d + light_point_quadratic * d * d);
+        float NdotL = max(dot(n, Lp), 0.0);
+        diffuse_accum  += color_diffuse * light_point_diffuse * NdotL * att;
+        vec3 R = reflect(-Lp, n);
+        specular_accum += color_specular * light_point_diffuse * pow(max(dot(R, V), 0.0), brightness) * att;
+    }
+    
+    // — Spot —
+    if(use_light_spot) {
+        vec3 Ls = light_spot_position - pos;
+        float d = length(Ls);
+        Ls = normalize(Ls);
+        float theta = dot(Ls, normalize(-light_spot_direction));
+        float eps = light_spot_cutoff - light_spot_outerCutoff;
+        float intensity = clamp((theta - light_spot_outerCutoff) / eps, 0.0, 1.0);
+        float att = intensity / (light_spot_constant + light_spot_linear * d + light_spot_quadratic * d * d);
+        float NdotL = max(dot(n, Ls), 0.0);
+        diffuse_accum  += color_diffuse * light_spot_diffuse * NdotL * att;
+        vec3 R = reflect(-Ls, n);
+        specular_accum += color_specular * light_spot_diffuse * pow(max(dot(R, V), 0.0), brightness) * att;
+    }
 
-    // calculer le niveau de réflexion spéculaire (r • v)
-    reflection_specular = pow(max(dot(v, r), 0.0), brightness);
-  }
+    // combinaison finale
+    surface_color = ambient + diffuse_accum + specular_accum;
 
-  // calculer la couleur du fragment
-  surface_color = vec3(
-    color_ambient +
-    color_diffuse * reflection_diffuse +
-    color_specular * reflection_specular);
-
-  // transformation de la position du sommet par les matrices de modèle, vue et projection
-  gl_Position = projectionMatrix * modelViewMatrix * position;
+    // projection
+    gl_Position = projectionMatrix * modelViewMatrix * position;
 }

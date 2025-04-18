@@ -133,12 +133,6 @@
     <ClCompile Include="src\renderer.cpp">
       <Filter>src\rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\light.cpp">
-      <Filter>src\rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\shaders.cpp">
-      <Filter>src\rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\materials.cpp">
       <Filter>src\rendering</Filter>
     </ClCompile>
@@ -624,12 +618,6 @@
       <Filter>src\components</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer.h">
-      <Filter>src\rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\light.h">
-      <Filter>src\rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\shaders.h">
       <Filter>src\rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\materials.h">

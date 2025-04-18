@@ -2,54 +2,91 @@
 
 #version 330
 
-// attributs interpolés à partir des valeurs en sortie du shader de sommets
 in vec3 surface_position;
 in vec3 surface_normal;
-
-// attribut en sortie
 out vec4 fragment_color;
 
-// couleurs de réflexion du matériau
+// matériel
 uniform vec3 color_ambient;
 uniform vec3 color_diffuse;
 uniform vec3 color_specular;
-
-// facteur de brillance spéculaire du matériau
 uniform float brightness;
 
-// position d'une source de lumière
-uniform vec3 light_position;
+// lumière ambiante
+uniform bool use_light_ambient;
+uniform vec3 light_ambient;
 
-void main()
-{
-  // re-normaliser la normale après interpolation
-  vec3 n = normalize(surface_normal);
+// directionnelle
+uniform bool use_light_directional;
+uniform vec3 light_directional_direction;
+uniform vec3 light_directional_diffuse;
 
-  // calculer la direction de la surface vers la lumière (l)
-  vec3 l = normalize(light_position - surface_position);
+// ponctuelle
+uniform bool use_light_point;
+uniform vec3 light_point_position;
+uniform vec3 light_point_diffuse;
+uniform float light_point_constant;
+uniform float light_point_linear;
+uniform float light_point_quadratic;
 
-  // calculer le niveau de réflexion diffuse (n • l)
-  float reflection_diffuse = max(dot(n, l), 0.0);
+// spot
+uniform bool use_light_spot;
+uniform vec3 light_spot_position;
+uniform vec3 light_spot_direction;
+uniform vec3 light_spot_diffuse;
+uniform float light_spot_cutoff;
+uniform float light_spot_outerCutoff;
+uniform float light_spot_constant;
+uniform float light_spot_linear;
+uniform float light_spot_quadratic;
 
-  // réflexion spéculaire par défaut
-  float reflection_specular = 0.0;
+void main() {
+    vec3 n = normalize(surface_normal);
 
-  // calculer la réflexion spéculaire seulement s'il y a réflexion diffuse
-  if (reflection_diffuse > 0.0)
-  {
-    // calculer la direction de la surface vers la caméra (v)
-    vec3 v = normalize(-surface_position);
+    // ambiante conditionnelle
+    vec3 ambient = vec3(0.0);
+    if(use_light_ambient) {
+        ambient = color_ambient * light_ambient;
+    }
 
-    // calculer la direction de la réflection (r) du rayon incident (-l) en fonction de la normale (n)
-    vec3 r = reflect(-l, n);
+    vec3 diffuse_sum  = vec3(0.0);
+    vec3 specular_sum = vec3(0.0);
 
-    // calculer le niveau de réflexion spéculaire (r • v)
-    reflection_specular = pow(max(dot(v, r), 0.0), brightness);
-  }
+    // directionnelle
+    if(use_light_directional) {
+        vec3 L = normalize(-light_directional_direction);
+        float NdotL = max(dot(n, L), 0.0);
+        diffuse_sum  += color_diffuse * light_directional_diffuse * NdotL;
+        vec3 R = reflect(-L, n);
+        specular_sum += color_specular * light_directional_diffuse * pow(max(dot(R, normalize(-surface_position)), 0.0), brightness);
+    }
 
-  // calculer la couleur du fragment
-  fragment_color = vec4(
-    color_ambient +
-    color_diffuse * reflection_diffuse +
-    color_specular * reflection_specular, 1.0);
+    // ponctuelle
+    if(use_light_point) {
+        vec3 Lp = light_point_position - surface_position;
+        float d = length(Lp);
+        Lp = normalize(Lp);
+        float att = 1.0 / (light_point_constant + light_point_linear * d + light_point_quadratic * d * d);
+        float NdotL = max(dot(n, Lp), 0.0);
+        diffuse_sum  += color_diffuse * light_point_diffuse * NdotL * att;
+        vec3 R = reflect(-Lp, n);
+        specular_sum += color_specular * light_point_diffuse * pow(max(dot(R, normalize(-surface_position)), 0.0), brightness) * att;
+    }
+
+    // spot
+    if(use_light_spot) {
+        vec3 Ls = light_spot_position - surface_position;
+        float d = length(Ls);
+        Ls = normalize(Ls);
+        float theta = dot(Ls, normalize(-light_spot_direction));
+        float eps = light_spot_cutoff - light_spot_outerCutoff;
+        float intensity = clamp((theta - light_spot_outerCutoff) / eps, 0.0, 1.0);
+        float att = intensity / (light_spot_constant + light_spot_linear * d + light_spot_quadratic * d * d);
+        float NdotL = max(dot(n, Ls), 0.0);
+        diffuse_sum  += color_diffuse * light_spot_diffuse * NdotL * att;
+        vec3 R = reflect(-Ls, n);
+        specular_sum += color_specular * light_spot_diffuse * pow(max(dot(R, normalize(-surface_position)), 0.0), brightness) * att;
+    }
+
+    fragment_color = vec4(ambient + diffuse_sum + specular_sum, 1.0);
 }

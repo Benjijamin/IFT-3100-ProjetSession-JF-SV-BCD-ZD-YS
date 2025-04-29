@@ -3,7 +3,7 @@
 void BezierCurve::setup()
 {
     // Taille et espacement des fenêtres
-    windowSize = ImVec2(400.0f, 175.0f);
+    windowSize = ImVec2(400.0f, 100.0f);
     windowGap = 12.0f;
     windowPos = ImVec2(ofGetWidth() - windowSize.x - windowGap / 3, windowGap * 2);
 
@@ -15,7 +15,7 @@ void BezierCurve::setup()
     minPts = 3;
     maxPts = 9;
     nPts = 3;
-    ptOffset = 100.0f;
+    ptOffset = 150.0f;
     ptSize = 20.0f;
     ptColor = ofColor(255.0f, 0.0f, 0.0f);
 
@@ -63,12 +63,12 @@ void BezierCurve::drawGui()
     ImGui::SetNextWindowSize(windowSize);
 
     // Titre de la fenêtre
-    ImGui::Begin("Bézier-style curve", nullptr, flags);
+    ImGui::Begin("Bezier-style curve", nullptr, flags);
     
     // Boutons d'édition
     ImGui::SliderInt("Control points", &nPts, minPts, maxPts);
     ImGui::ColorEdit3("Line color", (float*) &lineColor);
-    if (ImGui::Button("Add Bézier-style curve")) addCurve();
+    if (ImGui::Button("Add Bezier-style curve")) addCurve();
 
     // Fin
     ImGui::PopStyleVar(3);
@@ -94,17 +94,55 @@ void BezierCurve::begin()
     active = true;
 }
 
-bool BezierCurve::isEditing() const
+void BezierCurve::drawEditorWindow()
+{
+    // Drapeaux de la fenêtre
+    ImGuiWindowFlags flags = 0;
+    flags |= ImGuiWindowFlags_NoCollapse;
+    flags |= ImGuiWindowFlags_NoMove;
+    flags |= ImGuiWindowFlags_NoResize;
+    flags |= ImGuiWindowFlags_NoTitleBar;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(12, 12));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 4));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 4));
+
+    // Paramètres de la fenêtre
+    ImGui::SetNextWindowPos(windowPos);
+    ImGui::SetNextWindowSize(windowSize);
+
+    // Titre de la fenêtre
+    ImGui::Begin("Bezier curve editor", nullptr, flags);
+
+    // Boutons d'édition
+    if (ImGui::Button("Apply curve")) applyCurve();
+
+    // Fin
+    ImGui::PopStyleVar(3);
+    ImGui::End();
+}
+
+const bool BezierCurve::checkHover(const ImVec2& v) const
+{
+    ImVec2 windowArea = windowPos + windowSize;
+    bool withinBoundsX = v.x >= windowPos.x && v.x <= windowArea.x;
+    bool withinBoundsY = v.y >= windowPos.y && v.y <= windowArea.y;
+    return withinBoundsX && withinBoundsY;
+}
+
+const bool BezierCurve::isEditing() const
 {
     return editing;
 }
 
 void BezierCurve::drawCurrent() const
 {
+    // Tracer la courbe
     ofFill();
     ofSetColor(currentCurve.color);
     currentCurve.line.draw();
 
+    // Tracer les points de contrôle
     ofSetColor(ptColor);
     for (const auto& pt : currentCurve.pts)
     {
@@ -115,14 +153,16 @@ void BezierCurve::drawCurrent() const
 void BezierCurve::addCurve()
 {
     editing = true;
+
+    // Initialiser la courbe
     Curve c;
     c.color = lineColor;
-
     for (int i = 0; i <= lineRes; ++i)
     {
         c.line.addVertex(ofPoint());
     }
 
+    // Initialiser les points de contrôle et calculer la courbe en conséquence
     initPts(c);
     computeCurve(c);
     currentCurve = c;
@@ -130,15 +170,11 @@ void BezierCurve::addCurve()
 
 void BezierCurve::initPts(Curve& c) const
 {
-    ofVec2f center = ofVec2f(ofGetWidth() / 2.0f, ofGetHeight() / 2.0f);
-    int offset = 0;
-    int delta = -1;
-
+    float spacing = (float) nPts / 2.0f - 0.5f;
     for (int i = 0; i < nPts; ++i)
     {
-        c.pts.push_back(ofVec2f(center.x + (float) offset * ptOffset, center.y));
-        offset = ceil((float) i / 2.0f) * delta;
-        delta *= -1;
+        auto offset = ofGetWidth() / 2.0f + ((float) i - spacing) * ptOffset;
+        c.pts.push_back(ofVec2f(offset, ofGetHeight() / 2.0f));
     }
 }
 
@@ -172,7 +208,6 @@ void BezierCurve::computeCurve(Curve& c) const
     for (int i = 0; i <= lineRes; ++i)
     {
         computeFragment(c, i);
-        ofLog() << "Ligne, point " << i << " - x: " << c.line[i].x << ", y: " << c.line[i].y;
     }
 }
 
@@ -195,6 +230,7 @@ void BezierCurve::applyCurve()
     curves.push_back(currentCurve);
 }
 
+// Méthodes inutilisées
 void BezierCurve::update() {}
 void BezierCurve::mousePressed(int x, int y, int button) {}
 void BezierCurve::mouseReleased(int x, int y, int button) {}

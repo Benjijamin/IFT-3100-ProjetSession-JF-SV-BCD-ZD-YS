@@ -71,7 +71,13 @@ void DessinVectoriel::draw()
 
 void DessinVectoriel::drawGui()
 {
-    if (!active || curve.isEditing()) return;
+    if (!active) return;
+
+    if (curve.isEditing())
+    {
+        curve.drawEditorWindow();
+        return;
+    }
 
     // Drapeaux de la fenêtre
     ImGuiWindowFlags flags = 0;
@@ -145,7 +151,11 @@ void DessinVectoriel::mousePressed(int x, int y, int button)
 
 void DessinVectoriel::mouseDragged(int x, int y, int button)
 {
-    if (!curve.isEditing())
+    if (curve.isEditing())
+    {
+        curve.mouseDragged(x, y, button);
+    }
+    else
     {
         // Restreindre la sélection à la fenêtre
         mousePos.x = std::clamp(x, mouseGap, ofGetWidth() - mouseGap);
@@ -244,7 +254,7 @@ bool DessinVectoriel::checkHover() const
     ImVec2 windowArea = windowPos + windowSize;
     bool withinBoundsX = mousePos.x >= windowPos.x && mousePos.x <= windowArea.x;
     bool withinBoundsY = mousePos.y >= windowPos.y && mousePos.y <= windowArea.y;
-    return withinBoundsX && withinBoundsY;
+    return (withinBoundsX && withinBoundsY) || curve.checkHover(mousePos);
 }
 
 // Helper Functions

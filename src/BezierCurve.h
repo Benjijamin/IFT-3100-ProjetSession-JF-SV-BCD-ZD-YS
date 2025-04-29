@@ -19,7 +19,9 @@ public:
     void mouseDragged(int x, int y, int button) override;
 
     void begin();
-    bool isEditing() const;
+    void drawEditorWindow();
+    const bool checkHover(const ImVec2& v) const;
+    const bool isEditing() const;
     void drawCurrent() const;
     void addCurve();
     void initPts(Curve& c) const;

@@ -8,6 +8,7 @@
 #include "CameraManager.h"
 #include "LightModal.h"
 #include "MaterialModal.h"
+#include "Skybox.h"
 
 class SceneEditor : public Editor {
 public:
@@ -55,4 +56,6 @@ private:
     bool isMaterialPopupOpen;
 
     ofEasyCam camera;
+
+    Skybox skybox;
 };

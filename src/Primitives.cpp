@@ -51,15 +51,86 @@ std::shared_ptr<ofMesh> Primitives::getCubePrimitive(float size)
 		20, 21, 23, 23, 22, 20 //bottom
 	};
 
-	//cubemap ex:de6.jpg
 	std::vector<glm::vec2> texCoords =
 	{
 		glm::vec2(0, 0.333), glm::vec2(0.25, 0.333), glm::vec2(0, 0.666), glm::vec2(0.25, 0.666), //back
 		glm::vec2(0.25, 0.333), glm::vec2(0.5, 0.333), glm::vec2(0.25, 0.666), glm::vec2(0.5, 0.666), //left
 		glm::vec2(0.5, 0.333), glm::vec2(0.75, 0.333), glm::vec2(0.5, 0.666), glm::vec2(0.75, 0.666), //front
 		glm::vec2(0.75, 0.333), glm::vec2(1, 0.333), glm::vec2(0.75, 0.666), glm::vec2(1, 0.666), //right
-		glm::vec2(0.5, 0), glm::vec2(0.75, 0), glm::vec2(0.5, 0.333), glm::vec2(0.75, 0.333), //top
-		glm::vec2(0.5, 0.666), glm::vec2(0.75, 0.666), glm::vec2(0.5, 1), glm::vec2(0.75, 1) //bottom
+		glm::vec2(0.25, 0.333), glm::vec2(0.25, 0), glm::vec2(0.5, 0.333), glm::vec2(0.5, 0), //top
+		glm::vec2(0.5, 0.666), glm::vec2(0.5, 1), glm::vec2(0.25, 0.666), glm::vec2(0.25, 1) //bottom
+	};
+
+	auto primitive = make_shared<ofMesh>();
+	primitive->addVertices(verts);
+	primitive->addIndices(indices);
+	primitive->addTexCoords(texCoords);
+	primitive->addNormals(calculateNormals(primitive));
+	primitive->flatNormals();
+
+	return primitive;
+}
+
+std::shared_ptr<ofMesh> Primitives::getSkyboxPrimitive(float size) 
+{
+	std::vector<glm::vec3> verts =
+	{
+		//back
+		{  size,  size, -size }, //rtb
+		{ -size,  size, -size }, //ltb
+		{  size, -size, -size }, //rbb
+		{ -size, -size, -size }, //lbb
+
+		//left
+		{ -size,  size, -size }, //ltb
+		{ -size,  size,  size }, //ltf
+		{ -size, -size, -size }, //lbb
+		{ -size, -size,  size }, //lbf
+
+		//front
+		{ -size,  size,  size }, //ltf
+		{  size,  size,  size }, //rtf
+		{ -size, -size,  size }, //lbf
+		{  size, -size,  size }, //rbf
+
+		//right
+		{  size,  size,  size }, //rtf
+		{  size,  size, -size }, //rtb
+		{  size, -size,  size }, //rbf
+		{  size, -size, -size }, //rbb
+
+		//top
+		{ -size,  size, -size }, //ltb
+		{  size,  size, -size }, //rtb
+		{ -size,  size,  size }, //ltf
+		{  size,  size,  size }, //rtf
+
+		//bottom
+		{ -size, -size,  size }, //lbf
+		{  size, -size,  size }, //rbf
+		{ -size, -size, -size }, //lbb
+		{  size, -size, -size }, //rbb
+	};
+
+	//inverted normals
+	std::vector<unsigned int> indices =
+	{
+		3, 1, 0, 0, 2, 3, //back
+		7, 5, 4, 4, 6, 7, //left
+		11, 9, 8, 8, 10, 11, //front
+		15, 13, 12, 12, 14, 15, //right
+		19, 17, 16, 16, 18, 19, //top
+		23, 21, 20, 20, 22, 23 //bottom
+	};
+
+	std::vector<glm::vec2> texCoords =
+	{
+		glm::vec2(0, 0.333), glm::vec2(0.25, 0.333), glm::vec2(0, 0.666), glm::vec2(0.25, 0.666), //back
+		glm::vec2(0.25, 0.333), glm::vec2(0.5, 0.333), glm::vec2(0.25, 0.666), glm::vec2(0.5, 0.666), //left
+		glm::vec2(0.5, 0.333), glm::vec2(0.75, 0.333), glm::vec2(0.5, 0.666), glm::vec2(0.75, 0.666), //front
+		glm::vec2(0.75, 0.333), glm::vec2(1, 0.333), glm::vec2(0.75, 0.666), glm::vec2(1, 0.666), //right
+		glm::vec2(0.25, 0.333), glm::vec2(0.25, 0), glm::vec2(0.5, 0.333), glm::vec2(0.5, 0), //top
+		glm::vec2(0.5, 0.666), glm::vec2(0.5, 1), glm::vec2(0.25, 0.666), glm::vec2(0.25, 1) //bottom
 	};
 
 	auto primitive = make_shared<ofMesh>();

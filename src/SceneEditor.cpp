@@ -29,6 +29,8 @@ void SceneEditor::setup() {
 
     isLightPopupOpen = false;
     isMaterialPopupOpen = false;
+
+    skybox.setup();
 }
 
 void SceneEditor::update() {
@@ -49,6 +51,8 @@ void SceneEditor::draw() {
     ofCamera* frustumCam = cameraManager.getFrustumCamera();
 
     selectedCam->begin();
+
+    skybox.draw();
 
     if (cameraManager.isFrustumCullingEnabled() && frustumCam) {
         sceneGraph.drawVisibleNodes(*frustumCam);

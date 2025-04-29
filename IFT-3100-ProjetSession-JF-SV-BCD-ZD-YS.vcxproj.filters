@@ -139,6 +139,9 @@
     <ClCompile Include="src\LightModal.cpp">
       <Filter>src\components\modals</Filter>
     </ClCompile>
+    <ClCompile Include="src\Skybox.cpp">
+      <Filter>src\components\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -628,6 +631,9 @@
     </ClInclude>
     <ClInclude Include="src\LightModal.h">
       <Filter>src\components\modals</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Skybox.h">
+      <Filter>src\components\scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

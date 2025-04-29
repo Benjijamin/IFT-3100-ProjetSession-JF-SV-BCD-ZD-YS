@@ -171,7 +171,7 @@ void DessinVectoriel::mouseDragged(int x, int y, int button)
 
 void DessinVectoriel::mouseReleased(int x, int y, int button)
 {
-    if (curve.isEditing())
+    if (!curve.isEditing())
     {
         mouseHeld = false;
 

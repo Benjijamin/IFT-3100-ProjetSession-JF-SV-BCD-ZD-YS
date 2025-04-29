@@ -23,14 +23,14 @@ public:
     const bool checkHover(const ImVec2& v) const;
     const bool isEditing() const;
     void drawCurrent() const;
-    void addCurve();
+    void toggleEditor();
     void initPts(Curve& c) const;
     const float fact(const int n) const;
     const float Bernstein(const int n, const int k, const float t) const;
     void computeFragment(Curve& c, const int index) const;
     void computeCurve(Curve& c) const;
     void refreshCurve(const float x, const float y);
-    void applyCurve();
+    void quitEditor();
 
     // Méthodes inutilisées
     void update() override;
@@ -60,6 +60,8 @@ private:
     int ptOffset;
     float ptSize;
     ofColor ptColor;
+    ofColor textColor;
+    ofTrueTypeFont ptFont;
 
     // Variables d'état
     bool active;

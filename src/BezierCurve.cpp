@@ -17,7 +17,9 @@ void BezierCurve::setup()
     nPts = 3;
     ptOffset = 150.0f;
     ptSize = 20.0f;
-    ptColor = ofColor(255.0f, 0.0f, 0.0f);
+    ptColor = ofColor(255.0f);
+    textColor = ofColor(0.0f);
+    ptFont.load("arial.ttf", 16);
 
     // Variables d'état
     active = false;
@@ -63,12 +65,12 @@ void BezierCurve::drawGui()
     ImGui::SetNextWindowSize(windowSize);
 
     // Titre de la fenêtre
-    ImGui::Begin("Bezier-style curve", nullptr, flags);
+    ImGui::Begin("Bezier-like curve", nullptr, flags);
     
     // Boutons d'édition
     ImGui::SliderInt("Control points", &nPts, minPts, maxPts);
     ImGui::ColorEdit3("Line color", (float*) &lineColor);
-    if (ImGui::Button("Add Bezier-style curve")) addCurve();
+    if (ImGui::Button("Add Bezier-like curve")) toggleEditor();
 
     // Fin
     ImGui::PopStyleVar(3);
@@ -115,7 +117,7 @@ void BezierCurve::drawEditorWindow()
     ImGui::Begin("Bezier curve editor", nullptr, flags);
 
     // Boutons d'édition
-    if (ImGui::Button("Apply curve")) applyCurve();
+    if (ImGui::Button("Apply curve")) quitEditor();
 
     // Fin
     ImGui::PopStyleVar(3);
@@ -143,14 +145,18 @@ void BezierCurve::drawCurrent() const
     currentCurve.line.draw();
 
     // Tracer les points de contrôle
-    ofSetColor(ptColor);
+    int index = 1;
     for (const auto& pt : currentCurve.pts)
     {
+        ofSetColor(ptColor);
         ofDrawEllipse(pt, ptSize, ptSize);
+        ofSetColor(textColor);
+        ptFont.drawString(to_string(index), pt.x - ptSize / 3.0f, pt.y + ptSize / 2.5f);
+        ++index;
     }
 }
 
-void BezierCurve::addCurve()
+void BezierCurve::toggleEditor()
 {
     editing = true;
 
@@ -224,7 +230,7 @@ void BezierCurve::refreshCurve(const float x, const float y)
     computeCurve(currentCurve);
 }
 
-void BezierCurve::applyCurve()
+void BezierCurve::quitEditor()
 {
     editing = false;
     curves.push_back(currentCurve);

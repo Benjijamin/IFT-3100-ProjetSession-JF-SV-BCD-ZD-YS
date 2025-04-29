@@ -104,6 +104,7 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\BezierCurve.cpp" />
     <ClCompile Include="src\CameraManager.cpp" />
     <ClCompile Include="src\ColorPicker.cpp" />
     <ClCompile Include="src\CustomSlider.cpp" />
@@ -147,6 +148,7 @@
     <ClCompile Include="src\Viewer2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\BezierCurve.h" />
     <ClInclude Include="src\CameraManager.h" />
     <ClInclude Include="src\ColorPicker.h" />
     <ClInclude Include="src\CustomSlider.h" />

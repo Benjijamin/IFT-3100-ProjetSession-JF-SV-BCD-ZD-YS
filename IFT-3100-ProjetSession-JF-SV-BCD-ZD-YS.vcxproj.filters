@@ -130,6 +130,9 @@
     <ClCompile Include="src\DynamicCursor.cpp">
       <Filter>src\components</Filter>
     </ClCompile>
+    <ClCompile Include="src\BezierCurve.cpp">
+      <Filter>src\editors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -604,6 +607,9 @@
     </ClInclude>
     <ClInclude Include="src\DynamicCursor.h">
       <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BezierCurve.h">
+      <Filter>src\editors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

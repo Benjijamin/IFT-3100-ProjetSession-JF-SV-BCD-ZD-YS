@@ -5,6 +5,16 @@ void SceneEditor::setup() {
 
     sceneGraph.setup();
 
+    auto defaultLight = std::make_shared<ofLight>();
+
+    defaultLight->enable();
+    defaultLight->setPointLight();
+    defaultLight->setDiffuseColor(ofFloatColor(1.0f, 1.0f, 1.0f, 1.0f));
+    defaultLight->setAmbientColor(ofFloatColor(1.0f, 1.0f, 1.0f, 1.0f));
+    defaultLight->setSpecularColor(ofFloatColor(1.0f, 1.0f, 1.0f, 1.0f));
+
+    sceneGraph.addLightNode(defaultLight, "Default Light", sceneGraph.getRootNode());
+
     gizmoManager.setup();
     gizmoManager.setSelectedNode(sceneGraph.getSelectedNode());
 
@@ -13,23 +23,15 @@ void SceneEditor::setup() {
     cameraManager.addFreeFlightCamera("Free Flight Camera", glm::vec3(0, 0, 500));
     cameraManager.setSelectedCamera(0);
 
-    light.setup();
-    light.setPosition(200, 300, 400);
-    light.enable();
-
-    material.setDiffuseColor(ofFloatColor(0.5f, 0.5f, 0.5f, 1.0f));
-    material.setAmbientColor(ofFloatColor(0.3f, 0.3f, 0.3f, 1.0f));
-    material.setSpecularColor(ofFloatColor(0.9f, 0.9f, 0.9f, 1.0f));
-    material.setEmissiveColor(ofFloatColor(0.1f, 0.1f, 0.1f, 1.0f));
-    material.setShininess(64);
-
+    firstTime = true;
     justAddedNode = false;
     shouldEnableMouseInput = false;
+
+    isLightPopupOpen = false;
+    isMaterialPopupOpen = false;
 }
 
 void SceneEditor::update() {
-    light.setPosition(cameraManager.getSelectedCamera()->getPosition());
-
     sceneGraph.update();
     gizmoManager.update();
     cameraManager.update();
@@ -48,18 +50,12 @@ void SceneEditor::draw() {
 
     selectedCam->begin();
 
-    light.enable();
-    material.begin();
-
     if (cameraManager.isFrustumCullingEnabled() && frustumCam) {
         sceneGraph.drawVisibleNodes(*frustumCam);
     }
     else {
         sceneGraph.draw();
     }
-
-    material.end();
-    light.disable();
 
     gizmoManager.draw(*selectedCam);
 
@@ -84,6 +80,48 @@ void SceneEditor::drawGui() {
     drawSceneGraph();
 
     ImGui::End();
+
+    ImGui::SetNextWindowSize(ImVec2(400.0f, 0));
+
+    if (isLightPopupOpen) {
+        if (!lightModal.isOpen()) {
+            cameraManager.disableAllMouseInput();
+
+            if (activeLight) {
+                lightModal.openEditLightModal(activeLight);
+            }
+            else {
+                lightModal.openNewLightModal(activeLightType);
+            }
+        }
+
+        if (activeLight) {
+            lightModal.editLight(activeLight);
+        }
+        else {
+            lightModal.createNewLight(sceneGraph);
+        }
+
+        if (!lightModal.isOpen()) {
+            cameraManager.enableSelectedMouseInput();
+            activeLight.reset();
+            isLightPopupOpen = false;
+        }
+    }
+
+    if (isMaterialPopupOpen) {
+        if (!materialModal.isOpen()) {
+            cameraManager.disableAllMouseInput();
+            materialModal.openModal(activeMaterial);
+        }
+
+        materialModal.draw();
+
+        if (!materialModal.isOpen()) {
+            cameraManager.enableSelectedMouseInput();
+            isMaterialPopupOpen = false;
+        }
+    }
 
     gizmoManager.drawGui();
     cameraManager.drawGui();
@@ -170,6 +208,13 @@ void SceneEditor::drawSceneGraph() {
 void SceneEditor::drawSceneGraphNode(std::shared_ptr<SceneNode> node) {
     ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
+    if (node == sceneGraph.getRootNode()) {
+        if (firstTime) {
+            ImGui::SetNextTreeNodeOpen(true);
+            firstTime = false;
+        }
+    }
+
     if (node == sceneGraph.getSelectedNode()) {
         nodeFlags |= ImGuiTreeNodeFlags_Selected;
         if (justAddedNode) {
@@ -186,10 +231,7 @@ void SceneEditor::drawSceneGraphNode(std::shared_ptr<SceneNode> node) {
         gizmoManager.setSelectedNode(node);
     }
 
-    if (ImGui::BeginPopupContextItem()) {
-        newObjectMenu(node);
-        ImGui::EndPopup();
-    }
+    handleContextMenu(node);
 
     if (nodeOpen) {
         for (auto& child : node->getChildren()) {
@@ -200,19 +242,59 @@ void SceneEditor::drawSceneGraphNode(std::shared_ptr<SceneNode> node) {
     }
 }
 
-void SceneEditor::newObjectMenu(std::shared_ptr<SceneNode> node) {
-    if (node != sceneGraph.getRootNode()) {
-        if (ImGui::Selectable("Delete")) {
-            sceneGraph.deleteNode(node);
-        }
-    }
+void SceneEditor::handleContextMenu(std::shared_ptr<SceneNode> node) {
+    if (ImGui::BeginPopupContextItem()) {
+        if (node != sceneGraph.getRootNode()) {
+            if (ImGui::Selectable("Delete")) {
+                if (node->hasLight()) {
+                    node->getLight()->disable();
+                }
 
-    if (ImGui::Selectable("New Empty")) newEmptyObject("Empty", node);
-    if (ImGui::Selectable("New Sphere")) newPrimitiveObject(PrimitiveType::Sphere, "Sphere", node);
-    if (ImGui::Selectable("New Pyramid")) newPrimitiveObject(PrimitiveType::Tetrahedron, "Pyramid", node);
-    if (ImGui::Selectable("New Cube")) newPrimitiveObject(PrimitiveType::Cube, "Cube", node);
-    if (ImGui::Selectable("New Cylinder")) newPrimitiveObject(PrimitiveType::Cylinder, "Cylinder", node);
-    if (ImGui::Selectable("New Cone")) newPrimitiveObject(PrimitiveType::Cone, "Cone", node);
+                sceneGraph.deleteNode(node);
+            }
+        }
+
+        if (node->hasLight()) {
+            if (ImGui::Selectable("Edit Light")) {
+                activeLight = node->getLight();
+                isLightPopupOpen = true;
+            }
+        }
+
+        if (node->hasMaterial() && !node->hasLight()) {
+            if (ImGui::Selectable("Edit Material")) {
+                activeMaterial = node->getMaterial();
+                isMaterialPopupOpen = true;
+            }
+        }
+
+        if (ImGui::Selectable("New Empty")) newEmptyObject("Empty", node);
+
+        if (ImGui::Selectable("New Sphere")) newPrimitiveObject(PrimitiveType::Sphere, "Sphere", node);
+        if (ImGui::Selectable("New Pyramid")) newPrimitiveObject(PrimitiveType::Tetrahedron, "Pyramid", node);
+        if (ImGui::Selectable("New Cube")) newPrimitiveObject(PrimitiveType::Cube, "Cube", node);
+        if (ImGui::Selectable("New Cylinder")) newPrimitiveObject(PrimitiveType::Cylinder, "Cylinder", node);
+        if (ImGui::Selectable("New Cone")) newPrimitiveObject(PrimitiveType::Cone, "Cone", node);
+
+        if (ImGui::Selectable("New Ambient Light")) {
+            activeLightType = LightModal::LightType::Ambient;
+            isLightPopupOpen = true;
+        }
+        if (ImGui::Selectable("New Point Light")) {
+            activeLightType = LightModal::LightType::Point;
+            isLightPopupOpen = true;
+        }
+        if (ImGui::Selectable("New Directional Light")) {
+            activeLightType = LightModal::LightType::Directional;
+            isLightPopupOpen = true;
+        }
+        if (ImGui::Selectable("New Spot Light")) {
+            activeLightType = LightModal::LightType::Spot;
+            isLightPopupOpen = true;
+        }
+
+        ImGui::EndPopup();
+    }
 }
 
 void SceneEditor::nodeDragDropBehaviour(std::shared_ptr<SceneNode> node) {

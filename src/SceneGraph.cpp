@@ -50,6 +50,7 @@ void SceneGraph::addModelNode(const std::string& path, std::shared_ptr<SceneNode
     model->load(path);
     model->setPosition(0, 0, 0);
     model->setRotation(0, 180, 1, 0, 0);
+    model->setScale(0.3f, 0.3f, 0.3f);
 
     std::string baseName = std::filesystem::path(path).stem().string();
     std::string uniqueName = generateUniqueName(baseName);
@@ -59,6 +60,15 @@ void SceneGraph::addModelNode(const std::string& path, std::shared_ptr<SceneNode
 
     if (parent) {
         parent->addChild(newNode);
+    }
+}
+
+void SceneGraph::addLightNode(std::shared_ptr<ofLight> light, const std::string& name, std::shared_ptr<SceneNode> parent) {
+    auto lightNode = std::make_shared<SceneNode>(generateUniqueName(name));
+    lightNode->setLight(light);
+
+    if (parent) {
+        parent->addChild(lightNode);
     }
 }
 

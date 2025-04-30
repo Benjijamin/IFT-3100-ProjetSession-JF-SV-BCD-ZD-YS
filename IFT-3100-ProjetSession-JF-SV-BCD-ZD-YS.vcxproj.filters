@@ -94,12 +94,6 @@
     <ClCompile Include="src\FreeFlightCamera.cpp">
       <Filter>src\camera</Filter>
     </ClCompile>
-    <ClCompile Include="src\SceneGraph.cpp">
-      <Filter>src\components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SceneNode.cpp">
-      <Filter>src\components</Filter>
-    </ClCompile>
     <ClCompile Include="src\DessinVectoriel.cpp">
       <Filter>src\editors</Filter>
     </ClCompile>
@@ -132,6 +126,20 @@
     </ClCompile>
     <ClCompile Include="src\BezierCurve.cpp">
       <Filter>src\editors</Filter>
+    <ClCompile Include="src\SceneNode.cpp">
+      <Filter>src\components\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneGraph.cpp">
+      <Filter>src\components\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AABB.cpp">
+      <Filter>src\components\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaterialModal.cpp">
+      <Filter>src\components\modals</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LightModal.cpp">
+      <Filter>src\components\modals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +211,12 @@
     </Filter>
     <Filter Include="src\camera">
       <UniqueIdentifier>{a2ded317-f4b7-446d-8787-374079313d3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\components\modals">
+      <UniqueIdentifier>{6601a504-37bf-4b79-a99f-8c2b45427c58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\components\scene">
+      <UniqueIdentifier>{2ad1651e-88f0-4790-91bb-a206781f54d2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -569,12 +583,6 @@
     <ClInclude Include="src\FreeFlightCamera.h">
       <Filter>src\camera</Filter>
     </ClInclude>
-    <ClInclude Include="src\SceneNode.h">
-      <Filter>src\components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SceneGraph.h">
-      <Filter>src\components</Filter>
-    </ClInclude>
     <ClInclude Include="src\DessinVectoriel.h">
       <Filter>src\editors</Filter>
     </ClInclude>
@@ -610,6 +618,20 @@
     </ClInclude>
     <ClInclude Include="src\BezierCurve.h">
       <Filter>src\editors</Filter>
+    <ClInclude Include="src\SceneNode.h">
+      <Filter>src\components\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneGraph.h">
+      <Filter>src\components\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AABB.h">
+      <Filter>src\components\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MaterialModal.h">
+      <Filter>src\components\modals</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LightModal.h">
+      <Filter>src\components\modals</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

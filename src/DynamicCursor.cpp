@@ -1,14 +1,12 @@
 #include "DynamicCursor.h"
 
 void DynamicCursor::setup() {
-
     currentCursorType = DEFAULT;
     currentCursorHandle = getSystemCursor(DEFAULT);
     SetCursor(currentCursorHandle);
 }
 
 void DynamicCursor::update(int x, int y) {
-
     bool isOverAnyImGuiWindow = isMouseOverAnyImGuiWindow();
 
     if (isOverAnyImGuiWindow) {

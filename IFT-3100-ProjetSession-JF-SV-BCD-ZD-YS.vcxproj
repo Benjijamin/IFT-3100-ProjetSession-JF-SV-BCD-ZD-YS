@@ -105,6 +105,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\BezierCurve.cpp" />
+    <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\CameraManager.cpp" />
     <ClCompile Include="src\ColorPicker.cpp" />
     <ClCompile Include="src\CustomSlider.cpp" />
@@ -112,7 +113,9 @@
     <ClCompile Include="src\DynamicCursor.cpp" />
     <ClCompile Include="src\FreeFlightCamera.cpp" />
     <ClCompile Include="src\GizmoManager.cpp" />
+    <ClCompile Include="src\LightModal.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MaterialModal.cpp" />
     <ClCompile Include="src\MenuBar.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\AssetBrowser.cpp" />
@@ -149,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BezierCurve.h" />
+    <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\CameraManager.h" />
     <ClInclude Include="src\ColorPicker.h" />
     <ClInclude Include="src\CustomSlider.h" />
@@ -157,6 +161,8 @@
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\FreeFlightCamera.h" />
     <ClInclude Include="src\GizmoManager.h" />
+    <ClInclude Include="src\LightModal.h" />
+    <ClInclude Include="src\MaterialModal.h" />
     <ClInclude Include="src\MenuBar.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\AssetBrowser.h" />

@@ -3,50 +3,55 @@
 #include "ofMain.h"
 #include "ofxImGui.h"
 #include "ofxAssimpModelLoader.h"
+#include "AABB.h"
+#include "Primitives.h"
 
-enum class PrimitiveType 
-{
-    None, Sphere, Tetrahedron, Cube, Cylinder, Cone 
+enum class PrimitiveType {
+    None, Sphere, Tetrahedron, Cube, Cylinder, Cone
 };
 
 class SceneNode : public ofNode, public std::enable_shared_from_this<SceneNode> {
 public:
     SceneNode(const std::string& name);
-
-    void setModel(std::shared_ptr<ofxAssimpModelLoader> model);
-    void setTexture(const std::string& path);
-
-    void draw();
-    void drawVisibleNodes(const ofCamera& camera);
+    ~SceneNode();
 
     void addChild(std::shared_ptr<SceneNode> child);
     void removeChild(std::shared_ptr<SceneNode> child);
     std::vector<std::shared_ptr<SceneNode>> getChildren() const;
 
     std::string getName() const;
-    void setName(std::string& newName);
+    void setName(const std::string& newName);
 
     void setPrimitive(PrimitiveType newPrimitiveType);
-    bool containsModel() const;
 
-    ofBoxPrimitive getAABB() const;
+    void setModel(std::shared_ptr<ofxAssimpModelLoader> newModel);
+    bool hasModel() const;
+
+    void setDefaultMaterial();
+    void setLightMaterial();
+    bool hasMaterial() const;
+    std::shared_ptr<ofMaterial> getMaterial() const;
+
+    void setLight(std::shared_ptr<ofLight> newLight);
+    bool hasLight() const;
+    std::shared_ptr<ofLight> getLight() const;
+
+    void setTexture(const std::string& path);
+
+    void draw();
+    void drawVisibleNodes(const ofCamera& camera);
+
+    ofBoxPrimitive getBoundingBox() const;
 
     bool operator==(const SceneNode& other) const;
 
 private:
     void customDraw() override;
 
-    void initAABBToInfinity();
-    void computeAABB(std::shared_ptr<ofxAssimpModelLoader> model);
-    bool isAABBVisible(const ofCamera& camera);
-    std::vector<glm::vec4> extractFrustumPlanes(const ofCamera& camera);
-    std::vector<glm::vec3> getAABBVertices();
-    std::vector<glm::vec3> SceneNode::getTransformedAABBVertices(const glm::mat4& transform);
-    bool isAABBInsideFrustum(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec4>& frustumPlanes);
-    void drawAABBBox();
+    void drawLight();
+    void drawPrimitive();
 
     std::string name;
-    std::shared_ptr<ofxAssimpModelLoader> model;
     std::vector<std::shared_ptr<SceneNode>> children;
 
     PrimitiveType primitiveType;
@@ -55,5 +60,10 @@ private:
     ofImage textureImage;
     ofTexture texture;
 
-    ofBoxPrimitive aabb;
+    std::shared_ptr<ofxAssimpModelLoader> model;
+    std::shared_ptr<ofMaterial> material;
+    std::shared_ptr<ofLight> light;
+
+    SceneNode* parent = nullptr;
+    AABB boundingBox;
 };

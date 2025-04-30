@@ -6,6 +6,8 @@
 #include "SceneGraph.h"
 #include "GizmoManager.h"
 #include "CameraManager.h"
+#include "LightModal.h"
+#include "MaterialModal.h"
 
 class SceneEditor : public Editor {
 public:
@@ -27,7 +29,7 @@ private:
     void drawSceneGraph();
     void drawSceneGraphNode(std::shared_ptr<SceneNode> node);
     void drawInfo(std::shared_ptr<SceneNode> node);
-    void newObjectMenu(std::shared_ptr<SceneNode> node);
+    void handleContextMenu(std::shared_ptr<SceneNode> node);
     void nodeDragDropBehaviour(std::shared_ptr<SceneNode> node);
 
     void newEmptyObject(const std::string& name, std::shared_ptr<SceneNode> parent);
@@ -38,12 +40,19 @@ private:
     GizmoManager gizmoManager;
     CameraManager cameraManager;
 
-    bool shouldEnableMouseInput;
+    bool firstTime;
     bool justAddedNode;
+    bool shouldEnableMouseInput;
+
+    LightModal lightModal;
+    MaterialModal materialModal;
+
+    LightModal::LightType activeLightType;
+    std::shared_ptr<ofLight> activeLight;
+    std::shared_ptr<ofMaterial> activeMaterial;
+
+    bool isLightPopupOpen;
+    bool isMaterialPopupOpen;
 
     ofEasyCam camera;
-    ofLight light;
-    ofMaterial material;
-
-    
 };

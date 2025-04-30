@@ -34,6 +34,9 @@ void DessinVectoriel::setup()
     mouseGap = 2;
     mouseInit = {};
     mousePos = {};
+
+    // Courbe paramétrique
+    curve.setup();
 }
 
 void DessinVectoriel::draw()
@@ -60,12 +63,21 @@ void DessinVectoriel::draw()
         buildShape(s, false);
     }
 
+    // Courbe paramétrique
+    curve.draw();
+
     ofPopStyle();
 }
 
 void DessinVectoriel::drawGui()
 {
     if (!active) return;
+
+    if (curve.isEditing())
+    {
+        curve.drawEditorWindow();
+        return;
+    }
 
     // Drapeaux de la fenêtre
     ImGuiWindowFlags flags = 0;
@@ -103,6 +115,9 @@ void DessinVectoriel::drawGui()
 
     // Fin
     ImGui::End();
+
+    // Courbe paramétrique
+    curve.drawGui();
 }
 
 void DessinVectoriel::exit()
@@ -112,6 +127,7 @@ void DessinVectoriel::exit()
 
     active = false;
     shapes.clear();
+    curve.exit();
 }
 
 void DessinVectoriel::begin()
@@ -119,36 +135,50 @@ void DessinVectoriel::begin()
     prevBg = ofGetBackgroundColor();
     active = true;
     shapes.clear();
+    curve.begin();
 }
 
 void DessinVectoriel::mousePressed(int x, int y, int button)
 {
-    mouseHeld = true;
-    mouseInit = ImVec2(x, y);
-    mousePos = mouseInit;
-    hovering = checkHover();
+    if (!curve.isEditing())
+    {
+        mouseHeld = true;
+        mouseInit = ImVec2(x, y);
+        mousePos = mouseInit;
+        hovering = checkHover();
+    }
 }
 
 void DessinVectoriel::mouseDragged(int x, int y, int button)
 {
-    // Restreindre la sélection à la fenêtre
-    mousePos.x = std::clamp(x, mouseGap, ofGetWidth() - mouseGap);
-    mousePos.y = std::clamp(y, mouseGap, ofGetHeight() - mouseGap);
-
-    // Tracer la courbe si le mode Suite de points est sélectionné
-    if (typeIndex == 5 && !hovering)
+    if (curve.isEditing())
     {
-        shapes.push_back(initShape());
+        curve.mouseDragged(x, y, button);
+    }
+    else
+    {
+        // Restreindre la sélection à la fenêtre
+        mousePos.x = std::clamp(x, mouseGap, ofGetWidth() - mouseGap);
+        mousePos.y = std::clamp(y, mouseGap, ofGetHeight() - mouseGap);
+
+        // Tracer la courbe si le mode Suite de points est sélectionné
+        if (typeIndex == 5 && !hovering)
+        {
+            shapes.push_back(initShape());
+        }
     }
 }
 
 void DessinVectoriel::mouseReleased(int x, int y, int button)
 {
-    mouseHeld = false;
-
-    if (!hovering)
+    if (!curve.isEditing())
     {
-        shapes.push_back(initShape());
+        mouseHeld = false;
+
+        if (!hovering)
+        {
+            shapes.push_back(initShape());
+        }
     }
 }
 
@@ -224,7 +254,7 @@ bool DessinVectoriel::checkHover() const
     ImVec2 windowArea = windowPos + windowSize;
     bool withinBoundsX = mousePos.x >= windowPos.x && mousePos.x <= windowArea.x;
     bool withinBoundsY = mousePos.y >= windowPos.y && mousePos.y <= windowArea.y;
-    return withinBoundsX && withinBoundsY;
+    return (withinBoundsX && withinBoundsY) || curve.checkHover(mousePos);
 }
 
 // Helper Functions

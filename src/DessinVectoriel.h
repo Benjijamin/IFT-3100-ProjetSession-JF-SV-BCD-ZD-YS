@@ -6,6 +6,7 @@
 #include "ofMain.h"
 #include "ofxImGui.h"
 #include "Editor.h"
+#include "BezierCurve.h"
 
 struct Shape {
     ImVec2 initPos;
@@ -74,6 +75,7 @@ private:
     int maxWidth;
     int circRes;
     ofColor prevBg;
+    BezierCurve curve;
 
     // Variables d'état
     bool active;

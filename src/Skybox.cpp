@@ -10,6 +10,9 @@ void Skybox::setup()
 	skyColor = glm::vec4(0.2, 0.4, 0.4, 1);
 	horizonColor = glm::vec4(0.2, 0.3, 0.3, 1);
 	bottomColor = glm::vec4(0, 0.1, 0.1, 1);
+	skyPower = 1.0f;
+	horizonPower = 1.0f;
+	bottomPower = 1.0f;
 }
 
 void Skybox::draw() 
@@ -35,6 +38,9 @@ void Skybox::draw()
 		shaderCustom.setUniform4f("horizonColor", horizonColor);
 		shaderCustom.setUniform4f("bottomColor", bottomColor);
 		shaderCustom.setUniform1i("enableStars", enableStars);
+		shaderCustom.setUniform1f("skyPower", skyPower);
+		shaderCustom.setUniform1f("horizonPower", horizonPower);
+		shaderCustom.setUniform1f("bottomPower", bottomPower);
 
 		drawSkybox();
 
@@ -56,6 +62,7 @@ void Skybox::drawGui()
 		{
 			ImGui::OpenPopup("SkyColorPopup");
 		}
+		ImGui::SliderFloat("Sky Power", &skyPower, 1.0f, 5.0f);
 
 		if (ImGui::BeginPopup("SkyColorPopup")) 
 		{
@@ -68,6 +75,7 @@ void Skybox::drawGui()
 		{
 			ImGui::OpenPopup("HorizonColorPopup");
 		}
+		ImGui::SliderFloat("Horizon Power", &horizonPower, 1.0f, 5.0f);
 
 		if (ImGui::BeginPopup("HorizonColorPopup"))
 		{
@@ -80,6 +88,7 @@ void Skybox::drawGui()
 		{
 			ImGui::OpenPopup("BottomColorPopup");
 		}
+		ImGui::SliderFloat("Bottom Power", &bottomPower, 1.0f, 5.0f);
 
 		if (ImGui::BeginPopup("BottomColorPopup"))
 		{
@@ -90,6 +99,26 @@ void Skybox::drawGui()
 		ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
 		ImGui::Checkbox("Enable Stars", &enableStars);
+	}
+
+	ImGui::Dummy(ImVec2(0.0f, 5.0f));
+	ImGui::Separator();
+	ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+	if (ImGui::Button("Default")) 
+	{
+		image.load("skybox_default.png");
+	}
+
+	ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+	if (ImGui::Button("Load Cubemap")) 
+	{
+		ofFileDialogResult result = ofSystemLoadDialog("Select an image");
+		if (result.bSuccess)
+		{
+			image.load(result.getPath());
+		}
 	}
 
 	ImGui::End();

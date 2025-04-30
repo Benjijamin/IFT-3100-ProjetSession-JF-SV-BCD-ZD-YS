@@ -29,5 +29,8 @@ private:
 	glm::vec4 skyColor;
 	glm::vec4 horizonColor;
 	glm::vec4 bottomColor;
+	float skyPower;
+	float horizonPower;
+	float bottomPower;
 	bool enableStars;
 };

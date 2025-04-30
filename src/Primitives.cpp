@@ -53,12 +53,12 @@ std::shared_ptr<ofMesh> Primitives::getCubePrimitive(float size)
 
 	std::vector<glm::vec2> texCoords =
 	{
-		glm::vec2(0, 0.333), glm::vec2(0.25, 0.333), glm::vec2(0, 0.666), glm::vec2(0.25, 0.666), //back
-		glm::vec2(0.25, 0.333), glm::vec2(0.5, 0.333), glm::vec2(0.25, 0.666), glm::vec2(0.5, 0.666), //left
-		glm::vec2(0.5, 0.333), glm::vec2(0.75, 0.333), glm::vec2(0.5, 0.666), glm::vec2(0.75, 0.666), //front
-		glm::vec2(0.75, 0.333), glm::vec2(1, 0.333), glm::vec2(0.75, 0.666), glm::vec2(1, 0.666), //right
-		glm::vec2(0.25, 0.333), glm::vec2(0.25, 0), glm::vec2(0.5, 0.333), glm::vec2(0.5, 0), //top
-		glm::vec2(0.5, 0.666), glm::vec2(0.5, 1), glm::vec2(0.25, 0.666), glm::vec2(0.25, 1) //bottom
+		glm::vec2(0, 0.334), glm::vec2(0.25, 0.334), glm::vec2(0, 0.666), glm::vec2(0.25, 0.666), //back
+		glm::vec2(0.25, 0.334), glm::vec2(0.5, 0.334), glm::vec2(0.25, 0.666), glm::vec2(0.5, 0.666), //left
+		glm::vec2(0.5, 0.334), glm::vec2(0.75, 0.334), glm::vec2(0.5, 0.666), glm::vec2(0.75, 0.666), //front
+		glm::vec2(0.75, 0.334), glm::vec2(1, 0.334), glm::vec2(0.75, 0.666), glm::vec2(1, 0.666), //right
+		glm::vec2(0.251, 0.333), glm::vec2(0.251, 0), glm::vec2(0.499, 0.333), glm::vec2(0.499, 0), //top
+		glm::vec2(0.499, 0.665), glm::vec2(0.499, 1), glm::vec2(0.251, 0.665), glm::vec2(0.251, 1) //bottom
 	};
 
 	auto primitive = make_shared<ofMesh>();
@@ -125,12 +125,12 @@ std::shared_ptr<ofMesh> Primitives::getSkyboxPrimitive(float size)
 
 	std::vector<glm::vec2> texCoords =
 	{
-		glm::vec2(0, 0.333), glm::vec2(0.25, 0.333), glm::vec2(0, 0.666), glm::vec2(0.25, 0.666), //back
-		glm::vec2(0.25, 0.333), glm::vec2(0.5, 0.333), glm::vec2(0.25, 0.666), glm::vec2(0.5, 0.666), //left
-		glm::vec2(0.5, 0.333), glm::vec2(0.75, 0.333), glm::vec2(0.5, 0.666), glm::vec2(0.75, 0.666), //front
-		glm::vec2(0.75, 0.333), glm::vec2(1, 0.333), glm::vec2(0.75, 0.666), glm::vec2(1, 0.666), //right
-		glm::vec2(0.25, 0.333), glm::vec2(0.25, 0), glm::vec2(0.5, 0.333), glm::vec2(0.5, 0), //top
-		glm::vec2(0.5, 0.666), glm::vec2(0.5, 1), glm::vec2(0.25, 0.666), glm::vec2(0.25, 1) //bottom
+		glm::vec2(0, 0.334), glm::vec2(0.25, 0.334), glm::vec2(0, 0.666), glm::vec2(0.25, 0.666), //back
+		glm::vec2(0.25, 0.334), glm::vec2(0.5, 0.334), glm::vec2(0.25, 0.666), glm::vec2(0.5, 0.666), //left
+		glm::vec2(0.5, 0.334), glm::vec2(0.75, 0.334), glm::vec2(0.5, 0.666), glm::vec2(0.75, 0.666), //front
+		glm::vec2(0.75, 0.334), glm::vec2(1, 0.334), glm::vec2(0.75, 0.666), glm::vec2(1, 0.666), //right
+		glm::vec2(0.251, 0.333), glm::vec2(0.251, 0), glm::vec2(0.499, 0.333), glm::vec2(0.499, 0), //top
+		glm::vec2(0.499, 0.665), glm::vec2(0.499, 1), glm::vec2(0.251, 0.665), glm::vec2(0.251, 1) //bottom
 	};
 
 	auto primitive = make_shared<ofMesh>();

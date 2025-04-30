@@ -5,6 +5,9 @@ uniform vec4 skyColor;
 uniform vec4 horizonColor;
 uniform vec4 bottomColor;
 uniform bool enableStars;
+uniform float skyPower;
+uniform float horizonPower;
+uniform float bottomPower;
 
 // attribut en entrée
 in vec2 surface_texcoord;
@@ -27,11 +30,14 @@ void main()
     float horizon = 1 - (top + bot);
 
     float star = 0;
-    
+
     if(enableStars){
         vec3 gridDir = floor(vDirection * 500) / 500;
         star = step(0.9995, random(gridDir));
     }
 
-    fragment_color = top * skyColor + horizon * horizonColor + bot * bottomColor + star;
+    fragment_color = 
+        pow(top, skyPower) * skyColor + 
+        pow(horizon, horizonPower) * horizonColor + 
+        pow(bot, bottomPower) * bottomColor + star;
 }

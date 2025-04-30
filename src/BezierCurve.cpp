@@ -9,7 +9,7 @@ void BezierCurve::setup()
 
     // Atrributs de la courbe
     lineRes = 100;
-    lineColor = ofColor(255.0f);
+    // lineColor = ofColor(255.0f);
 
     // Attributs des points de contrôle
     minPts = 3;
@@ -69,7 +69,7 @@ void BezierCurve::drawGui()
     
     // Boutons d'édition
     ImGui::SliderInt("Control points", &nPts, minPts, maxPts);
-    ImGui::ColorEdit3("Line color", (float*) &lineColor);
+    // ImGui::ColorEdit3("Line color", (float*) &lineColor);
     if (ImGui::Button("Add Bezier-like curve")) toggleEditor();
 
     // Fin
@@ -162,7 +162,7 @@ void BezierCurve::toggleEditor()
 
     // Initialiser la courbe
     Curve c;
-    c.color = lineColor;
+    // c.color = lineColor;
     for (int i = 0; i <= lineRes; ++i)
     {
         c.line.addVertex(ofPoint());

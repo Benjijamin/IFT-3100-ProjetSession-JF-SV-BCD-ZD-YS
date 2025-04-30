@@ -72,6 +72,15 @@ void SceneGraph::addLightNode(std::shared_ptr<ofLight> light, const std::string&
     }
 }
 
+//void SceneGraph::addSurfaceNode(const std::string& name, std::shared_ptr<SceneNode> parent) {
+//    auto surfaceNode = std::make_shared<SceneNode>(generateUniqueName(name));
+//    surfaceNode->setSurface();
+//
+//    if (parent) {
+//        parent->addChild(surfaceNode);
+//    }
+//}
+
 void SceneGraph::unloadNodes(const std::string& path) {
     std::string baseName = std::filesystem::path(path).stem().string();
     deleteNodesByBaseName(baseName);

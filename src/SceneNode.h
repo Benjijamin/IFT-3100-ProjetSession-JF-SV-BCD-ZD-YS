@@ -5,6 +5,7 @@
 #include "ofxAssimpModelLoader.h"
 #include "AABB.h"
 #include "Primitives.h"
+#include "BezierCurve.h"
 
 enum class PrimitiveType {
     None, Sphere, Tetrahedron, Cube, Cylinder, Cone
@@ -36,6 +37,8 @@ public:
     bool hasLight() const;
     std::shared_ptr<ofLight> getLight() const;
 
+   //void setSurface();
+
     void setTexture(const std::string& path);
 
     void draw();
@@ -50,6 +53,7 @@ private:
 
     void drawLight();
     void drawPrimitive();
+    void drawSurface();
 
     std::string name;
     std::vector<std::shared_ptr<SceneNode>> children;
@@ -63,6 +67,7 @@ private:
     std::shared_ptr<ofxAssimpModelLoader> model;
     std::shared_ptr<ofMaterial> material;
     std::shared_ptr<ofLight> light;
+    //std::shared_ptr<ofMesh> surface;
 
     SceneNode* parent = nullptr;
     AABB boundingBox;

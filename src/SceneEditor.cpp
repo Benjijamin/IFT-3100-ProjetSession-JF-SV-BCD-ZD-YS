@@ -282,6 +282,8 @@ void SceneEditor::handleContextMenu(std::shared_ptr<SceneNode> node) {
         if (ImGui::Selectable("New Cylinder")) newPrimitiveObject(PrimitiveType::Cylinder, "Cylinder", node);
         if (ImGui::Selectable("New Cone")) newPrimitiveObject(PrimitiveType::Cone, "Cone", node);
 
+        //if (ImGui::Selectable("New Parametric Surface")) newSurfaceObject("Parametric Surface", node);
+
         if (ImGui::Selectable("New Ambient Light")) {
             activeLightType = LightModal::LightType::Ambient;
             isLightPopupOpen = true;
@@ -335,3 +337,8 @@ void SceneEditor::newPrimitiveObject(PrimitiveType primitiveType, const std::str
     sceneGraph.addPrimitiveNode(primitiveType, name, parent);
     justAddedNode = true;
 }
+
+//void SceneEditor::newSurfaceObject(const std::string& name, std::shared_ptr<SceneNode> parent) {
+//    sceneGraph.addSurfaceNode(name, parent);
+//    justAddedNode = true;
+//}

@@ -6,6 +6,7 @@
 #include "SceneGraph.h"
 #include "GizmoManager.h"
 #include "CameraManager.h"
+#include "renderer.h"
 
 class SceneEditor : public Editor {
 public:

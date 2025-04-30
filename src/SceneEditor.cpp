@@ -23,6 +23,12 @@ void SceneEditor::setup() {
     material.setEmissiveColor(ofFloatColor(0.1f, 0.1f, 0.1f, 1.0f));
     material.setShininess(64);
 
+    // Shaders classiques
+
+    // 4 types de lumière (en objet)
+
+    // bibliothèque de matériaux
+
     justAddedNode = false;
     shouldEnableMouseInput = false;
 }

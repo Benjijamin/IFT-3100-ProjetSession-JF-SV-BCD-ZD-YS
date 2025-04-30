@@ -13,6 +13,7 @@
 
 #include "ofMain.h"
 #include "ofxAssimpModelLoader.h"
+#include "materials.h"
 
 // énumération des types de shader
 enum class ShaderType { color_fill, lambert, gouraud, phong, blinn_phong, toon };
@@ -108,7 +109,18 @@ public:
 	void shaderToon() const;
 
 	void shaderAttributes() const;
+	void shaderAttributesDynamicM() const;
 
 	float oscillate(float time, float frequency, float amplitude);
+
+	// liaison vers la bibliothèque de matériaux
+	void setMaterialsLibrary(Materials* m) { materials = m; }
+
+	// choisir le matériau courant par son nom
+	void setCurrentMaterial(const std::string& name) {currentMaterialName = name; }
+
+private:
+	Materials* materials = nullptr;
+	std::string currentMaterialName = "default";
 };
 

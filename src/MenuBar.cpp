@@ -1,6 +1,14 @@
 #include "MenuBar.h"
 
-void MenuBar::setup() { screenCapture.setup(); }
+void MenuBar::setup() { 
+	screenCapture.setup();
+
+	previewFbo.allocate(200, 200, GL_RGBA);
+	previewLight.setup();
+	previewLight.setDiffuseColor(ofFloatColor(1, 1, 1));
+	previewLight.setPosition(0, 0, 200);
+	previewLight.enable();
+}
 void MenuBar::update() { screenCapture.update(); }
 void MenuBar::draw() { screenCapture.draw(); }
 void MenuBar::exit() {}
@@ -146,14 +154,100 @@ void MenuBar::drawEditMenu() {
 
 // MÉTHODES POUR ONGLET 'RENDER'
 void MenuBar::drawRenderMenu() {
-	if (ImGui::BeginMenu("Render")) {
-		if (ImGui::MenuItem("Render Image")) {}
-		if (ImGui::MenuItem("Render Animation")) {}
+	if (ImGui::BeginMenu("Renderer")) {
+		if (ImGui::BeginMenu("Classic rendering")) {
+			if (ImGui::BeginMenu("Materials")) {
+				if (ImGui::MenuItem("Create material")) { 
+					showCreateMatWindow = true; 
+				}
+				if (ImGui::MenuItem("Import material")) {
 
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+		}
 		ImGui::EndMenu();
 	}
+	if (showCreateMatWindow) { drawCreateMaterialWindow(); }
 }
 
+void MenuBar::drawCreateMaterialWindow() {
+	// Begin une fenêtre ImGui flottante
+	ImGui::Begin("Create Material", &showCreateMatWindow,
+		ImGuiWindowFlags_AlwaysAutoResize);
+
+	// Nom du matériau
+	//ImGui::InputText("Name", &newMatName);
+	ImGui::InputText("Name", newMatNameBuf, IM_ARRAYSIZE(newMatNameBuf));
+
+	// Sliders couleur
+	float amb[3] = { tmpAmbient.r / 255.0f, tmpAmbient.g / 255.0f, tmpAmbient.b / 255.0f };
+	if (ImGui::ColorEdit3("Ambient", amb)) {
+		tmpAmbient = ofColor(amb[0] * 255, amb[1] * 255, amb[2] * 255);
+	}
+	float dif[3] = { tmpDiffuse.r / 255.0f, tmpDiffuse.g / 255.0f, tmpDiffuse.b / 255.0f };
+	if (ImGui::ColorEdit3("Diffuse", dif)) {
+		tmpDiffuse = ofColor(dif[0] * 255, dif[1] * 255, dif[2] * 255);
+	}
+	float spec[3] = { tmpSpecular.r / 255.0f, tmpSpecular.g / 255.0f, tmpSpecular.b / 255.0f };
+	if (ImGui::ColorEdit3("Specular", spec)) {
+		tmpSpecular = ofColor(spec[0] * 255, spec[1] * 255, spec[2] * 255);
+	}
+
+	// Slider shininess
+	ImGui::SliderFloat("Shininess", &tmpShininess, 1.0f, 128.0f);
+
+	// Autres Sliders (Types de texture, par exemple)
+	// ...
+
+	// Boutons Save / Cancel
+	if (ImGui::Button("Save")) {
+		std::string finalName(newMatNameBuf);
+		ofMaterial mat;
+		mat.setAmbientColor(tmpAmbient);
+		mat.setDiffuseColor(tmpDiffuse);
+		mat.setSpecularColor(tmpSpecular);
+		mat.setShininess(tmpShininess);
+		if (materials) materials->create(finalName, mat);
+		showCreateMatWindow = false;
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Cancel")) {
+		showCreateMatWindow = false;
+	}
+
+	ImGui::Separator();
+	ImGui::Text("Preview:");
+
+	//— Rendu du preview dans le FBO —
+	previewFbo.begin();
+	ofClear(0);
+	ofEnableDepthTest();
+	previewCam.begin();
+	// appliquer le matériau temporaire
+	tmpAmbient.normalize(); tmpDiffuse.normalize(); tmpSpecular.normalize();
+	ofSetGlobalAmbientColor(tmpAmbient);
+	previewLight.enable();
+	ofMaterial tmpMat;
+	tmpMat.setAmbientColor(tmpAmbient);
+	tmpMat.setDiffuseColor(tmpDiffuse);
+	tmpMat.setSpecularColor(tmpSpecular);
+	tmpMat.setShininess(tmpShininess);
+	tmpMat.begin();
+	ofDrawSphere(0, 0, 50, 50);  // sphère de presentation
+	tmpMat.end();
+	previewLight.disable();
+	previewCam.end();
+	ofDisableDepthTest();
+	previewFbo.end();
+
+	// afficher le FBO dans ImGui
+	ImGui::Image((ImTextureID)(uintptr_t)previewFbo.getTexture().getTextureData().textureID,
+		ImVec2(200, 200));
+
+	ImGui::End();
+}
 
 // MÉTHODES POUR ONGLET 'WINDOW'
 void MenuBar::drawWindowMenu() {

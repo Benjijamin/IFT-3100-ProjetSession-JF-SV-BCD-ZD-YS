@@ -1,7 +1,7 @@
 ﻿#include "ofApp.h"
 
 // code original, a remettre en place avant merge
-/*
+
 void ofApp::setup() {
     ofSetFrameRate(60);
 
@@ -16,10 +16,16 @@ void ofApp::setup() {
     menuBar.setup();
     dessinVectoriel.setup();
     dynamicCursor.setup();
+    materials.setup();
+    renderer.setup();
 
     currentEditor = nullptr;
 
     menuBar.onNewDrawing = std::bind(&ofApp::handleNewDrawing, this);
+
+    materialNames = materials.list();
+    renderer.setMaterialsLibrary(&materials);
+    menuBar.setMaterialsLibrary(&materials);
 
     assetBrowser.onAssetAddition = std::bind(&ofApp::handleAssetAddition, this);
     assetBrowser.onAssetRemoval = std::bind(&ofApp::handleAssetRemoval, this);
@@ -176,13 +182,19 @@ void ofApp::handleAssetSelection() {
 void ofApp::handleAssetSave(const std::string& path) {
     currentEditor->save(path);
 }
-*/
 
+
+
+/*
 // IFT3100H24_ShaderClassic/application.cpp
 // Classe principale de l'application.
 
 void ofApp::setup() {
     ofLog() << "<app::setup>";
+
+    materials.setup(); // Matériau par défaut
+    renderer.setMaterialsLibrary(&materials);
+    materialNames = materials.getMaterialNames();
 
     is_key_press_up = false;
     is_key_press_down = false;
@@ -328,3 +340,4 @@ void ofApp::windowResized(int w, int h) {
 void ofApp::exit() {
     ofLog() << "<app::exit>";
 }
+*/

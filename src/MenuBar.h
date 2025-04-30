@@ -5,6 +5,7 @@
 #include "imageEditor.h"
 #include "ScreenCapture.h"
 #include "DessinVectoriel.h"
+#include "materials.h"
 
 /*
 * \brief Classe qui gère la barre de menu.
@@ -19,6 +20,7 @@ public:
 	void exit();
 
     std::function<void()> onNewDrawing;
+	void setMaterialsLibrary(Materials* m) { materials = m; }
 
 private:
 	// Objets issus d'autres classes pour liaison avec boutons de l'interface
@@ -58,6 +60,24 @@ private:
 	* \brief > 
 	*/
 	void drawRenderMenu();
+
+	void drawCreateMaterialWindow();
+
+	// Fenêtre de modification pour un matériau (version illumination classique)
+	bool showCreateMatWindow = false;
+	//std::string newMatName = "NewMaterial";
+	char newMatNameBuf[64] = "NewMaterial";
+	ofColor    tmpAmbient = ofColor(50);
+	ofColor    tmpDiffuse = ofColor(200);
+	ofColor    tmpSpecular = ofColor(255);
+	float      tmpShininess = 32.0f;
+
+	// Preview du matériau
+	ofFbo      previewFbo;
+	ofEasyCam  previewCam;
+	ofLight    previewLight;
+
+	Materials* materials = nullptr;
 
 	//----------------------//
 	/*

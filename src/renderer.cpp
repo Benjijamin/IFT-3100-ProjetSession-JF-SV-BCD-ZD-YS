@@ -10,6 +10,7 @@
  */
 
 #include "renderer.h"
+#include <ofApp.h>
 
 Renderer::Renderer() {}
 
@@ -18,7 +19,7 @@ void Renderer::setup() {
     ofSetSphereResolution(32);
     ofSetBackgroundColor(0);
     ofEnableDepthTest();
-    ofSetLogLevel(OF_LOG_VERBOSE);
+    //ofSetLogLevel(OF_LOG_VERBOSE);
 
     // paramètres
     camera_offset = 350.0f; // à changer
@@ -297,19 +298,24 @@ void Renderer::shaderColorFill() const {
     shader->setUniform3f("color", 1.0f, 1.0f, 0.0f);
 }
 void Renderer::shaderLambert() const {
-    shaderAttributes();
+    //shaderAttributes();
+    shaderAttributesDynamicM();
 }
 void Renderer::shaderGouraud() const {
-    shaderAttributes();
+    //shaderAttributes();
+    shaderAttributesDynamicM();
 }
 void Renderer::shaderPhong() const {
-    shaderAttributes();
+    //shaderAttributes();
+    shaderAttributesDynamicM();
 }
 void Renderer::shaderBlinnPhong() const {
-    shaderAttributes();
+    //shaderAttributes();
+    shaderAttributesDynamicM();
 }
 void Renderer::shaderToon() const {
-    shaderAttributes();
+    //shaderAttributes();
+    shaderAttributesDynamicM();
 }
 
 void Renderer::shaderAttributes() const {
@@ -332,6 +338,84 @@ void Renderer::shaderAttributes() const {
     shader->setUniform1i("use_light_directional", is_active_light_directional);
     if (is_active_light_directional) {
         // direction locale Z⁻ (vers la lumière)
+        glm::vec3 dir = orientation_directional * glm::vec3(0, 0, -1);
+        shader->setUniform3f("light_directional_direction", dir.x, dir.y, dir.z);
+
+        ofFloatColor diffDir = light_directional.getDiffuseColor();
+        shader->setUniform3f("light_directional_diffuse", diffDir.r, diffDir.g, diffDir.b);
+    }
+
+    // — Lumière ponctuelle
+    shader->setUniform1i("use_light_point", is_active_light_point);
+    if (is_active_light_point) {
+        glm::vec3 posP = light_point.getGlobalPosition();
+        glm::mat4 view = ofGetCurrentViewMatrix();
+        glm::vec4 P = view * glm::vec4(posP, 1.0f);
+        shader->setUniform3f("light_point_position", P.x, P.y, P.z);
+
+        ofFloatColor diffP = light_point.getDiffuseColor();
+        shader->setUniform3f("light_point_diffuse", diffP.r, diffP.g, diffP.b);
+
+        // constantes d’atténuation, integrer dans l'interface
+        shader->setUniform1f("light_point_constant", 0.5f);
+        shader->setUniform1f("light_point_linear", 0.0001);
+        shader->setUniform1f("light_point_quadratic", 0.0001f);
+    }
+
+    // — Lumière spot
+    shader->setUniform1i("use_light_spot", is_active_light_spot);
+    if (is_active_light_spot) {
+        glm::vec3 posS = light_spot.getGlobalPosition();
+        glm::mat4 view = ofGetCurrentViewMatrix();
+        glm::vec4 S = view * glm::vec4(posS, 1.0f);
+        glm::vec3 dirS = orientation_spot * glm::vec3(0, 0, -1);
+        shader->setUniform3f("light_spot_position", S.x, S.y, S.z);
+        shader->setUniform3f("light_spot_direction", dirS.x, dirS.y, dirS.z);
+
+        // cut‑off en cosinus
+        float cut = glm::cos(glm::radians(light_spot.getSpotlightCutOff()));
+        float outer = glm::cos(glm::radians(light_spot.getSpotConcentration()));
+        shader->setUniform1f("light_spot_cutoff", cut);
+        shader->setUniform1f("light_spot_outerCutoff", outer);
+
+        ofFloatColor diffS = light_spot.getDiffuseColor();
+        shader->setUniform3f("light_spot_diffuse", diffS.r, diffS.g, diffS.b);
+
+        // même atténuation que ponctuelle ou spécifique
+        shader->setUniform1f("light_spot_constant", 0.5f);
+        shader->setUniform1f("light_spot_linear", 0.00001f);
+        shader->setUniform1f("light_spot_quadratic", 0.00001f);
+    }
+}
+
+void Renderer::shaderAttributesDynamicM() const {
+    // Utilisation du matériau voulu
+    const ofMaterial& mat = materials ? materials->get(currentMaterialName) : material_cube; // matériau choisi, sinon celui par défaut (cube, dans ce cas)
+
+    // Initialisation des paramètres
+    ofFloatColor amb = mat.getAmbientColor();
+    ofFloatColor diff = mat.getDiffuseColor();
+    ofFloatColor spec = mat.getSpecularColor();
+
+    shader->setUniform3f("color_ambient", amb.r, amb.g, amb.b);
+    shader->setUniform3f("color_diffuse", diff.r, diff.g, diff.b);
+    shader->setUniform3f("color_specular", spec.r, spec.g, spec.b);
+    shader->setUniform1f("brightness", mat.getShininess());
+
+    // — Lumière ambiante
+    shader->setUniform1i("use_light_ambient", is_active_light_ambient);
+    if (is_active_light_ambient) {
+        // couleur ambiante (0–1)
+        shader->setUniform3f("light_ambient",
+            light_ambient.r / 255.0f,
+            light_ambient.g / 255.0f,
+            light_ambient.b / 255.0f);
+    }
+
+    // — Lumière directionnelle
+    shader->setUniform1i("use_light_directional", is_active_light_directional);
+    if (is_active_light_directional) {
+        // direction locale Z- (vers la lumière)
         glm::vec3 dir = orientation_directional * glm::vec3(0, 0, -1);
         shader->setUniform3f("light_directional_direction", dir.x, dir.y, dir.z);
 

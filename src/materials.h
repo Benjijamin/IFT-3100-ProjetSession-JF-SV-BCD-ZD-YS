@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 /**
 * @class Materials
@@ -10,33 +11,30 @@
 */
 class Materials {
 public:
+	/// Initialise le manager : crée le dossier data/materials, charge le default et les fichiers JSON existants
 	void setup();
-	void update();
-	void draw();
 
+	/// Crée ou remplace un matériau et l'enregistre sur disque
+	void create(const std::string& name, const ofMaterial& material);
 
-	/**
-	 * @brief Méthode créant un matériau par défaut.Ce dernier sert de place holder en attedant que l'utilisateur en import (ou créer) un.
-	 */
-	void defaultMaterial();
+	/// Retourne la liste des noms disponibles
+	std::vector<std::string> list() const;
 
-	/**
-	 * @brief Méthode gérant la création d'un matériau à l'aide d'une interface
-	 */
-	void createMaterial(const std::string& name, const ofMaterial& material);
-
-	/**
-	 * @brief Import d'un matériau directement dans l'interface de matériau
-	 */
-	bool importMaterial(const std::string& filepath, const std::string& name);
-
-	// Accesseurs
-	ofMaterial& getMaterial(const std::string& name);
-	ofMaterial& getDefaultMaterial();
+	/// Getter, Accède au matériau par nom, fallback sur "default"
+	const ofMaterial& get(const std::string& name) const;
 
 private:
+	/// Construit le matériau "default"
+	void makeDefaultMaterial();
+
+	/// Sauvegarde un matériau nommé en JSON dans data/materials/name.json
+	void saveMaterial(const std::string& name) const;
+
+	/// Charge tous les .json de data/materials/ en matériaux
+	void loadMaterials();
+
 	std::unordered_map<std::string, ofMaterial> materials;
 	ofMaterial default_material;
-
+	std::string materialsPath;  // chemin absolu vers data/materials/
 };
 

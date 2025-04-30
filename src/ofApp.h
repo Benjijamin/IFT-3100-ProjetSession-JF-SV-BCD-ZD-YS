@@ -1,18 +1,18 @@
 #pragma once
 
 #include "ofMain.h"
-//#include "ofxImGui.h"
-//#include "Editor.h"
-//#include "ImageEditor.h"
-//#include "SceneEditor.h"
-//#include "DessinVectoriel.h"
-//#include "AssetBrowser.h"
-//#include "MenuBar.h"
-//#include "DynamicCursor.h"
+#include "ofxImGui.h"
+#include "Editor.h"
+#include "ImageEditor.h"
+#include "SceneEditor.h"
+#include "DessinVectoriel.h"
+#include "AssetBrowser.h"
+#include "MenuBar.h"
+#include "DynamicCursor.h"
 #include "renderer.h"
 
 // code original, a remettre en place avant merge
-/*
+
 class ofApp : public ofBaseApp {
 public:
     void setup();
@@ -33,6 +33,15 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
 
+    // Shaders et materiaux
+    Renderer renderer;
+    Materials materials;
+    std::vector<std::string> shaderNames = {"Colour Fill", "Lambert", "Phong", "Blinn-Phong", "Cel Shading (Toon)"};
+    std::vector<std::string> materialNames;
+
+    int shaderIndex = 0;
+    int materialIndex = 0;
+
 private:
     void handleNewDrawing();
     void handleAssetAddition();
@@ -51,12 +60,20 @@ private:
 
     Editor* currentEditor;
 };
-*/
 
+
+/*
 class ofApp : public ofBaseApp {
 public:
 
     Renderer renderer;
+    Materials materials;
+
+    int shaderIndex = 0;
+    int materialIndex = 0;
+
+    std::vector<std::string> shaderNames = {"Colour Fill", "Lambert", "Phong", "Blinn-Phong", "Cel Shading (Toon)"};
+    std::vector<std::string> materialNames;
 
     float time_current;
     float time_last;
@@ -76,20 +93,5 @@ public:
     void keyReleased(int key);
     void mouseReleased(int x, int y, int button);
     void windowResized(int w, int h);
-
-    /*
-    ofLight dirLight;           // Lumière directionnelle
-
-    // Shaders
-    ofShader lambertShader;
-    ofShader phongShader;
-
-    ofSpherePrimitive sphere;   // Objet à illuminer
-
-    // Material
-    ofMaterial material;        // Matériau appliqué
-
-    // Direction lumiere
-    ofVec3f lightDirection;     // Direction de la lumière
-    */
 };
+*/

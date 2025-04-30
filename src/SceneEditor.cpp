@@ -130,6 +130,7 @@ void SceneEditor::drawGui() {
 
     gizmoManager.drawGui();
     cameraManager.drawGui();
+    skybox.drawGui();
 
     drawInfo(sceneGraph.getSelectedNode());
 }

@@ -5,6 +5,7 @@ uniform sampler2D skyboxTexture;
 
 // attribut en entrée
 in vec2 surface_texcoord;
+in float height;
 
 // attribut en sortie
 out vec4 fragment_color;

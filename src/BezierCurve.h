@@ -49,7 +49,7 @@ private:
 
     // Attributs de la courbe
     int lineRes;
-    ofColor lineColor;
+    // ofColor lineColor;
     Curve currentCurve;
     vector<Curve> curves;
     

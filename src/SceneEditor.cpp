@@ -52,6 +52,7 @@ void SceneEditor::draw() {
 
     selectedCam->begin();
 
+    skybox.setCamera(*selectedCam);
     skybox.draw();
 
     if (cameraManager.isFrustumCullingEnabled() && frustumCam) {

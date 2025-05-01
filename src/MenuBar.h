@@ -21,9 +21,11 @@ public:
 
     std::function<void()> onNewDrawing;
 
+	bool* tonemapping;
 private:
 	// Objets issus d'autres classes pour liaison avec boutons de l'interface
 	ScreenCapture screenCapture;
+
 
 	// ONGLET DES FICHIERS
 	//----------------------//
@@ -44,13 +46,6 @@ private:
 	void drawExitMenu();
 	void saveProject(const std::string& filePath);
 	void openProject(const std::string& filePath);
-	//----------------------//
-	/*
-	* \brief Gère le bouton 'Edit' de l'interface.
-	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawEditMenu():
-	* \brief > 
-	*/
-	void drawEditMenu();
 
 	//----------------------//
 	/*
@@ -70,25 +65,9 @@ private:
 
 	//----------------------//
 	/*
-	* \brief Gère le bouton 'Scene' de l'interface.
-	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawSceneMenu():
-	* \brief > 
-	*/
-	void drawSceneMenu();
-
-	//----------------------//
-	/*
 	* \brief Gère le bouton 'Help' dans l'interface.
 	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawHelpMenu():
 	* \brief > 
 	*/
 	void drawHelpMenu();
-
-	//----------------------//
-	/*
-	* \brief Gère le bouton 'Toolbar' à droite de l'interface.
-	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawToolBar():
-	* \brief > 
-	*/
-	void drawToolBar();
 };

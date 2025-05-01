@@ -18,11 +18,15 @@ void ofApp::setup() {
     currentEditor = nullptr;
 
     menuBar.onNewDrawing = std::bind(&ofApp::handleNewDrawing, this);
+    menuBar.tonemapping = &tonemapping;
 
     assetBrowser.onAssetAddition = std::bind(&ofApp::handleAssetAddition, this);
     assetBrowser.onAssetRemoval = std::bind(&ofApp::handleAssetRemoval, this);
     assetBrowser.onAssetSelection = std::bind(&ofApp::handleAssetSelection, this);
     assetBrowser.onAssetSave = std::bind(&ofApp::handleAssetSave, this, std::placeholders::_1);
+
+    ppFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+    acesShader.load("tonemapping_aces_330_vs.glsl", "tonemapping_aces_330_fs.glsl");
 }
 
 void ofApp::update() {
@@ -32,8 +36,22 @@ void ofApp::update() {
 }
 
 void ofApp::draw() {
+
+    ppFbo.begin();
+    ofClear(0);
     if (currentEditor) {
         currentEditor->draw();
+    }
+    ppFbo.end();
+
+    if (tonemapping) {
+        acesShader.begin();
+        ppFbo.draw(0, 0);
+        acesShader.end();
+    }
+    else 
+    {
+        ppFbo.draw(0, 0);
     }
 
     gui.begin();
@@ -124,7 +142,7 @@ void ofApp::mouseExited(int x, int y) {
 }
 
 void ofApp::windowResized(int w, int h) {
-
+    ppFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 }
 
 void ofApp::dragEvent(ofDragInfo dragInfo) {

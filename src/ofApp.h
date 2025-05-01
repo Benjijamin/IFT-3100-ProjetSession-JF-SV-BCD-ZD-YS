@@ -49,4 +49,8 @@ private:
     DynamicCursor dynamicCursor;
 
     Editor* currentEditor;
+
+    ofFbo ppFbo;
+    ofShader acesShader;
+    bool tonemapping;
 };

@@ -129,7 +129,7 @@ void Skybox::drawSkybox() const
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 
 	model->drawFaces();
 
@@ -144,11 +144,12 @@ glm::mat4 Skybox::getViewMatrix() const
 	view[3][0] = 0.0f;
 	view[3][1] = 0.0f;
 	view[3][2] = 0.0f;
-	view[0][3] = 0.0f;
-	view[1][3] = 0.0f;
-	view[2][3] = 0.0f;
 
-	return view;
+	//J'ai aucune pourquoi le fbo de post-processing flip uniquement la skybox, mais voici le duct-tape
+	//Il faut aussi inverser l'ordre des vertex pour le culling
+	glm::mat4 flipY = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f));
+
+	return flipY * view;
 }
 
 glm::mat4 Skybox::getProjectionMatrix() const

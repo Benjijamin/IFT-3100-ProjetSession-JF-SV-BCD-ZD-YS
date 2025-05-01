@@ -19,6 +19,7 @@ public:
     void addPrimitiveNode(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent);
     void addModelNode(const std::string& path, std::shared_ptr<SceneNode> parent);
     void addLightNode(std::shared_ptr<ofLight> light, const std::string& name, std::shared_ptr<SceneNode> parent);
+    //void addSurfaceNode(std::shared_ptr<ofMesh> mesh, const std::string& name, std::shared_ptr<SceneNode> parent);
 
     void unloadNodes(const std::string& path);
     void deleteNode(std::shared_ptr<SceneNode> node);

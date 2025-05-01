@@ -97,6 +97,11 @@ std::shared_ptr<ofMaterial> SceneNode::getMaterial() const {
     return material;
 }
 
+//void SceneNode::setSurface() {
+//    surface = std::make_shared<ofMesh>();
+//    setDefaultMaterial();
+//}
+
 void SceneNode::setLight(std::shared_ptr<ofLight> newLight) {
     this->light = newLight;
 
@@ -129,6 +134,9 @@ void SceneNode::customDraw() {
     else if (model) {
         model->drawFaces();
     }
+    //else if (surface) {
+    //    drawSurface();
+    //}
     else {
         drawPrimitive();
     }
@@ -186,6 +194,40 @@ void SceneNode::drawPrimitive() {
 
     texture.unbind();
 }
+
+//void SceneNode::drawSurface() {
+//    ofMesh mesh;
+//    float meshSize = 100.0f;
+//
+//    vector<ofVec3f> pts;
+//    pts.push_back(ofVec3f(0.0f, 0.0f, 0.0f));
+//    pts.push_back(ofVec3f(meshSize / 2.0f, meshSize, 0.0f));
+//    pts.push_back(ofVec3f(meshSize, 0.0f, 0.0f));
+//    pts.push_back(ofVec3f(meshSize, meshSize, meshSize / 2.0f));
+//    pts.push_back(ofVec3f(meshSize, 0.0f, meshSize));
+//    pts.push_back(ofVec3f(meshSize / 2.0f, meshSize, meshSize));
+//    pts.push_back(ofVec3f(0.0f, 0.0f, meshSize));
+//    pts.push_back(ofVec3f(0.0f, meshSize, meshSize / 2.0f));
+//
+//    for (int i = 0; i <= meshSize; ++i)
+//    {
+//        float t = (float) i / meshSize;
+//        ofVec3f coords = pow(1 - t, 2) * pts[0] + 2 * (1 - t) * t * pts[1] + pow(t, 2) * pts[2];
+//    }
+//
+//
+//    for (int i = 0; i < meshSize; ++i)
+//    {
+//        for (int j = 0; i < meshSize; ++i)
+//        {
+//            auto t = (float) i / meshSize;
+//            mesh.addVertex(ofPoint((float)j, (float)i, 0.0f));
+//        }
+//    }
+//
+//    // Connecter les sommets de la surface ensemble
+//
+//}
 
 void SceneNode::draw() {
     ofPushMatrix();

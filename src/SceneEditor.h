@@ -35,6 +35,7 @@ private:
 
     void newEmptyObject(const std::string& name, std::shared_ptr<SceneNode> parent);
     void newPrimitiveObject(PrimitiveType primitiveType, const std::string& name, std::shared_ptr<SceneNode> parent);
+    //void newSurfaceObject(const std::string& name, std::shared_ptr<SceneNode> parent);
 
     char* sceneName;
     SceneGraph sceneGraph;

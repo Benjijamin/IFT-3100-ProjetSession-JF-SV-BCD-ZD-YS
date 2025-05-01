@@ -9,7 +9,10 @@ void SceneGraph::setup() {
 }
 
 void SceneGraph::update() {
-
+    if (selectedNode->isSurfaceControl()) 
+    {
+        selectedNode->updateSurface();
+    }
 }
 
 void SceneGraph::draw() {
@@ -72,14 +75,30 @@ void SceneGraph::addLightNode(std::shared_ptr<ofLight> light, const std::string&
     }
 }
 
-//void SceneGraph::addSurfaceNode(const std::string& name, std::shared_ptr<SceneNode> parent) {
-//    auto surfaceNode = std::make_shared<SceneNode>(generateUniqueName(name));
-//    surfaceNode->setSurface();
-//
-//    if (parent) {
-//        parent->addChild(surfaceNode);
-//    }
-//}
+void SceneGraph::addSurfaceNode(const std::string& name, std::shared_ptr<SceneNode> parent) {
+    auto surfaceNode = std::make_shared<SceneNode>(generateUniqueName(name));
+
+    glm::vec3 surfacePos = surfaceNode->getPosition();
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++) 
+        {
+            auto controlPoint = std::make_shared<SceneNode>(generateUniqueName("(" + std::to_string(i) + "," + std::to_string(j) + ")"));
+
+            float x = (i - 1.5f) * 30.0f;
+            float z = (j - 1.5f) * 30.0f;
+            controlPoint->setPosition(surfacePos.x + x, surfacePos.y, surfacePos.z + z);
+
+            surfaceNode->addChild(controlPoint);
+        }
+    }
+
+    surfaceNode->setSurface(Primitives::getBezierSurface(surfaceNode->getControlPoints(), 10));
+
+    if (parent) {
+        parent->addChild(surfaceNode);
+    }
+}
 
 void SceneGraph::unloadNodes(const std::string& path) {
     std::string baseName = std::filesystem::path(path).stem().string();

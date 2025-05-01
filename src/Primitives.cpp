@@ -170,6 +170,71 @@ std::shared_ptr<ofMesh> Primitives::getTetrahedronPrimitive(float size)
 	return primitive;
 }
 
+glm::vec3 bezierCurve(float t, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4)
+{
+	float it = 1.0f - t;
+
+	return (it * it * it * p1) +
+		(3 * t * it * it * p2) +
+		(3 * t * t * it * p3) +
+		(t * t * t * p4);
+}
+
+std::shared_ptr<ofMesh> Primitives::getBezierSurface(std::vector<glm::vec3>& controlPoints, int resolution) 
+{
+	auto mesh = make_shared<ofMesh>();
+	mesh->setMode(OF_PRIMITIVE_TRIANGLES);
+
+	//Bezier dans les deux sens
+	for (int i = 0; i < resolution; ++i)
+	{
+		for (int j = 0; j < resolution; ++j)
+		{
+			float u = (float)i / (resolution - 1);
+			float v = (float)j / (resolution - 1);
+
+			glm::vec3 temp[4];
+
+			for (int k = 0; k < 4; ++k)
+			{
+				glm::vec3 p1 = controlPoints[k * 4 + 0];
+				glm::vec3 p2 = controlPoints[k * 4 + 1];
+				glm::vec3 p3 = controlPoints[k * 4 + 2];
+				glm::vec3 p4 = controlPoints[k * 4 + 3];
+
+				temp[k] = bezierCurve(v, p1, p2, p3, p4);
+			}
+
+			glm::vec3 point = bezierCurve(u, temp[0], temp[1], temp[2], temp[3]);
+
+			mesh->addVertex(point);
+		}
+	}
+
+	for (int y = 0; y < resolution - 1; ++y) 
+	{
+		for (int x = 0; x < resolution - 1; ++x) 
+		{
+			int v1 = x + y * resolution;
+			int v2 = (x + 1) + y * resolution;
+			int v3 = x + (y + 1) * resolution;
+			int v4 = (x + 1) + (y + 1) * resolution;
+
+			mesh->addIndex(v1);
+			mesh->addIndex(v2);
+			mesh->addIndex(v3);
+
+			mesh->addIndex(v2);
+			mesh->addIndex(v4);
+			mesh->addIndex(v3);
+		}
+	}
+
+	mesh->addNormals(calculateNormals(mesh));
+
+	return mesh;
+}
+
 std::vector<glm::vec3> Primitives::calculateNormals(std::shared_ptr<ofMesh> mesh) {
 	std::vector<glm::vec3> normals;
 

@@ -97,11 +97,6 @@ std::shared_ptr<ofMaterial> SceneNode::getMaterial() const {
     return material;
 }
 
-//void SceneNode::setSurface() {
-//    surface = std::make_shared<ofMesh>();
-//    setDefaultMaterial();
-//}
-
 void SceneNode::setLight(std::shared_ptr<ofLight> newLight) {
     this->light = newLight;
 
@@ -122,6 +117,55 @@ void SceneNode::setTexture(const std::string& path)
     texture = textureImage.getTextureReference();
 }
 
+void SceneNode::setSurface(std::shared_ptr<ofMesh> surfaceMesh) 
+{
+    surface = surfaceMesh;
+
+    setDefaultMaterial();
+}
+
+void SceneNode::updateSurface() 
+{
+    auto parent = dynamic_cast<SceneNode*>(getParent());
+
+    if (surface) 
+    {
+        surface = Primitives::getBezierSurface(getControlPoints(), 10);
+    }
+    else if(parent->surface)
+    {
+        parent->surface = Primitives::getBezierSurface(parent->getControlPoints(), 10);
+    }
+}
+
+bool SceneNode::isSurfaceControl() const
+{
+    if (getParent()) 
+    {
+        auto parent = dynamic_cast<SceneNode*>(getParent());
+        if (parent->surface) 
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+std::vector<glm::vec3> SceneNode::getControlPoints() const
+{
+    std::vector<glm::vec3> controlPoints;
+    auto children = getChildren();
+    controlPoints.resize(children.size());
+
+    for (size_t i = 0; i < children.size(); i++)
+    {
+        controlPoints[i] = children[i]->getPosition();
+    }
+
+    return controlPoints;
+}
+
 void SceneNode::customDraw() {
     if (texture.isAllocated())
     {
@@ -134,9 +178,9 @@ void SceneNode::customDraw() {
     else if (model) {
         model->drawFaces();
     }
-    //else if (surface) {
-    //    drawSurface();
-    //}
+    else if (surface) {
+        drawSurface();
+    }
     else {
         drawPrimitive();
     }
@@ -195,40 +239,13 @@ void SceneNode::drawPrimitive() {
     texture.unbind();
 }
 
-//void SceneNode::drawSurface() {
-//    ofMesh mesh;
-//    float meshSize = 100.0f;
-//
-//    vector<ofVec3f> pts;
-//    pts.push_back(ofVec3f(0.0f, 0.0f, 0.0f));
-//    pts.push_back(ofVec3f(meshSize / 2.0f, meshSize, 0.0f));
-//    pts.push_back(ofVec3f(meshSize, 0.0f, 0.0f));
-//    pts.push_back(ofVec3f(meshSize, meshSize, meshSize / 2.0f));
-//    pts.push_back(ofVec3f(meshSize, 0.0f, meshSize));
-//    pts.push_back(ofVec3f(meshSize / 2.0f, meshSize, meshSize));
-//    pts.push_back(ofVec3f(0.0f, 0.0f, meshSize));
-//    pts.push_back(ofVec3f(0.0f, meshSize, meshSize / 2.0f));
-//
-//    for (int i = 0; i <= meshSize; ++i)
-//    {
-//        float t = (float) i / meshSize;
-//        ofVec3f coords = pow(1 - t, 2) * pts[0] + 2 * (1 - t) * t * pts[1] + pow(t, 2) * pts[2];
-//    }
-//
-//
-//    for (int i = 0; i < meshSize; ++i)
-//    {
-//        for (int j = 0; i < meshSize; ++i)
-//        {
-//            auto t = (float) i / meshSize;
-//            mesh.addVertex(ofPoint((float)j, (float)i, 0.0f));
-//        }
-//    }
-//
-//    // Connecter les sommets de la surface ensemble
-//
-//}
-
+void SceneNode::drawSurface() 
+{
+    surface->drawFaces();
+    for (auto& control : children) {
+        ofDrawSphere(control->getPosition(), 1);
+    }
+}
 void SceneNode::draw() {
     ofPushMatrix();
     ofMultMatrix(getLocalTransformMatrix());

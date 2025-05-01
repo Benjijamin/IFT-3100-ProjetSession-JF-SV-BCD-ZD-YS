@@ -37,7 +37,11 @@ public:
     bool hasLight() const;
     std::shared_ptr<ofLight> getLight() const;
 
-   //void setSurface();
+    void setSurface(std::shared_ptr<ofMesh> surfaceMesh);
+    void updateSurface();
+    bool isSurfaceControl() const;
+    std::vector<glm::vec3> getControlPoints() const;
+
 
     void setTexture(const std::string& path);
 
@@ -67,7 +71,8 @@ private:
     std::shared_ptr<ofxAssimpModelLoader> model;
     std::shared_ptr<ofMaterial> material;
     std::shared_ptr<ofLight> light;
-    //std::shared_ptr<ofMesh> surface;
+
+    std::shared_ptr<ofMesh> surface;
 
     SceneNode* parent = nullptr;
     AABB boundingBox;

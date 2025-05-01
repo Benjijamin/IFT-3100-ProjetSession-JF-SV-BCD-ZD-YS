@@ -249,7 +249,7 @@ void SceneEditor::drawSceneGraphNode(std::shared_ptr<SceneNode> node) {
 }
 
 void SceneEditor::handleContextMenu(std::shared_ptr<SceneNode> node) {
-    if (ImGui::BeginPopupContextItem()) {
+    if (!node->isSurfaceControl() && ImGui::BeginPopupContextItem()) {
         if (node != sceneGraph.getRootNode()) {
             if (ImGui::Selectable("Delete")) {
                 if (node->hasLight()) {
@@ -258,6 +258,7 @@ void SceneEditor::handleContextMenu(std::shared_ptr<SceneNode> node) {
 
                 sceneGraph.deleteNode(node);
             }
+            ImGui::Separator();
         }
 
         if (node->hasLight()) {
@@ -265,6 +266,7 @@ void SceneEditor::handleContextMenu(std::shared_ptr<SceneNode> node) {
                 activeLight = node->getLight();
                 isLightPopupOpen = true;
             }
+            ImGui::Separator();
         }
 
         if (node->hasMaterial() && !node->hasLight()) {
@@ -272,17 +274,21 @@ void SceneEditor::handleContextMenu(std::shared_ptr<SceneNode> node) {
                 activeMaterial = node->getMaterial();
                 isMaterialPopupOpen = true;
             }
+            ImGui::Separator();
         }
 
         if (ImGui::Selectable("New Empty")) newEmptyObject("Empty", node);
+
+        ImGui::Separator();
 
         if (ImGui::Selectable("New Sphere")) newPrimitiveObject(PrimitiveType::Sphere, "Sphere", node);
         if (ImGui::Selectable("New Pyramid")) newPrimitiveObject(PrimitiveType::Tetrahedron, "Pyramid", node);
         if (ImGui::Selectable("New Cube")) newPrimitiveObject(PrimitiveType::Cube, "Cube", node);
         if (ImGui::Selectable("New Cylinder")) newPrimitiveObject(PrimitiveType::Cylinder, "Cylinder", node);
         if (ImGui::Selectable("New Cone")) newPrimitiveObject(PrimitiveType::Cone, "Cone", node);
+        if (ImGui::Selectable("New Bezier Surface")) newSurfaceObject("Parametric Surface", node);
 
-        //if (ImGui::Selectable("New Parametric Surface")) newSurfaceObject("Parametric Surface", node);
+        ImGui::Separator();
 
         if (ImGui::Selectable("New Ambient Light")) {
             activeLightType = LightModal::LightType::Ambient;
@@ -338,7 +344,7 @@ void SceneEditor::newPrimitiveObject(PrimitiveType primitiveType, const std::str
     justAddedNode = true;
 }
 
-//void SceneEditor::newSurfaceObject(const std::string& name, std::shared_ptr<SceneNode> parent) {
-//    sceneGraph.addSurfaceNode(name, parent);
-//    justAddedNode = true;
-//}
+void SceneEditor::newSurfaceObject(const std::string& name, std::shared_ptr<SceneNode> parent) {
+    sceneGraph.addSurfaceNode(name, parent);
+    justAddedNode = true;
+}

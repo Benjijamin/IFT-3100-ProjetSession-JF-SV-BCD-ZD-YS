@@ -128,6 +128,60 @@ void SceneEditor::drawGui() {
         }
     }
 
+    if (ImGui::Button("Render Ray Traced Image")) {
+        // Configurer le ray tracer
+        rayTracer.setSceneGraph(&sceneGraph);
+        rayTracer.setCamera(cameraManager.getSelectedCamera());
+
+        // Lancer le ray tracer pour l'image complète
+        rayTracer.render();
+
+        // Tester des rayons directs vers chaque sphère
+        auto allNodes = sceneGraph.getAllNodes();
+        bool anyIntersection = false;
+
+        for (const auto& node : allNodes) {
+            if (node->getPrimitiveType() == PrimitiveType::Sphere) {
+                // Créer un rayon depuis la caméra vers le centre de la sphère
+                glm::vec3 center = node->getGlobalPosition();
+                glm::vec3 rayOrigin = cameraManager.getSelectedCamera()->getGlobalPosition();
+                glm::vec3 rayDirection = glm::normalize(center - rayOrigin);
+
+                Ray directRay(rayOrigin, rayDirection);
+                RayHit directHit = rayTracer.intersectScene(directRay, sceneGraph);
+
+                if (directHit.hit) {
+                    anyIntersection = true;
+                    break;
+                }
+            }
+        }
+
+        // Afficher le résultat dans une popup
+        showIntersectionPopup = true;
+        rayIntersectsSphere = anyIntersection;
+        ImGui::OpenPopup("Intersection Result");
+    }
+
+    // Afficher la popup avec le résultat
+    if (showIntersectionPopup) {
+        if (ImGui::BeginPopup("Intersection Result")) {
+            if (rayIntersectsSphere) {
+                ImGui::Text("Intersection avec une sphere detectee !");
+            }
+            else {
+                ImGui::Text("Aucune intersection.");
+            }
+
+            if (ImGui::Button("Fermer")) {
+                showIntersectionPopup = false;
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+
+
     gizmoManager.drawGui();
     cameraManager.drawGui();
     skybox.drawGui();

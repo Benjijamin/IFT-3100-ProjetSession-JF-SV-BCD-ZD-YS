@@ -151,6 +151,12 @@
     <ClCompile Include="src\Renderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\RayTracer.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ray.cpp">
+      <Filter>src\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -658,6 +664,18 @@
     </ClInclude>
     <ClInclude Include="src\Renderer.h">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RayTracer.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Ray.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RayHit.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sphere.h">
+      <Filter>src\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

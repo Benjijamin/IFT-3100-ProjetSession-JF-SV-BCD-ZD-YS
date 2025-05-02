@@ -9,6 +9,8 @@
 #include "LightModal.h"
 #include "MaterialModal.h"
 #include "Skybox.h"
+#include "RayTracer.h"
+
 
 class SceneEditor : public Editor {
 public:
@@ -61,4 +63,9 @@ private:
     ofEasyCam camera;
 
     Skybox skybox;
+
+    RayTracer rayTracer;
+
+    bool showIntersectionPopup = false;
+    bool rayIntersectsSphere = false;
 };

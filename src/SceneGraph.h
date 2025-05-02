@@ -27,6 +27,7 @@ public:
 
     std::shared_ptr<SceneNode> getRootNode() const;
     std::shared_ptr<SceneNode> getSelectedNode() const;
+    std::vector<std::shared_ptr<SceneNode>> getAllNodes() const;
     void setSelectedNode(std::shared_ptr<SceneNode> node);
 
     bool editNodeName(std::shared_ptr<SceneNode> node, std::string& name);

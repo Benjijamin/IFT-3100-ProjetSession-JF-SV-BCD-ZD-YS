@@ -52,6 +52,9 @@ public:
 
     bool operator==(const SceneNode& other) const;
 
+    PrimitiveType getPrimitiveType() const {return primitiveType;}
+
+
 private:
     void customDraw() override;
 

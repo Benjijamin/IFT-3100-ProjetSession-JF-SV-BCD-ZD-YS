@@ -113,6 +113,20 @@ std::shared_ptr<SceneNode> SceneGraph::getSelectedNode() const {
     return selectedNode;
 }
 
+std::vector<std::shared_ptr<SceneNode>> SceneGraph::getAllNodes() const {
+    std::vector<std::shared_ptr<SceneNode>> nodes;
+
+    std::function<void(std::shared_ptr<SceneNode>)> collect = [&](std::shared_ptr<SceneNode> node) {
+        nodes.push_back(node);
+        for (const auto& child : node->getChildren()) {
+            collect(child);
+        }
+        };
+
+    collect(rootNode);
+    return nodes;
+}
+
 void SceneGraph::setSelectedNode(std::shared_ptr<SceneNode> node) {
     selectedNode = node;
 }

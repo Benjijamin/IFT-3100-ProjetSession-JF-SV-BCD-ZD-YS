@@ -304,3 +304,4 @@ ofBoxPrimitive SceneNode::getBoundingBox() const {
 bool SceneNode::operator==(const SceneNode& other) const {
     return name == other.name;
 }
+

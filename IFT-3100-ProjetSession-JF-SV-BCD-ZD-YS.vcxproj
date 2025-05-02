@@ -122,6 +122,8 @@
     <ClCompile Include="src\AssetBrowser.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
     <ClCompile Include="src\Primitives.cpp" />
+    <ClCompile Include="src\Ray.cpp" />
+    <ClCompile Include="src\RayTracer.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\SceneEditor.cpp" />
     <ClCompile Include="src\SceneGraph.cpp" />
@@ -172,6 +174,9 @@
     <ClInclude Include="src\AssetBrowser.h" />
     <ClInclude Include="src\ImageEditor.h" />
     <ClInclude Include="src\Primitives.h" />
+    <ClInclude Include="src\Ray.h" />
+    <ClInclude Include="src\RayHit.h" />
+    <ClInclude Include="src\RayTracer.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\SceneEditor.h" />
     <ClInclude Include="src\SceneGraph.h" />
@@ -293,6 +298,7 @@
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_textedit.h" />
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_truetype.h" />
     <ClInclude Include="src\Skybox.h" />
+    <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\Viewer2D.h" />
   </ItemGroup>
   <ItemGroup>

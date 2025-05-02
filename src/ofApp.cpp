@@ -8,10 +8,16 @@ void ofApp::setup() {
     ImGui::StyleColorsClassic();
     ofSetBackgroundColor(ofColor(60, 60, 60));
 
+    renderer.setup();
+    materials.setup();
+
+    menuBar.setRenderer(&renderer);
+    menuBar.setMaterial(&materials);
+    menuBar.setup();
+
     imageEditor.setup();
     sceneEditor.setup();
     assetBrowser.setup();
-    menuBar.setup();
     dessinVectoriel.setup();
     dynamicCursor.setup();
 

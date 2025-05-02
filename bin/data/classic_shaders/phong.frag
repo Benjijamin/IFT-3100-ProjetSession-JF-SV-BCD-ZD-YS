@@ -2,8 +2,11 @@
 
 #version 330
 
+// attributs in (de .vert)
 in vec3 surface_position;
 in vec3 surface_normal;
+
+// attribut en sortie
 out vec4 fragment_color;
 
 // matériel

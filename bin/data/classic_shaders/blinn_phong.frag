@@ -2,8 +2,11 @@
 
 #version 330
 
+// attributs in (de .vert)
 in vec3 surface_position;
 in vec3 surface_normal;
+
+// attribut en sortie
 out vec4 fragment_color;
 
 // Matériau
@@ -44,7 +47,7 @@ void main() {
     vec3 n = normalize(surface_normal);
     vec3 v = normalize(-surface_position);
 
-    // 1) Ambient
+    // Ambient
     vec3 ambient = vec3(0.0);
     if(use_light_ambient) {
         ambient = color_ambient * light_ambient;
@@ -53,7 +56,7 @@ void main() {
     vec3 diffuse_sum = vec3(0.0);
     vec3 specular_sum = vec3(0.0);
 
-    // 2) Directionnelle
+    // Directionnelle
     if(use_light_directional) {
         vec3 L = normalize(-light_directional_direction);
         float NdotL = max(dot(n, L), 0.0);
@@ -62,7 +65,7 @@ void main() {
         specular_sum += color_specular * light_directional_diffuse * pow(max(dot(n, H), 0.0), brightness);
     }
 
-    // 3) Ponctuelle
+    // Ponctuelle
     if(use_light_point) {
         vec3 Lp = light_point_position - surface_position;
         float d = length(Lp);
@@ -74,7 +77,7 @@ void main() {
         specular_sum += color_specular * light_point_diffuse * pow(max(dot(n, H), 0.0), brightness) * att;
     }
 
-    // 4) Spot
+    // spot
     if(use_light_spot) {
         vec3 Ls = light_spot_position - surface_position;
         float d = length(Ls);
@@ -89,6 +92,6 @@ void main() {
         specular_sum += color_specular * light_spot_diffuse * pow(max(dot(n, H), 0.0), brightness) * att;
     }
 
-    // Couleur finale
+    // coulor finale
     fragment_color = vec4(ambient + diffuse_sum + specular_sum, 1.0);
 }

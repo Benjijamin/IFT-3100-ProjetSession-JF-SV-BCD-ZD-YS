@@ -145,6 +145,12 @@
     <ClCompile Include="src\Skybox.cpp">
       <Filter>src\components\scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Material.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -221,6 +227,12 @@
     </Filter>
     <Filter Include="src\components\scene">
       <UniqueIdentifier>{2ad1651e-88f0-4790-91bb-a206781f54d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{a9eccfe5-d249-453f-b7cc-0264bea32681}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{e8c9af63-74e0-4f1e-8a82-73b2e5fa2eb4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -641,5 +653,49 @@
     <ClInclude Include="src\Skybox.h">
       <Filter>src\components\scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Material.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\data\classic_shaders\blinn_phong.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\blinn_phong.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\colorFill.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\colorFill.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\gouraud.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\gouraud.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\lambert.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\lambert.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\phong.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\phong.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\toon.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="bin\data\classic_shaders\toon.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

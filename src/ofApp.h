@@ -8,6 +8,8 @@
 #include "DessinVectoriel.h"
 #include "AssetBrowser.h"
 #include "MenuBar.h"
+#include "Renderer.h"
+#include "Material.h"
 #include "DynamicCursor.h"
 
 
@@ -46,6 +48,8 @@ private:
     DessinVectoriel dessinVectoriel;
     AssetBrowser assetBrowser;
     MenuBar menuBar;
+    Renderer renderer;
+    Materials materials;
     DynamicCursor dynamicCursor;
 
     Editor* currentEditor;

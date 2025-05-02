@@ -2,7 +2,7 @@
 
 #version 330
 
-// attributs interpolés à partir des valeurs en sortie du shader de sommets
+// attributs in (de .vert)
 in vec3 surface_position;
 in vec3 surface_normal;
 

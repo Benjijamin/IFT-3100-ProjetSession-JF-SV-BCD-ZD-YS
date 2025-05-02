@@ -115,12 +115,14 @@
     <ClCompile Include="src\GizmoManager.cpp" />
     <ClCompile Include="src\LightModal.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\MaterialModal.cpp" />
     <ClCompile Include="src\MenuBar.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\AssetBrowser.cpp" />
     <ClCompile Include="src\ImageEditor.cpp" />
     <ClCompile Include="src\Primitives.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\SceneEditor.cpp" />
     <ClCompile Include="src\SceneGraph.cpp" />
     <ClCompile Include="src\SceneNode.cpp" />
@@ -163,12 +165,14 @@
     <ClInclude Include="src\FreeFlightCamera.h" />
     <ClInclude Include="src\GizmoManager.h" />
     <ClInclude Include="src\LightModal.h" />
+    <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\MaterialModal.h" />
     <ClInclude Include="src\MenuBar.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\AssetBrowser.h" />
     <ClInclude Include="src\ImageEditor.h" />
     <ClInclude Include="src\Primitives.h" />
+    <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\SceneEditor.h" />
     <ClInclude Include="src\SceneGraph.h" />
     <ClInclude Include="src\SceneNode.h" />
@@ -295,6 +299,20 @@
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
       <Project>{5837595d-aca9-485c-8e76-729040ce4b0b}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\data\classic_shaders\blinn_phong.frag" />
+    <None Include="bin\data\classic_shaders\blinn_phong.vert" />
+    <None Include="bin\data\classic_shaders\colorFill.frag" />
+    <None Include="bin\data\classic_shaders\colorFill.vert" />
+    <None Include="bin\data\classic_shaders\gouraud.frag" />
+    <None Include="bin\data\classic_shaders\gouraud.vert" />
+    <None Include="bin\data\classic_shaders\lambert.frag" />
+    <None Include="bin\data\classic_shaders\lambert.vert" />
+    <None Include="bin\data\classic_shaders\phong.frag" />
+    <None Include="bin\data\classic_shaders\phong.vert" />
+    <None Include="bin\data\classic_shaders\toon.frag" />
+    <None Include="bin\data\classic_shaders\toon.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

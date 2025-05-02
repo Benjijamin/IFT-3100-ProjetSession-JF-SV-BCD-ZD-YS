@@ -22,42 +22,42 @@ void Renderer::setup() {
     //ofSetLogLevel(OF_LOG_VERBOSE);
 
     // paramètres
-    camera_offset = 350.0f; // à changer
-    oscillation_amplitude = 32.0f;
-    oscillation_frequency = 7500.0f;
-    speed_motion = 150.0f;
-    initial_x = 0.0f;
-    initial_z = -100.0f;
-    scale_cube = 100.0f;
-    scale_sphere = 80.0f;
-    scale_chair = 0.618f;
+    //camera_offset = 350.0f; // à changer
+    //oscillation_amplitude = 32.0f;
+    //oscillation_frequency = 7500.0f;
+    //speed_motion = 150.0f;
+    //initial_x = 0.0f;
+    //initial_z = -100.0f;
+    //scale_cube = 100.0f;
+    //scale_sphere = 80.0f;
+    //scale_chair = 0.618f;
 
     // initialisation des variables
-    offset_x = initial_x;
-    offset_z = initial_z;
+    //offset_x = initial_x;
+    //offset_z = initial_z;
 
-    delta_x = speed_motion;
-    delta_z = speed_motion;
+    //delta_x = speed_motion;
+    //delta_z = speed_motion;
 
     // chargement d'un modèle 3D
-    chair.loadModel("geometry/chair_01.obj");
+    //chair.loadModel("geometry/chair_01.obj");
 
     // désactiver le matériau par défaut du modèle
-    chair.disableMaterials();
+    //chair.disableMaterials();
 
     // charger, compiler et linker les sources des shaders
-    shader_color_fill.load("shaders/colorFill");
-    shader_lambert.load("shaders/lambert");
-    shader_gouraud.load("shaders/gouraud");
-    shader_phong.load("shaders/phong");
-    shader_blinn_phong.load("shaders/blinn_phong");
-    shader_toon.load("shaders/toon");
+    shader_color_fill.load("bin/data/classic_shaders/colorFill");
+    shader_lambert.load("bin/data/classic_shaders/lambert");
+    shader_gouraud.load("bin/data/classic_shaders/gouraud");
+    shader_phong.load("bin/data/classic_shaders/phong");
+    shader_blinn_phong.load("bin/data/classic_shaders/blinn_phong");
+    shader_toon.load("bin/data/classic_shaders/toon");
 
     // shader actif au lancement de la scène
     shader_active = ShaderType::blinn_phong;
 
     // initialisation de la scène
-    reset();
+    //reset();
 }
 
 void Renderer::reset() {
@@ -177,12 +177,6 @@ void Renderer::update() {
     case ShaderType::lambert:
         shader_name = "Lambert";
         shader = &shader_lambert;
-        //shader->begin();
-        // — Matériau
-        //shader->setUniform3f("color_ambient", 0.1f, 0.1f, 0.1f);
-        //shader->setUniform3f("color_diffuse", 0.6f, 0.6f, 0.6f);
-        //shaderLambert();
-        //shader->end();
         break;
 
 
@@ -238,9 +232,6 @@ void Renderer::update() {
 
 void Renderer::draw() {
     ofBackground(0);
-    //ofEnableLighting(); // activer l'éclairage dynamique
-    //lighting_on();
-    //light.enable(); // activer la lumière dynamique
 
     shader->begin(); // activer le shader
 
@@ -408,7 +399,7 @@ void Renderer::shaderAttributesDynamicM() const {
     shader->setUniform3f("color_specular", spec.r, spec.g, spec.b);
     shader->setUniform1f("brightness", mat.getShininess());
 
-    // — Lumière ambiante
+    // ambiante
     shader->setUniform1i("use_light_ambient", is_active_light_ambient);
     if (is_active_light_ambient) {
         // couleur ambiante (0–1)
@@ -418,7 +409,7 @@ void Renderer::shaderAttributesDynamicM() const {
             light_ambient.b / 255.0f);
     }
 
-    // — Lumière directionnelle
+    // directionnelle
     shader->setUniform1i("use_light_directional", is_active_light_directional);
     if (is_active_light_directional) {
         // direction locale Z- (vers la lumière)
@@ -429,7 +420,7 @@ void Renderer::shaderAttributesDynamicM() const {
         shader->setUniform3f("light_directional_diffuse", diffDir.r, diffDir.g, diffDir.b);
     }
 
-    // — Lumière ponctuelle
+    // ponctuelle
     shader->setUniform1i("use_light_point", is_active_light_point);
     if (is_active_light_point) {
         glm::vec3 posP = light_point.getGlobalPosition();
@@ -446,7 +437,7 @@ void Renderer::shaderAttributesDynamicM() const {
         shader->setUniform1f("light_point_quadratic", 0.0001f);
     }
 
-    // — Lumière spot
+    // Lumière spot
     shader->setUniform1i("use_light_spot", is_active_light_spot);
     if (is_active_light_spot) {
         glm::vec3 posS = light_spot.getGlobalPosition();

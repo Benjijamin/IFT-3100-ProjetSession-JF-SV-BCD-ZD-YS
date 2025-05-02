@@ -38,7 +38,7 @@ uniform float light_spot_constant;
 uniform float light_spot_linear;
 uniform float light_spot_quadratic;
 
-// Fonction de quantification toon
+// Fonction d'intensite toon
 float toonIntensity(float NdotL) {
     if(NdotL > 0.95) return 1.0;
     else if(NdotL > 0.5) return 0.7;

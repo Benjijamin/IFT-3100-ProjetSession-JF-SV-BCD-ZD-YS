@@ -14,6 +14,8 @@ public:
 
     void setSelectedNode(std::shared_ptr<SceneNode> node);
 
+    void onWindowResize(int w, int h);
+
 private:
     ofxGizmo gizmo;
     ofxGizmo::ofxGizmoType gizmoType;

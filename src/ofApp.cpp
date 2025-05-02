@@ -35,8 +35,8 @@ void ofApp::update() {
     }
 }
 
-void ofApp::draw() {
-
+void ofApp::draw() 
+{
     ppFbo.begin();
     ofClear(0);
     if (currentEditor) {
@@ -143,6 +143,7 @@ void ofApp::mouseExited(int x, int y) {
 
 void ofApp::windowResized(int w, int h) {
     ppFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+    sceneEditor.onWindowResize(w, h);
 }
 
 void ofApp::dragEvent(ofDragInfo dragInfo) {

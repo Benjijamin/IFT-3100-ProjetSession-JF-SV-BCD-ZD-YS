@@ -160,6 +160,11 @@ void SceneEditor::mouseScrolled(int x, int y, float scrollX, float scrollY) {
 
 }
 
+void SceneEditor::onWindowResize(int w, int h) 
+{
+    gizmoManager.onWindowResize(w, h);
+}
+
 void SceneEditor::load(const std::string& path) {
     sceneGraph.addModelNode(path, sceneGraph.getRootNode());
 }

@@ -23,6 +23,8 @@ public:
     void mouseReleased(int x, int y, int button) override;
     void mouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
+    void onWindowResize(int w, int h);
+
     void load(const std::string& path) override;
     void save(const std::string& path) override;
 

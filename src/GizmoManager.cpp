@@ -58,3 +58,8 @@ void GizmoManager::setSelectedNode(std::shared_ptr<SceneNode> node) {
         gizmo.hide();
     }
 }
+
+void GizmoManager::onWindowResize(int w, int h) 
+{
+    gizmo.setViewDimensions(w, h);
+}

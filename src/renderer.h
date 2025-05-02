@@ -114,7 +114,7 @@ public:
 	float oscillate(float time, float frequency, float amplitude);
 
 	// liaison vers la bibliothèque de matériaux
-	void setMaterialsLibrary(Materials* m) { materials = m; }
+	void setMaterial(Materials* m) { materials = m; }
 
 	// choisir le matériau courant par son nom
 	void setCurrentMaterial(const std::string& name) {currentMaterialName = name; }

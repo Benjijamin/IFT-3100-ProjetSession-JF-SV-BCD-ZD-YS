@@ -1,10 +1,12 @@
 #pragma once
-#include "ofMain.h"
+
 #include "ofxImGui.h"
+#include "ofMain.h"
 
 #include "imageEditor.h"
 #include "ScreenCapture.h"
 #include "DessinVectoriel.h"
+#include "renderer.h"
 #include "materials.h"
 
 /*
@@ -19,12 +21,17 @@ public:
 	void drawGui();
 	void exit();
 
-    std::function<void()> onNewDrawing;
-	void setMaterialsLibrary(Materials* m) { materials = m; }
+	std::function<void()> onNewDrawing;
+
+	bool* tonemapping;
+
+	void setMaterial(Materials* m) { materials = m; }
+	void setRenderer(Renderer* r) { renderer = r; }
 
 private:
 	// Objets issus d'autres classes pour liaison avec boutons de l'interface
 	ScreenCapture screenCapture;
+
 
 	// ONGLET DES FICHIERS
 	//----------------------//
@@ -45,23 +52,18 @@ private:
 	void drawExitMenu();
 	void saveProject(const std::string& filePath);
 	void openProject(const std::string& filePath);
-	//----------------------//
-	/*
-	* \brief Gère le bouton 'Edit' de l'interface.
-	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawEditMenu():
-	* \brief > 
-	*/
-	void drawEditMenu();
 
 	//----------------------//
 	/*
 	* \brief Gère le bouton 'Render' de l'interface.
 	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawRenderMenu():
-	* \brief > 
+	* \brief >
 	*/
 	void drawRenderMenu();
 
 	void drawCreateMaterialWindow();
+
+	void loadMaterialFromJson(const std::string& filepath);
 
 	// Fenêtre de modification pour un matériau (version illumination classique)
 	bool showCreateMatWindow = false;
@@ -78,36 +80,23 @@ private:
 	ofLight    previewLight;
 
 	Materials* materials = nullptr;
+	Renderer* renderer = nullptr;
+
+	ShaderType previewShader = ShaderType::blinn_phong;
 
 	//----------------------//
 	/*
 	* \brief Gère le bouton 'Window' de l'interface.
 	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawWindowMenu():
-	* \brief > 
+	* \brief >
 	*/
 	void drawWindowMenu();
 
 	//----------------------//
 	/*
-	* \brief Gère le bouton 'Scene' de l'interface.
-	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawSceneMenu():
-	* \brief > 
-	*/
-	void drawSceneMenu();
-
-	//----------------------//
-	/*
 	* \brief Gère le bouton 'Help' dans l'interface.
 	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawHelpMenu():
-	* \brief > 
+	* \brief >
 	*/
 	void drawHelpMenu();
-
-	//----------------------//
-	/*
-	* \brief Gère le bouton 'Toolbar' à droite de l'interface.
-	* \brief La structure du bouton englobe des «sous-boutons» qui sont des méthodes appellées par drawToolBar():
-	* \brief > 
-	*/
-	void drawToolBar();
 };

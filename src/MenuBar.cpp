@@ -1,13 +1,15 @@
 #include "MenuBar.h"
 
-void MenuBar::setup() { 
-	screenCapture.setup();
+void MenuBar::setup() {
+	// Activer un buffer de profondeur pour la fenêtre de preview de matériau
+	ofFbo::Settings s;
+	s.width = 300;
+	s.height = 300;
+	s.internalformat = GL_RGBA;
+	s.useDepth = true;
+	previewFbo.allocate(s);
 
-	previewFbo.allocate(200, 200, GL_RGBA);
-	previewLight.setup();
-	previewLight.setDiffuseColor(ofFloatColor(1, 1, 1));
-	previewLight.setPosition(0, 0, 200);
-	previewLight.enable();
+	screenCapture.setup();
 }
 void MenuBar::update() { screenCapture.update(); }
 void MenuBar::draw() { screenCapture.draw(); }
@@ -16,7 +18,6 @@ void MenuBar::exit() {}
 void MenuBar::drawGui() {
 	if (ImGui::BeginMainMenuBar()) {
 		drawFileMenu();
-		drawEditMenu();
 		drawRenderMenu();
 		drawWindowMenu();
 		drawHelpMenu();
@@ -24,13 +25,11 @@ void MenuBar::drawGui() {
 		ImGui::EndMainMenuBar();
 	}
 
-	//drawToolBar();
-
 	screenCapture.drawGui();
 }
 
 void MenuBar::drawFileMenu() {
-    if (ImGui::BeginMenu("File")) {
+	if (ImGui::BeginMenu("File")) {
 		drawDrawingMenu();
 
 		ImGui::Separator();
@@ -71,14 +70,6 @@ void MenuBar::drawDrawingMenu() {
 			if (onNewDrawing) onNewDrawing();
 		}
 
-		if (ImGui::MenuItem("Export Drawing")) {
-			
-		}
-
-		if (ImGui::MenuItem("Import Drawing")) {
-			
-		}
-
 		ImGui::EndMenu();
 	}
 }
@@ -109,7 +100,7 @@ void MenuBar::drawSettingsMenu() {
 }
 
 void MenuBar::drawExitMenu() {
-	if (ImGui::MenuItem("Exit")) { 
+	if (ImGui::MenuItem("Exit")) {
 		ofExit();
 	}
 }
@@ -130,78 +121,60 @@ void MenuBar::openProject(const std::string& filePath) {
 	}
 }
 
-
-// MÉTHODES POUR ONGLET 'EDIT'
-void MenuBar::drawEditMenu() {
-	if (ImGui::BeginMenu("Edit")) {
-		if (ImGui::MenuItem("Capture Screenshot")) { screenCapture.captureScreenshot(); }
-
-		ImGui::Separator();
-
-		if (ImGui::MenuItem("Undo", "Ctrl+Z")) {}
-		if (ImGui::MenuItem("Redo", "Ctrl+Y")) {}
-
-		ImGui::Separator();
-
-		if (ImGui::MenuItem("Cut", "Ctrl+X")) {}
-		if (ImGui::MenuItem("Copy", "Ctrl+C")) {}
-		if (ImGui::MenuItem("Paste", "Ctrl+V")) {}
-
-		ImGui::EndMenu();
-	}
-}
-
-
 // MÉTHODES POUR ONGLET 'RENDER'
 void MenuBar::drawRenderMenu() {
 	if (ImGui::BeginMenu("Renderer")) {
 		if (ImGui::BeginMenu("Classic rendering")) {
 			if (ImGui::BeginMenu("Materials")) {
-				if (ImGui::MenuItem("Create material")) { 
-					showCreateMatWindow = true; 
+				if (ImGui::MenuItem("Create material")) {
+					showCreateMatWindow = true;
 				}
 				if (ImGui::MenuItem("Import material")) {
-
+					ofFileDialogResult result = ofSystemLoadDialog("Select a material (.json)", false);
+					if (result.bSuccess) {
+						loadMaterialFromJson(result.getPath());
+						showCreateMatWindow = true;
+					}
 				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Shaders")) {
+
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}
+		if (ImGui::MenuItem("Capture Screenshot")) { screenCapture.captureScreenshot(); }
+
+		ImGui::Separator();
+
+		//ImGui::Checkbox("ACES Tone Mapping", tonemapping);
+
+
 		ImGui::EndMenu();
 	}
 	if (showCreateMatWindow) { drawCreateMaterialWindow(); }
 }
 
 void MenuBar::drawCreateMaterialWindow() {
-	// Begin une fenêtre ImGui flottante
-	ImGui::Begin("Create Material", &showCreateMatWindow,
-		ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Begin("Create Material", &showCreateMatWindow, ImGuiWindowFlags_AlwaysAutoResize);
 
-	// Nom du matériau
-	//ImGui::InputText("Name", &newMatName);
 	ImGui::InputText("Name", newMatNameBuf, IM_ARRAYSIZE(newMatNameBuf));
 
-	// Sliders couleur
 	float amb[3] = { tmpAmbient.r / 255.0f, tmpAmbient.g / 255.0f, tmpAmbient.b / 255.0f };
-	if (ImGui::ColorEdit3("Ambient", amb)) {
-		tmpAmbient = ofColor(amb[0] * 255, amb[1] * 255, amb[2] * 255);
-	}
-	float dif[3] = { tmpDiffuse.r / 255.0f, tmpDiffuse.g / 255.0f, tmpDiffuse.b / 255.0f };
-	if (ImGui::ColorEdit3("Diffuse", dif)) {
-		tmpDiffuse = ofColor(dif[0] * 255, dif[1] * 255, dif[2] * 255);
-	}
-	float spec[3] = { tmpSpecular.r / 255.0f, tmpSpecular.g / 255.0f, tmpSpecular.b / 255.0f };
-	if (ImGui::ColorEdit3("Specular", spec)) {
-		tmpSpecular = ofColor(spec[0] * 255, spec[1] * 255, spec[2] * 255);
-	}
+	ImGui::ColorEdit3("Ambient", amb);
+	tmpAmbient.set(amb[0] * 255, amb[1] * 255, amb[2] * 255);
 
-	// Slider shininess
+	float dif[3] = { tmpDiffuse.r / 255.0f, tmpDiffuse.g / 255.0f, tmpDiffuse.b / 255.0f };
+	ImGui::ColorEdit3("Diffuse", dif);
+	tmpDiffuse.set(dif[0] * 255, dif[1] * 255, dif[2] * 255);
+
+	float spec[3] = { tmpSpecular.r / 255.0f, tmpSpecular.g / 255.0f, tmpSpecular.b / 255.0f };
+	ImGui::ColorEdit3("Specular", spec);
+	tmpSpecular.set(spec[0] * 255, spec[1] * 255, spec[2] * 255);
+
 	ImGui::SliderFloat("Shininess", &tmpShininess, 1.0f, 128.0f);
 
-	// Autres Sliders (Types de texture, par exemple)
-	// ...
-
-	// Boutons Save / Cancel
 	if (ImGui::Button("Save")) {
 		std::string finalName(newMatNameBuf);
 		ofMaterial mat;
@@ -213,52 +186,101 @@ void MenuBar::drawCreateMaterialWindow() {
 		showCreateMatWindow = false;
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Cancel")) {
-		showCreateMatWindow = false;
-	}
+	if (ImGui::Button("Cancel")) showCreateMatWindow = false;
 
 	ImGui::Separator();
 	ImGui::Text("Preview:");
 
-	//— Rendu du preview dans le FBO —
+	if (!previewFbo.isAllocated()) {
+		previewFbo.allocate(200, 200, GL_RGBA);
+		previewCam.setupPerspective(false);
+	}
+
+	static const char* shaderNames[] = { "Color Fill", "Lambert", "Gouraud", "Phong", "Blinn-Phong", "Toon" };
+	int idx = (int)previewShader;
+	if (ImGui::Combo("Shader", &idx, shaderNames, IM_ARRAYSIZE(shaderNames))) { previewShader = (ShaderType)idx; }
+
 	previewFbo.begin();
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	ofClear(0);
 	ofEnableDepthTest();
 	previewCam.begin();
-	// appliquer le matériau temporaire
-	tmpAmbient.normalize(); tmpDiffuse.normalize(); tmpSpecular.normalize();
-	ofSetGlobalAmbientColor(tmpAmbient);
-	previewLight.enable();
-	ofMaterial tmpMat;
-	tmpMat.setAmbientColor(tmpAmbient);
-	tmpMat.setDiffuseColor(tmpDiffuse);
-	tmpMat.setSpecularColor(tmpSpecular);
-	tmpMat.setShininess(tmpShininess);
-	tmpMat.begin();
-	ofDrawSphere(0, 0, 50, 50);  // sphère de presentation
-	tmpMat.end();
-	previewLight.disable();
+	ofShader* sh = nullptr;
+	switch (previewShader) {
+	case ShaderType::color_fill:   sh = &renderer->shader_color_fill; break;
+	case ShaderType::lambert:      sh = &renderer->shader_lambert;    break;
+	case ShaderType::gouraud:      sh = &renderer->shader_gouraud;    break;
+	case ShaderType::phong:        sh = &renderer->shader_phong;      break;
+	case ShaderType::blinn_phong:  sh = &renderer->shader_blinn_phong; break;
+	case ShaderType::toon:         sh = &renderer->shader_toon;       break;
+	}
+	sh->begin();
+	sh->setUniform3f("color_ambient",
+		tmpAmbient.r / 255.f, tmpAmbient.g / 255.f, tmpAmbient.b / 255.f);
+	sh->setUniform3f("color_diffuse",
+		tmpDiffuse.r / 255.f, tmpDiffuse.g / 255.f, tmpDiffuse.b / 255.f);
+	sh->setUniform3f("color_specular",
+		tmpSpecular.r / 255.f, tmpSpecular.g / 255.f, tmpSpecular.b / 255.f);
+	sh->setUniform1f("brightness", tmpShininess);
+
+	sh->setUniform1i("use_light_ambient", 1);
+	sh->setUniform3f("light_ambient", 0.1f, 0.1f, 0.1f);
+	sh->setUniform1i("use_light_directional", 0);
+	sh->setUniform1i("use_light_point", 0);
+	sh->setUniform1i("use_light_spot", 0);
+
+	ofDrawSphere(0, 0, 0, 50);
+	sh->end();
 	previewCam.end();
 	ofDisableDepthTest();
 	previewFbo.end();
 
-	// afficher le FBO dans ImGui
-	ImGui::Image((ImTextureID)(uintptr_t)previewFbo.getTexture().getTextureData().textureID,
-		ImVec2(200, 200));
-
+	//ImGui::Image((ImTextureID)(uintptr_t)previewFbo.getTexture().getTextureData().textureID, ImVec2(200, 200));
+	ImGui::Image((ImTextureID)(uintptr_t)previewFbo.getTexture().getTextureData().textureID, ImVec2(previewFbo.getWidth(), previewFbo.getHeight()));
 	ImGui::End();
 }
+
+void MenuBar::loadMaterialFromJson(const std::string& filepath) {
+	ofJson j;
+	try {
+		j = ofLoadJson(filepath);
+	}
+	catch (...) {
+		ofLogError("MenuBar") << "Erreur lors du chargement du JSON : " << filepath;
+		return;
+	}
+
+	if (!j.contains("ambient") || !j.contains("diffuse") || !j.contains("specular") || !j.contains("shininess")) {
+		ofLogError("MenuBar") << "Fichier JSON invalide pour un matériau.";
+		return;
+	}
+
+	// Appliquer les paramètres au buffer actuel
+	tmpAmbient.set(j["ambient"]["r"].get<float>() * 255,
+		j["ambient"]["g"].get<float>() * 255,
+		j["ambient"]["b"].get<float>() * 255);
+
+	tmpDiffuse.set(j["diffuse"]["r"].get<float>() * 255,
+		j["diffuse"]["g"].get<float>() * 255,
+		j["diffuse"]["b"].get<float>() * 255);
+
+	tmpSpecular.set(j["specular"]["r"].get<float>() * 255,
+		j["specular"]["g"].get<float>() * 255,
+		j["specular"]["b"].get<float>() * 255);
+
+	tmpShininess = j["shininess"].get<float>();
+
+	// Remplir automatiquement le nom (à partir du nom de fichier)
+	std::string filename = ofFilePath::getBaseName(filepath);
+	strncpy(newMatNameBuf, filename.c_str(), IM_ARRAYSIZE(newMatNameBuf));
+}
+
 
 // MÉTHODES POUR ONGLET 'WINDOW'
 void MenuBar::drawWindowMenu() {
 	if (ImGui::BeginMenu("Window")) {
 		if (ImGui::MenuItem("Toggle Fullscreen")) { ofToggleFullscreen(); }
 		if (ImGui::MenuItem("Windowed")) { ofSetFullscreen(false); }
-		if (ImGui::MenuItem("Split canva")) {}
-
-		ImGui::Separator();
-
-		if (ImGui::MenuItem("Reset Layout")) {}
 
 		ImGui::EndMenu();
 	}
@@ -272,19 +294,4 @@ void MenuBar::drawHelpMenu() {
 		}
 		ImGui::EndMenu();
 	}
-}
-
-
-// MÉTHODES POUR BARRE D'OUTILS VERTICALE
-void MenuBar::drawToolBar() {
-	/*
-	ImGui::SetNextWindowPos(ImVec2(ofGetWidth() - 150, 20));
-	ImGui::SetNextWindowSize(ImVec2(50, 500));
-
-	ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-	
-	if (ImGui::Button("Dessin Vectoriel", ImVec2(100, 40))) { dessinVectoriel.begin(); }
-
-	ImGui::End();
-	*/
 }

@@ -10,22 +10,25 @@ void ofApp::setup() {
     ImGui::StyleColorsClassic();
     ofSetBackgroundColor(ofColor(60, 60, 60));
 
+    renderer.setup();
+    //materials.setup();
+    menuBar.setup();
+
+    menuBar.setRenderer(&renderer);
+    menuBar.setMaterial(&materials);
+    //renderer.setMaterial(&materials);
+
     imageEditor.setup();
     sceneEditor.setup();
     assetBrowser.setup();
-    menuBar.setup();
     dessinVectoriel.setup();
     dynamicCursor.setup();
-    materials.setup();
-    renderer.setup();
 
     currentEditor = nullptr;
 
     menuBar.onNewDrawing = std::bind(&ofApp::handleNewDrawing, this);
 
     materialNames = materials.list();
-    renderer.setMaterialsLibrary(&materials);
-    menuBar.setMaterialsLibrary(&materials);
 
     assetBrowser.onAssetAddition = std::bind(&ofApp::handleAssetAddition, this);
     assetBrowser.onAssetRemoval = std::bind(&ofApp::handleAssetRemoval, this);

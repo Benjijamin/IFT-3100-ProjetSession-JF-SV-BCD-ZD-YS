@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "ofMain.h"
 #include <unordered_map>
@@ -7,30 +7,30 @@
 
 /**
 * @class Materials
-* @brief Classe gérant les matériaux de base, création, importation, exportation et sauvegarde.
+* @brief Classe gï¿½rant les matï¿½riaux de base, crï¿½ation, importation, exportation et sauvegarde.
 */
 class Materials {
 public:
-	/// Initialise le manager : crée le dossier data/materials, charge le default et les fichiers JSON existants
+	/// Initialise le manager : crï¿½e le dossier data/materials, charge le default et les fichiers JSON existants
 	void setup();
 
-	/// Crée ou remplace un matériau et l'enregistre sur disque
+	/// Crï¿½e ou remplace un matï¿½riau et l'enregistre sur disque
 	void create(const std::string& name, const ofMaterial& material);
 
 	/// Retourne la liste des noms disponibles
 	std::vector<std::string> list() const;
 
-	/// Getter, Accède au matériau par nom, fallback sur "default"
+	/// Getter, Accï¿½de au matï¿½riau par nom, fallback sur "default"
 	const ofMaterial& get(const std::string& name) const;
 
 private:
-	/// Construit le matériau "default"
+	/// Construit le matï¿½riau "default"
 	void makeDefaultMaterial();
 
-	/// Sauvegarde un matériau nommé en JSON dans data/materials/name.json
+	/// Sauvegarde un matï¿½riau nommï¿½ en JSON dans data/materials/name.json
 	void saveMaterial(const std::string& name) const;
 
-	/// Charge tous les .json de data/materials/ en matériaux
+	/// Charge tous les .json de data/materials/ en matï¿½riaux
 	void loadMaterials();
 
 	std::unordered_map<std::string, ofMaterial> materials;

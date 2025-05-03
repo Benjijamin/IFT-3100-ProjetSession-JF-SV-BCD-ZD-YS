@@ -160,6 +160,7 @@
     <ClInclude Include="src\AABB.h" />
     <ClInclude Include="src\CameraManager.h" />
     <ClInclude Include="src\ColorPicker.h" />
+    <ClInclude Include="src\Cube.h" />
     <ClInclude Include="src\CustomSlider.h" />
     <ClInclude Include="src\DessinVectoriel.h" />
     <ClInclude Include="src\DynamicCursor.h" />
@@ -299,6 +300,7 @@
     <ClInclude Include="..\..\..\addons\ofxImGui\libs\imgui\src\imstb_truetype.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\Sphere.h" />
+    <ClInclude Include="src\Tetrahedron.h" />
     <ClInclude Include="src\Viewer2D.h" />
   </ItemGroup>
   <ItemGroup>

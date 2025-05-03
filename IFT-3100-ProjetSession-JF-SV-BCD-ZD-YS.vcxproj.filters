@@ -677,6 +677,12 @@
     <ClInclude Include="src\Sphere.h">
       <Filter>src\components</Filter>
     </ClInclude>
+    <ClInclude Include="src\Cube.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Tetrahedron.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\data\classic_shaders\blinn_phong.frag">

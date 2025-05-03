@@ -68,4 +68,7 @@ private:
 
     bool showIntersectionPopup = false;
     bool rayIntersectsSphere = false;
+
+    std::string intersectionInfo;
+
 };

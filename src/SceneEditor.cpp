@@ -128,6 +128,8 @@ void SceneEditor::drawGui() {
         }
     }
 
+    ImGui::Begin("RayTracing");
+
     if (ImGui::Button("Render Ray Traced Image")) {
         // Configurer le ray tracer
         rayTracer.setSceneGraph(&sceneGraph);
@@ -136,38 +138,84 @@ void SceneEditor::drawGui() {
         // Lancer le ray tracer pour l'image complète
         rayTracer.render();
 
-        // Tester des rayons directs vers chaque sphère
+        // Variables pour compter les intersections par type
+        int sphereCount = 0;
+        int cubeCount = 0;
+        int tetraCount = 0;
+
+        // Tester des rayons directs vers chaque primitive
         auto allNodes = sceneGraph.getAllNodes();
-        bool anyIntersection = false;
 
         for (const auto& node : allNodes) {
-            if (node->getPrimitiveType() == PrimitiveType::Sphere) {
-                // Créer un rayon depuis la caméra vers le centre de la sphère
+            // Vérifier seulement pour les types de primitives qu'on cherche
+            if (node->getPrimitiveType() == PrimitiveType::Sphere ||
+                node->getPrimitiveType() == PrimitiveType::Cube ||
+                node->getPrimitiveType() == PrimitiveType::Tetrahedron) {
+
+                // Créer un rayon depuis la caméra vers le centre de la primitive
                 glm::vec3 center = node->getGlobalPosition();
                 glm::vec3 rayOrigin = cameraManager.getSelectedCamera()->getGlobalPosition();
                 glm::vec3 rayDirection = glm::normalize(center - rayOrigin);
-
                 Ray directRay(rayOrigin, rayDirection);
+
+                // Vérifier l'intersection
                 RayHit directHit = rayTracer.intersectScene(directRay, sceneGraph);
 
-                if (directHit.hit) {
-                    anyIntersection = true;
-                    break;
+                if (directHit.hit && directHit.node) {
+                    // Incrémenter le compteur approprié selon le type
+                    switch (directHit.node->getPrimitiveType()) {
+                    case PrimitiveType::Sphere:
+                        sphereCount++;
+                        break;
+                    case PrimitiveType::Cube:
+                        cubeCount++;
+                        break;
+                    case PrimitiveType::Tetrahedron:
+                        tetraCount++;
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
         }
 
         // Afficher le résultat dans une popup
         showIntersectionPopup = true;
-        rayIntersectsSphere = anyIntersection;
+        rayIntersectsSphere = (sphereCount > 0);
+
+        // Stocker les compteurs dans des membres temporaires ou les utiliser directement
+        // Si vous avez besoin de les utiliser plus tard, ajoutez-les à la classe SceneEditor
+
         ImGui::OpenPopup("Intersection Result");
+
+        // Stockez ces valeurs dans des variables pour les utiliser dans la popup
+        intersectionInfo = "Intersection avec: ";
+        bool needComma = false;
+
+        if (sphereCount > 0) {
+            intersectionInfo += std::to_string(sphereCount) + " sphere" + (sphereCount > 1 ? "s" : "");
+            needComma = true;
+        }
+
+        if (cubeCount > 0) {
+            if (needComma) intersectionInfo += ", ";
+            intersectionInfo += std::to_string(cubeCount) + " cube" + (cubeCount > 1 ? "s" : "");
+            needComma = true;
+        }
+
+        if (tetraCount > 0) {
+            if (needComma) intersectionInfo += ", ";
+            intersectionInfo += std::to_string(tetraCount) + " tetrahedron" + (tetraCount > 1 ? "s" : "");
+        }
     }
 
     // Afficher la popup avec le résultat
     if (showIntersectionPopup) {
         if (ImGui::BeginPopup("Intersection Result")) {
-            if (rayIntersectsSphere) {
-                ImGui::Text("Intersection avec une sphere detectee !");
+            if (rayIntersectsSphere || !intersectionInfo.empty()) {
+                ImGui::Text("Intersections detectees!");
+                ImGui::Text("%s", intersectionInfo.c_str());
             }
             else {
                 ImGui::Text("Aucune intersection.");
@@ -180,6 +228,7 @@ void SceneEditor::drawGui() {
             ImGui::EndPopup();
         }
     }
+    ImGui::End();
 
 
     gizmoManager.drawGui();

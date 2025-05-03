@@ -106,35 +106,52 @@ glm::vec3 RayTracer::traceRay(const Ray& ray, int depth) {
 }
 
 RayHit RayTracer::intersectScene(const Ray& ray, const SceneGraph& sceneGraph) {
-    RayHit closestHit;
-    float minDistance = std::numeric_limits<float>::max();
+    RayHit hit;
+    hit.hit = false;
+    hit.distance = FLT_MAX;
 
-    for (const auto& node : sceneGraph.getAllNodes()) {
-        // Vérifie si c’est une sphère
-        if (node->getPrimitiveType() == PrimitiveType::Sphere) {
-            glm::vec3 center = node->getGlobalPosition();  // position du nœud dans la scène
-            float radius = 100.0f;  // rayon par défaut
+    // Iterate through scene nodes
+    auto nodes = sceneGraph.getAllNodes();
+    for (const auto& node : nodes) {
+        // Ignore empty nodes
+        if (node->getPrimitiveType() == PrimitiveType::None) {
+            continue;
+        }
 
-            // Test d'intersection rayon-sphère
-            glm::vec3 oc = ray.getOrigin() - center;
-            float a = glm::dot(ray.getDirection(), ray.getDirection());
-            float b = 2.0f * glm::dot(oc, ray.getDirection());
-            float c = glm::dot(oc, oc) - radius * radius;
-            float discriminant = b * b - 4 * a * c;
+        // Get node's global transform and position
+        glm::vec3 position = node->getGlobalPosition();
+        glm::mat4 transform = node->getGlobalTransformMatrix();
 
-            if (discriminant >= 0) {
-                float t = (-b - std::sqrt(discriminant)) / (2.0f * a);
-                if (t > 0.001f && t < minDistance) {
-                    minDistance = t;
-                    glm::vec3 hitPoint = ray.getOrigin() + t * ray.getDirection();
-                    glm::vec3 normal = glm::normalize(hitPoint - center);
-                    closestHit = RayHit{ true,t, hitPoint, normal, node.get()};
+        // Handle different primitive types
+        switch (node->getPrimitiveType()) {
+            case PrimitiveType::Sphere: {
+                Sphere sphere(position, 100.0f); // Adjust size based on your scene scale
+                if (sphere.intersect(ray, hit)) {
+                    hit.node = const_cast<SceneNode*>(node.get());
                 }
+                break;
             }
+            case PrimitiveType::Cube: {
+                Cube cube(position, 100.0f, transform); // Using the same size as your primitives
+                if (cube.intersect(ray, hit)) {
+                    hit.node = const_cast<SceneNode*>(node.get());
+                }
+                break;
+            }
+            case PrimitiveType::Tetrahedron: {
+                // Create a tetrahedron with the same size as your primitive
+                Tetrahedron tetrahedron(100.0f, position);
+                if (tetrahedron.intersect(ray, hit)) {
+                    hit.node = const_cast<SceneNode*>(node.get());
+                }
+                break;
+            }
+            default:
+                break;
         }
     }
 
-    return closestHit;
+    return hit;
 }
 
 glm::vec3 RayTracer::calculateLighting(const RayHit& hit, const Ray& ray, int depth) {

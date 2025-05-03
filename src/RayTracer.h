@@ -6,6 +6,8 @@
 #include "SceneGraph.h"
 #include "CameraManager.h"
 #include "Sphere.h"
+#include "Cube.h"
+#include "Tetrahedron.h"
 
 
 class RayTracer {
